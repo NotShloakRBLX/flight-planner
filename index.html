@@ -6,135 +6,162 @@
   <title>MSFS Flight Planner</title>
   <style>
     :root {
-      --bg-1: #060816;
-      --bg-2: #0b1230;
-      --card: rgba(18, 24, 52, 0.62);
-      --card-border: rgba(255, 255, 255, 0.12);
-      --text: #f5f7ff;
-      --muted: #b6bfdc;
-      --glow-1: #7a5cff;
-      --glow-2: #46a6ff;
-      --glow-3: #9f7bff;
-      --shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+      --bg-1: #050816;
+      --bg-2: #0a1130;
+      --bg-3: #04060f;
+      --card: rgba(15, 20, 42, 0.72);
+      --border: rgba(255, 255, 255, 0.09);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #f7f9ff;
+      --muted: #aeb7d7;
+      --purple: #7c5cff;
+      --blue: #4ca7ff;
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
       --radius-xl: 34px;
-      --radius-lg: 26px;
-      --radius-md: 20px;
-      --blur: 20px;
-      --transition: 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+      --radius-lg: 24px;
+      --transition: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
-      padding: 0;
       width: 100%;
       min-height: 100%;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 15% 18%, rgba(122, 92, 255, 0.22), transparent 26%),
-        radial-gradient(circle at 82% 24%, rgba(70, 166, 255, 0.19), transparent 28%),
-        radial-gradient(circle at 50% 82%, rgba(159, 123, 255, 0.12), transparent 34%),
-        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, #05070f 100%);
-      overflow-x: hidden;
+        radial-gradient(circle at 14% 18%, rgba(124, 92, 255, 0.18), transparent 24%),
+        radial-gradient(circle at 84% 22%, rgba(76, 167, 255, 0.14), transparent 24%),
+        radial-gradient(circle at 50% 90%, rgba(124, 92, 255, 0.10), transparent 28%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--bg-3) 100%);
+      overflow: hidden;
     }
 
     body {
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
     }
 
-    .background-grid {
+    .grid {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.18;
+      opacity: 0.14;
       background-image:
         linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
       background-size: 34px 34px;
-      mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
-      -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+      mask-image: radial-gradient(circle at center, black 32%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle at center, black 32%, transparent 100%);
     }
 
     .orb {
       position: fixed;
       border-radius: 999px;
       filter: blur(70px);
-      opacity: 0.5;
       pointer-events: none;
-      animation: floatOrb 12s ease-in-out infinite;
+      opacity: 0.42;
+      animation: drift 12s ease-in-out infinite;
     }
 
     .orb.one {
-      width: 280px;
-      height: 280px;
-      background: rgba(122, 92, 255, 0.24);
-      top: 8%;
-      left: 8%;
+      width: 260px;
+      height: 260px;
+      background: rgba(124, 92, 255, 0.18);
+      top: 6%;
+      left: 6%;
     }
 
     .orb.two {
-      width: 320px;
-      height: 320px;
-      background: rgba(70, 166, 255, 0.22);
-      right: 7%;
-      bottom: 10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(76, 167, 255, 0.16);
+      right: 6%;
+      bottom: 8%;
       animation-delay: -4s;
     }
 
-    .orb.three {
-      width: 220px;
-      height: 220px;
-      background: rgba(159, 123, 255, 0.18);
-      left: 50%;
-      top: 62%;
-      transform: translateX(-50%);
-      animation-delay: -7s;
-    }
-
-    @keyframes floatOrb {
+    @keyframes drift {
       0%, 100% {
         transform: translateY(0px) scale(1);
       }
       50% {
-        transform: translateY(-18px) scale(1.04);
+        transform: translateY(-16px) scale(1.04);
       }
     }
 
-    .shell {
+    .page-wrap {
       position: relative;
       width: 100%;
-      max-width: 1180px;
+      min-height: 100vh;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      padding: 24px;
+      transition:
+        opacity var(--transition),
+        transform var(--transition),
+        visibility var(--transition);
+    }
+
+    .screen.home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transform: scale(1);
+      visibility: visible;
+      z-index: 2;
+    }
+
+    .screen.admin {
+      opacity: 0;
+      transform: scale(1.02) translateY(18px);
+      visibility: hidden;
       z-index: 1;
     }
 
-    .hero-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 38px;
-      background: linear-gradient(180deg, rgba(18, 24, 52, 0.75), rgba(11, 16, 34, 0.72));
-      border: 1px solid var(--card-border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(var(--blur));
-      -webkit-backdrop-filter: blur(var(--blur));
-      padding: 34px;
+    .page-wrap.admin-open .screen.home {
+      opacity: 0;
+      transform: scale(0.985) translateY(-10px);
+      visibility: hidden;
+      pointer-events: none;
     }
 
-    .hero-card::before {
+    .page-wrap.admin-open .screen.admin {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      visibility: visible;
+      z-index: 3;
+    }
+
+    .hero-card {
+      width: 100%;
+      max-width: 1180px;
+      border-radius: 38px;
+      padding: 34px;
+      background: linear-gradient(180deg, rgba(17, 23, 49, 0.76), rgba(10, 14, 30, 0.72));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before,
+    .admin-shell::before {
       content: "";
       position: absolute;
       inset: 0;
       padding: 1px;
       border-radius: inherit;
-      background: linear-gradient(135deg, rgba(122,92,255,0.65), rgba(70,166,255,0.5), rgba(255,255,255,0.15));
+      background: linear-gradient(135deg, rgba(124,92,255,0.58), rgba(76,167,255,0.42), rgba(255,255,255,0.12));
       -webkit-mask:
         linear-gradient(#000 0 0) content-box,
         linear-gradient(#000 0 0);
@@ -146,39 +173,33 @@
     .hero-card::after {
       content: "";
       position: absolute;
-      inset: auto -10% -40% auto;
-      width: 360px;
-      height: 360px;
-      background: radial-gradient(circle, rgba(122,92,255,0.2), transparent 65%);
+      right: -120px;
+      bottom: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(124,92,255,0.20), transparent 65%);
       pointer-events: none;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 34px;
-      position: relative;
-      z-index: 1;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 14px;
+      margin-bottom: 34px;
+      position: relative;
+      z-index: 1;
     }
 
-    .brand-badge {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      background: linear-gradient(145deg, rgba(122,92,255,0.28), rgba(70,166,255,0.24));
-      border: 1px solid rgba(255,255,255,0.12);
+    .brand-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
       display: grid;
       place-items: center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-      font-size: 22px;
+      background: linear-gradient(145deg, rgba(124,92,255,0.22), rgba(76,167,255,0.16));
+      border: 1px solid rgba(255,255,255,0.10);
+      font-size: 1.25rem;
     }
 
     .brand-text h1 {
@@ -190,197 +211,119 @@
 
     .brand-text p {
       margin: 4px 0 0;
-      color: var(--muted);
       font-size: 0.88rem;
-      letter-spacing: 0.02em;
+      color: var(--muted);
     }
 
-    .status-pill {
-      display: inline-flex;
+    .home-layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 28px;
       align-items: center;
-      gap: 10px;
-      padding: 11px 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: #d9e2ff;
-      font-size: 0.9rem;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      white-space: nowrap;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #7cf7b7, #33d48b);
-      box-shadow: 0 0 16px rgba(73, 255, 170, 0.8);
-    }
-
-    .hero-grid {
       position: relative;
       z-index: 1;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 26px;
-      align-items: stretch;
     }
 
-    .hero-copy {
-      padding: 20px 4px 10px 4px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      padding: 10px 14px;
-      margin-bottom: 18px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.09);
-      color: #d7def8;
-      font-size: 0.82rem;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--glow-1), var(--glow-2));
-      box-shadow: 0 0 14px rgba(122, 92, 255, 0.7);
-    }
-
-    .hero-copy h2 {
+    .copy h2 {
       margin: 0;
-      font-size: clamp(2.25rem, 5vw, 4.4rem);
+      font-size: clamp(2.3rem, 5vw, 4.5rem);
       line-height: 0.95;
-      letter-spacing: -0.045em;
+      letter-spacing: -0.05em;
       font-weight: 800;
-      max-width: 640px;
+      max-width: 630px;
     }
 
-    .hero-copy h2 span {
-      display: inline-block;
-      background: linear-gradient(135deg, #ffffff 0%, #cfdbff 35%, #9fc4ff 65%, #b79cff 100%);
+    .copy h2 span {
+      background: linear-gradient(135deg, #ffffff 0%, #cfdcff 38%, #9ec7ff 68%, #b89dff 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
-    .hero-copy p {
-      margin: 22px 0 0;
-      max-width: 600px;
+    .copy p {
+      margin: 20px 0 0;
+      max-width: 560px;
       color: var(--muted);
-      font-size: 1.02rem;
+      font-size: 1rem;
       line-height: 1.75;
     }
 
-    .hero-footer {
-      margin-top: 26px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .mini-chip {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #d6dcf8;
-      font-size: 0.9rem;
-    }
-
-    .login-panel {
-      position: relative;
+    .panel {
       border-radius: 28px;
       padding: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.02));
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
       border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       display: flex;
       flex-direction: column;
       gap: 16px;
       min-height: 100%;
     }
 
-    .panel-header {
+    .panel-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 14px;
-      padding: 6px 8px 2px;
+      padding: 6px 8px 0;
     }
 
-    .panel-header h3 {
+    .panel-head h3 {
       margin: 0;
       font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.02em;
     }
 
-    .panel-header p {
+    .panel-head p {
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 0.92rem;
       line-height: 1.55;
-      max-width: 320px;
     }
 
-    .plane-pill {
+    .mini-badge {
       padding: 10px 12px;
       border-radius: 16px;
-      background: rgba(122, 92, 255, 0.12);
-      border: 1px solid rgba(122, 92, 255, 0.18);
+      background: rgba(124, 92, 255, 0.12);
+      border: 1px solid rgba(124, 92, 255, 0.16);
       font-size: 1rem;
     }
 
-    .login-option {
+    .option {
       position: relative;
       overflow: hidden;
+      width: 100%;
       border: 1px solid rgba(255,255,255,0.09);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.018)),
-        rgba(10, 13, 28, 0.55);
       border-radius: 24px;
       padding: 20px;
-      min-height: 192px;
-      text-align: left;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        rgba(8, 12, 28, 0.58);
       color: var(--text);
-      cursor: default;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 18px 34px rgba(0,0,0,0.22);
       transition:
         transform var(--transition),
         border-color var(--transition),
-        background var(--transition),
-        box-shadow var(--transition);
-      box-shadow: 0 16px 34px rgba(0,0,0,0.2);
+        box-shadow var(--transition),
+        background var(--transition);
     }
 
-    .login-option::before {
+    .option::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top right, rgba(122,92,255,0.16), transparent 40%);
-      opacity: 0.9;
+      background: radial-gradient(circle at top right, rgba(124,92,255,0.16), transparent 40%);
       pointer-events: none;
     }
 
-    .login-option:hover {
+    .option:hover {
       transform: translateY(-4px);
-      border-color: rgba(154, 186, 255, 0.24);
-      box-shadow: 0 24px 40px rgba(0,0,0,0.28);
+      border-color: rgba(155, 189, 255, 0.24);
+      box-shadow: 0 24px 42px rgba(0,0,0,0.28);
     }
 
-    .login-option:active {
+    .option:active {
       transform: translateY(-1px) scale(0.995);
     }
 
@@ -389,7 +332,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       position: relative;
       z-index: 1;
     }
@@ -400,34 +343,32 @@
       border-radius: 18px;
       display: grid;
       place-items: center;
-      font-size: 1.3rem;
+      font-size: 1.28rem;
+      background: linear-gradient(145deg, rgba(124,92,255,0.18), rgba(76,167,255,0.12));
       border: 1px solid rgba(255,255,255,0.1);
-      background: linear-gradient(145deg, rgba(122,92,255,0.18), rgba(70,166,255,0.12));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
 
     .option-tag {
       padding: 9px 11px;
       border-radius: 999px;
-      font-size: 0.78rem;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: #dae4ff;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
+      color: #dce5ff;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       white-space: nowrap;
     }
 
-    .login-option h4 {
+    .option h4 {
       margin: 0;
-      font-size: 1.24rem;
+      font-size: 1.22rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
       position: relative;
       z-index: 1;
     }
 
-    .login-option p {
+    .option p {
       margin: 10px 0 18px;
       color: var(--muted);
       font-size: 0.95rem;
@@ -443,214 +384,327 @@
       gap: 14px;
       position: relative;
       z-index: 1;
-      margin-top: auto;
     }
 
     .option-note {
+      color: #d8e1ff;
       font-size: 0.88rem;
-      color: #d6defa;
     }
 
-    .option-arrow {
+    .arrow {
       width: 42px;
       height: 42px;
       border-radius: 14px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255,255,255,0.09);
       background: rgba(255,255,255,0.04);
-      color: #eff3ff;
+      border: 1px solid rgba(255,255,255,0.09);
       transition: transform var(--transition), background var(--transition);
     }
 
-    .login-option:hover .option-arrow {
+    .option:hover .arrow {
       transform: translateX(3px);
       background: rgba(255,255,255,0.08);
     }
 
-    .bottom-strip {
-      position: relative;
-      z-index: 1;
-      margin-top: 18px;
+    .admin-screen-inner {
+      width: 100%;
+      height: 100%;
       display: flex;
-      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 18px;
+    }
+
+    .admin-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1360px;
+      min-height: calc(100vh - 48px);
+      border-radius: 36px;
+      background: linear-gradient(180deg, rgba(14, 19, 42, 0.78), rgba(8, 11, 24, 0.74));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 34px 38px 30px;
+      overflow: hidden;
+    }
+
+    .admin-shell::after {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 300px;
+      height: 300px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(76,167,255,0.16), transparent 66%);
+      pointer-events: none;
+    }
+
+    .admin-topbar {
+      display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding: 14px 6px 2px;
-      color: var(--muted);
-      font-size: 0.88rem;
+      gap: 18px;
+      margin-bottom: 42px;
+      position: relative;
+      z-index: 1;
     }
 
-    .bottom-strip .left,
-    .bottom-strip .right {
+    .admin-left {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
       align-items: center;
+      gap: 14px;
     }
 
-    .thin-divider {
-      width: 1px;
-      height: 12px;
-      background: rgba(255,255,255,0.12);
+    .back-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition:
+        transform var(--transition),
+        background var(--transition),
+        border-color var(--transition);
     }
 
-    @media (max-width: 980px) {
-      .hero-grid {
+    .back-btn:hover {
+      transform: translateX(-2px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .admin-label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .admin-label span:first-child {
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .admin-label span:last-child {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .admin-badge {
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.045);
+      color: #dce4ff;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .flights-header {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+    }
+
+    .flights-title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+      font-weight: 800;
+      letter-spacing: -0.045em;
+      color: #ffffff;
+    }
+
+    .flights-title .count {
+      opacity: 0.96;
+    }
+
+    .header-line-wrap {
+      position: relative;
+      margin-top: 18px;
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .header-line {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(155,190,255,0.58) 48%, rgba(124,92,255,0.34) 100%);
+      transform-origin: left center;
+      animation: lineReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes lineReveal {
+      0% {
+        transform: scaleX(0);
+        opacity: 0.2;
+      }
+      100% {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .home-layout {
         grid-template-columns: 1fr;
       }
-
-      .hero-copy {
-        padding-top: 4px;
-      }
-
-      .hero-copy h2 {
-        max-width: 100%;
-      }
     }
 
-    @media (max-width: 640px) {
-      body {
+    @media (max-width: 720px) {
+      .screen {
         padding: 16px;
       }
 
-      .hero-card {
-        padding: 18px;
+      .hero-card,
+      .admin-shell {
         border-radius: 28px;
       }
 
-      .topbar {
-        margin-bottom: 20px;
+      .hero-card {
+        padding: 20px;
+      }
+
+      .admin-shell {
+        padding: 24px 20px;
+        min-height: calc(100vh - 32px);
+      }
+
+      .admin-topbar {
         flex-direction: column;
         align-items: flex-start;
-      }
-
-      .status-pill {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .hero-copy h2 {
-        font-size: 2.4rem;
-      }
-
-      .hero-copy p {
-        font-size: 0.95rem;
-        line-height: 1.7;
-      }
-
-      .login-option {
-        min-height: 178px;
-      }
-
-      .bottom-strip {
-        font-size: 0.82rem;
+        margin-bottom: 28px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="background-grid"></div>
+  <div class="grid"></div>
   <div class="orb one"></div>
   <div class="orb two"></div>
-  <div class="orb three"></div>
 
-  <main class="shell">
-    <section class="hero-card">
-      <div class="topbar">
+  <div class="page-wrap" id="pageWrap">
+    <!-- Homepage -->
+    <section class="screen home">
+      <div class="hero-card">
         <div class="brand">
-          <div class="brand-badge">✈️</div>
+          <div class="brand-icon">✈️</div>
           <div class="brand-text">
             <h1>MSFS Flight Planner</h1>
             <p>Operations dashboard & passenger itinerary experience</p>
           </div>
         </div>
 
-        <div class="status-pill">
-          <span class="status-dot"></span>
-          Project Build Preview
-        </div>
-      </div>
-
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <div class="eyebrow">Flight Experience Control</div>
-          <h2>
-            Plan it.<br />
-            Manage it.<br />
-            <span>Track it beautifully.</span>
-          </h2>
-          <p>
-            A premium Microsoft Flight Simulator flight planner concept with separate admin and passenger experiences.
-            Choose how you want to enter the system below.
-          </p>
-
-          <div class="hero-footer">
-            <div class="mini-chip">Flighty-inspired styling</div>
-            <div class="mini-chip">Smooth Apple-like feel</div>
-            <div class="mini-chip">Admin + Passenger split</div>
-          </div>
-        </div>
-
-        <div class="login-panel">
-          <div class="panel-header">
-            <div>
-              <h3>Select Entry Point</h3>
-              <p>Both options are visual only for now. No login functionality has been added yet.</p>
-            </div>
-            <div class="plane-pill">🛫</div>
+        <div class="home-layout">
+          <div class="copy">
+            <h2>
+              Plan it.<br />
+              Manage it.<br />
+              <span>Track it beautifully.</span>
+            </h2>
+            <p>
+              A premium Microsoft Flight Simulator flight planner concept with separate admin and passenger experiences.
+              Choose how you want to enter the system below.
+            </p>
           </div>
 
-          <button class="login-option" type="button">
-            <div class="option-top">
-              <div class="option-icon">🧑‍✈️</div>
-              <div class="option-tag">Admin Access</div>
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Select Entry Point</h3>
+                <p>Both options are visual for now, with the admin page transition active.</p>
+              </div>
+              <div class="mini-badge">🛫</div>
             </div>
 
-            <h4>Admin Login</h4>
-            <p>
-              Manage flights, update operational details, and control the information shown on the passenger side.
-            </p>
+            <button class="option" id="adminButton" type="button">
+              <div class="option-top">
+                <div class="option-icon">🧑‍✈️</div>
+                <div class="option-tag">Admin Access</div>
+              </div>
 
-            <div class="option-bottom">
-              <span class="option-note">Desktop-optimized management portal</span>
-              <span class="option-arrow">→</span>
-            </div>
-          </button>
+              <h4>Admin Login</h4>
+              <p>
+                Manage flights, update planning details, and control what appears on the passenger side.
+              </p>
 
-          <button class="login-option" type="button">
-            <div class="option-top">
-              <div class="option-icon">🧳</div>
-              <div class="option-tag">Passenger View</div>
-            </div>
+              <div class="option-bottom">
+                <span class="option-note">Desktop-optimized management portal</span>
+                <span class="arrow">→</span>
+              </div>
+            </button>
 
-            <h4>Passenger Login</h4>
-            <p>
-              Access a mobile-focused itinerary experience with polished flight cards and real-time style status design.
-            </p>
+            <button class="option" type="button">
+              <div class="option-top">
+                <div class="option-icon">🧳</div>
+                <div class="option-tag">Passenger View</div>
+              </div>
 
-            <div class="option-bottom">
-              <span class="option-note">Clean travel-style interface</span>
-              <span class="option-arrow">→</span>
-            </div>
-          </button>
-        </div>
-      </div>
+              <h4>Passenger Login</h4>
+              <p>
+                Access a mobile-focused itinerary experience with polished flight cards and clean status styling.
+              </p>
 
-      <div class="bottom-strip">
-        <div class="left">
-          <span>Version 1 concept screen</span>
-          <span class="thin-divider"></span>
-          <span>No backend connected yet</span>
-        </div>
-        <div class="right">
-          <span>MSFS Flight Planner</span>
-          <span class="thin-divider"></span>
-          <span>Initial homepage</span>
+              <div class="option-bottom">
+                <span class="option-note">Visual only for now</span>
+                <span class="arrow">→</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </section>
-  </main>
+
+    <!-- Admin Page -->
+    <section class="screen admin">
+      <div class="admin-screen-inner">
+        <div class="admin-shell">
+          <div class="admin-topbar">
+            <div class="admin-left">
+              <button class="back-btn" id="backButton" type="button">←</button>
+              <div class="admin-label">
+                <span>Management View</span>
+                <span>Admin Dashboard</span>
+              </div>
+            </div>
+
+            <div class="admin-badge">Flight Planning System</div>
+          </div>
+
+          <div class="flights-header">
+            <h1 class="flights-title">Flights <span class="count">(0)</span></h1>
+            <div class="header-line-wrap">
+              <div class="header-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const pageWrap = document.getElementById('pageWrap');
+    const adminButton = document.getElementById('adminButton');
+    const backButton = document.getElementById('backButton');
+
+    adminButton.addEventListener('click', () => {
+      pageWrap.classList.add('admin-open');
+    });
+
+    backButton.addEventListener('click', () => {
+      pageWrap.classList.remove('admin-open');
+    });
+  </script>
 </body>
 </html>
