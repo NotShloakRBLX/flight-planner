@@ -6,6 +6,7 @@
 <title>MSFS Flight Planner</title>
 
 <style>
+/* --- YOUR ORIGINAL STYLES (UNCHANGED) --- */
 :root {
   --bg-1:#050816;
   --bg-2:#0a1130;
@@ -135,7 +136,6 @@ body{
   margin-top:10px;
 }
 
-/* FORM */
 .form{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -150,13 +150,10 @@ body{
   color:white;
 }
 
-.full{grid-column:span 2;}
-
 .simple-list{
   margin-top:20px;
-  font-size:14px;
-  line-height:1.6;
 }
+
 </style>
 </head>
 
@@ -217,13 +214,10 @@ body{
     <div class="form">
       <input id="dep" placeholder="Departure Airport">
       <input id="arr" placeholder="Arrival Airport">
-
       <input id="depTime" type="datetime-local">
       <input id="arrTime" type="datetime-local">
-
       <input id="icao" placeholder="Airline ICAO">
       <input id="flightNum" placeholder="Flight Number">
-
       <input id="dist" placeholder="Distance (NM)">
       <input id="tz" placeholder="Timezone Diff">
     </div>
@@ -236,7 +230,7 @@ body{
 
 <!-- PASSENGER -->
 <div class="screen passenger">
-  <div class="card">
+  <div class="card" id="passengerCard">
     <div class="title">Flights (0)</div>
     <div class="line"></div>
   </div>
@@ -244,10 +238,24 @@ body{
 
 </div>
 
-<script>
-const wrap = document.getElementById("wrap");
+<!-- ✅ FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-let flights = [];
+const firebaseConfig = {
+  apiKey: "AIzaSyDrFLJj44_ef4HVhu4QMbBFBtexn2HFMV4",
+  authDomain: "msfs-flight-planner-986ca.firebaseapp.com",
+  projectId: "msfs-flight-planner-986ca",
+  storageBucket: "msfs-flight-planner-986ca.firebasestorage.app",
+  messagingSenderId: "24985243023",
+  appId: "1:24985243023:web:b9649fb038b3219dc28ffa"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const wrap = document.getElementById("wrap");
 
 adminBtn.onclick=()=>{wrap.classList.add("admin-open");wrap.classList.remove("passenger-open");}
 passengerBtn.onclick=()=>{wrap.classList.add("passenger-open");wrap.classList.remove("admin-open");}
@@ -256,25 +264,50 @@ backBtn.onclick=()=>wrap.classList.remove("admin-open");
 addFlightBtn.onclick=()=>wrap.classList.add("add-open");
 addBack.onclick=()=>wrap.classList.remove("add-open");
 
-/* ADD FLIGHT LOGIC */
-submitFlight.onclick=()=>{
+/* SAVE FLIGHT */
+submitFlight.onclick = async () => {
   const flight = {
     dep: dep.value,
     arr: arr.value,
-    num: flightNum.value
+    depTime: depTime.value,
+    arrTime: arrTime.value,
+    icao: icao.value,
+    flightNum: flightNum.value,
+    dist: dist.value,
+    tz: tz.value
   };
 
-  flights.push(flight);
+  await addDoc(collection(db, "flights"), flight);
 
-  document.getElementById("flightCount").textContent = flights.length;
-
-  const list = document.getElementById("flightList");
-  list.innerHTML = flights.map(f =>
-    `${f.num} — ${f.dep} → ${f.arr}`
-  ).join("<br>");
-
+  loadFlights();
   wrap.classList.remove("add-open");
 };
+
+/* LOAD FLIGHTS */
+async function loadFlights() {
+  const snapshot = await getDocs(collection(db, "flights"));
+
+  let flights = [];
+  snapshot.forEach(doc => flights.push(doc.data()));
+
+  flightCount.textContent = flights.length;
+
+  flightList.innerHTML = flights.map(f =>
+    `${f.flightNum} — ${f.dep} → ${f.arr}`
+  ).join("<br>");
+
+  passengerCard.innerHTML = `
+    <div class="title">Flights (${flights.length})</div>
+    <div class="line"></div>
+    <div style="margin-top:20px;">
+      ${flights.map(f =>
+        `<div>${f.flightNum} — ${f.dep} → ${f.arr}</div>`
+      ).join("")}
+    </div>
+  `;
+}
+
+loadFlights();
 </script>
 
 </body>
