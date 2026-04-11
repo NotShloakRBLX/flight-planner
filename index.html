@@ -119,21 +119,24 @@
       z-index: 2;
     }
 
-    .screen.admin {
+    .screen.admin,
+    .screen.passenger {
       opacity: 0;
       transform: scale(1.02) translateY(18px);
       visibility: hidden;
       z-index: 1;
     }
 
-    .page-wrap.admin-open .screen.home {
+    .page-wrap.admin-open .screen.home,
+    .page-wrap.passenger-open .screen.home {
       opacity: 0;
       transform: scale(0.985) translateY(-10px);
       visibility: hidden;
       pointer-events: none;
     }
 
-    .page-wrap.admin-open .screen.admin {
+    .page-wrap.admin-open .screen.admin,
+    .page-wrap.passenger-open .screen.passenger {
       opacity: 1;
       transform: scale(1) translateY(0);
       visibility: visible;
@@ -155,7 +158,8 @@
     }
 
     .hero-card::before,
-    .admin-shell::before {
+    .admin-shell::before,
+    .passenger-shell::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -407,7 +411,8 @@
       background: rgba(255,255,255,0.08);
     }
 
-    .admin-screen-inner {
+    .admin-screen-inner,
+    .passenger-screen-inner {
       width: 100%;
       height: 100%;
       display: flex;
@@ -416,7 +421,8 @@
       padding-top: 18px;
     }
 
-    .admin-shell {
+    .admin-shell,
+    .passenger-shell {
       position: relative;
       width: 100%;
       max-width: 1360px;
@@ -431,7 +437,8 @@
       overflow: hidden;
     }
 
-    .admin-shell::after {
+    .admin-shell::after,
+    .passenger-shell::after {
       content: "";
       position: absolute;
       top: -120px;
@@ -443,7 +450,8 @@
       pointer-events: none;
     }
 
-    .admin-topbar {
+    .admin-topbar,
+    .passenger-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -453,7 +461,8 @@
       z-index: 1;
     }
 
-    .admin-left {
+    .admin-left,
+    .passenger-left {
       display: flex;
       align-items: center;
       gap: 14px;
@@ -480,26 +489,30 @@
       border-color: rgba(255,255,255,0.14);
     }
 
-    .admin-label {
+    .admin-label,
+    .passenger-label {
       display: flex;
       flex-direction: column;
       gap: 5px;
     }
 
-    .admin-label span:first-child {
+    .admin-label span:first-child,
+    .passenger-label span:first-child {
       color: var(--muted);
       font-size: 0.82rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    .admin-label span:last-child {
+    .admin-label span:last-child,
+    .passenger-label span:last-child {
       font-size: 1rem;
       font-weight: 700;
       letter-spacing: 0.02em;
     }
 
-    .admin-badge {
+    .admin-badge,
+    .passenger-badge {
       padding: 11px 16px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.09);
@@ -568,7 +581,8 @@
       }
 
       .hero-card,
-      .admin-shell {
+      .admin-shell,
+      .passenger-shell {
         border-radius: 28px;
       }
 
@@ -576,12 +590,14 @@
         padding: 20px;
       }
 
-      .admin-shell {
+      .admin-shell,
+      .passenger-shell {
         padding: 24px 20px;
         min-height: calc(100vh - 32px);
       }
 
-      .admin-topbar {
+      .admin-topbar,
+      .passenger-topbar {
         flex-direction: column;
         align-items: flex-start;
         margin-bottom: 28px;
@@ -645,7 +661,7 @@
               </div>
             </button>
 
-            <button class="option" type="button">
+            <button class="option" id="passengerButton" type="button">
               <div class="option-top">
                 <div class="option-icon">🧳</div>
                 <div class="option-tag">Passenger View</div>
@@ -691,19 +707,57 @@
         </div>
       </div>
     </section>
+
+    <!-- Passenger Page -->
+    <section class="screen passenger">
+      <div class="passenger-screen-inner">
+        <div class="passenger-shell">
+          <div class="passenger-topbar">
+            <div class="passenger-left">
+              <button class="back-btn" id="passengerBackButton" type="button">←</button>
+              <div class="passenger-label">
+                <span>Passenger View</span>
+                <span>Passenger Dashboard</span>
+              </div>
+            </div>
+
+            <div class="passenger-badge">Flight Planning System</div>
+          </div>
+
+          <div class="flights-header">
+            <h1 class="flights-title">Flights <span class="count">(0)</span></h1>
+            <div class="header-line-wrap">
+              <div class="header-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
     const pageWrap = document.getElementById('pageWrap');
     const adminButton = document.getElementById('adminButton');
+    const passengerButton = document.getElementById('passengerButton');
     const backButton = document.getElementById('backButton');
+    const passengerBackButton = document.getElementById('passengerBackButton');
 
     adminButton.addEventListener('click', () => {
+      pageWrap.classList.remove('passenger-open');
       pageWrap.classList.add('admin-open');
+    });
+
+    passengerButton.addEventListener('click', () => {
+      pageWrap.classList.remove('admin-open');
+      pageWrap.classList.add('passenger-open');
     });
 
     backButton.addEventListener('click', () => {
       pageWrap.classList.remove('admin-open');
+    });
+
+    passengerBackButton.addEventListener('click', () => {
+      pageWrap.classList.remove('passenger-open');
     });
   </script>
 </body>
