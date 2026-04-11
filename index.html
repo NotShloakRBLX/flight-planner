@@ -6,7 +6,6 @@
 <title>MSFS Flight Planner</title>
 
 <style>
-/* --- YOUR ORIGINAL STYLES (UNCHANGED) --- */
 :root {
   --bg-1:#050816;
   --bg-2:#0a1130;
@@ -19,6 +18,7 @@
 }
 
 *{box-sizing:border-box;}
+
 body{
   margin:0;
   font-family:Inter,system-ui;
@@ -136,6 +136,7 @@ body{
   margin-top:10px;
 }
 
+/* FORM */
 .form{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -150,10 +151,27 @@ body{
   color:white;
 }
 
-.simple-list{
-  margin-top:20px;
+/* NEW PASSENGER CARDS */
+.flight-card{
+  padding:16px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);
+  margin-bottom:12px;
 }
 
+.flight-num{
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.flight-route{
+  font-size:16px;
+  font-weight:600;
+}
+
+.simple-list{margin-top:20px;}
 </style>
 </head>
 
@@ -230,15 +248,30 @@ body{
 
 <!-- PASSENGER -->
 <div class="screen passenger">
-  <div class="card" id="passengerCard">
-    <div class="title">Flights (0)</div>
+  <div class="card">
+
+    <div class="topbar">
+      <div class="left">
+        <button class="back" id="pBack">←</button>
+        <div>
+          <div style="font-size:12px;color:gray;">PASSENGER VIEW</div>
+          <div style="font-weight:600;">Passenger Dashboard</div>
+        </div>
+      </div>
+
+      <div class="badge">Flight Planning System</div>
+    </div>
+
+    <div class="title">Flights (<span id="pFlightCount">0</span>)</div>
     <div class="line"></div>
+
+    <div id="passengerFlights" style="margin-top:20px;"></div>
+
   </div>
 </div>
 
 </div>
 
-<!-- ✅ FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -260,11 +293,11 @@ const wrap = document.getElementById("wrap");
 adminBtn.onclick=()=>{wrap.classList.add("admin-open");wrap.classList.remove("passenger-open");}
 passengerBtn.onclick=()=>{wrap.classList.add("passenger-open");wrap.classList.remove("admin-open");}
 backBtn.onclick=()=>wrap.classList.remove("admin-open");
+pBack.onclick=()=>wrap.classList.remove("passenger-open");
 
 addFlightBtn.onclick=()=>wrap.classList.add("add-open");
 addBack.onclick=()=>wrap.classList.remove("add-open");
 
-/* SAVE FLIGHT */
 submitFlight.onclick = async () => {
   const flight = {
     dep: dep.value,
@@ -278,15 +311,12 @@ submitFlight.onclick = async () => {
   };
 
   await addDoc(collection(db, "flights"), flight);
-
   loadFlights();
   wrap.classList.remove("add-open");
 };
 
-/* LOAD FLIGHTS */
 async function loadFlights() {
   const snapshot = await getDocs(collection(db, "flights"));
-
   let flights = [];
   snapshot.forEach(doc => flights.push(doc.data()));
 
@@ -296,15 +326,15 @@ async function loadFlights() {
     `${f.flightNum} — ${f.dep} → ${f.arr}`
   ).join("<br>");
 
-  passengerCard.innerHTML = `
-    <div class="title">Flights (${flights.length})</div>
-    <div class="line"></div>
-    <div style="margin-top:20px;">
-      ${flights.map(f =>
-        `<div>${f.flightNum} — ${f.dep} → ${f.arr}</div>`
-      ).join("")}
-    </div>
-  `;
+  document.getElementById("pFlightCount").textContent = flights.length;
+
+  document.getElementById("passengerFlights").innerHTML =
+    flights.map(f => `
+      <div class="flight-card">
+        <div class="flight-num">${f.flightNum}</div>
+        <div class="flight-route">${f.dep} → ${f.arr}</div>
+      </div>
+    `).join("");
 }
 
 loadFlights();
