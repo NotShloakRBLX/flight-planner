@@ -6,59 +6,72 @@
 <title>MSFS Flight Planner</title>
 
 <style>
-:root {
-  --bg-1:#050816;
-  --bg-2:#0a1130;
-  --bg-3:#04060f;
-  --border:rgba(255,255,255,0.08);
-  --text:#fff;
-  --purple:#7c5cff;
-  --blue:#4ca7ff;
+:root{
+--bg1:#050816;
+--bg2:#0a1130;
+--bg3:#04060f;
+--border:rgba(255,255,255,0.08);
+--text:#fff;
+--purple:#7c5cff;
+--blue:#4ca7ff;
 }
 
-*{box-sizing:border-box;}
 body{
-  margin:0;
-  font-family:Inter;
-  color:var(--text);
-  background:linear-gradient(160deg,var(--bg-1),var(--bg-2),var(--bg-3));
+margin:0;
+font-family:Inter;
+color:var(--text);
+background:linear-gradient(160deg,var(--bg1),var(--bg2),var(--bg3));
+overflow:hidden;
 }
 
-.screen{position:absolute;inset:0;padding:24px;}
-.admin,.passenger,.addFlight,.editFlight{display:none;}
+.screen{position:absolute;inset:0;padding:24px;display:none;}
+.home{display:flex;align-items:center;justify-content:center;}
 .admin-open .admin,
 .passenger-open .passenger,
-.add-open .addFlight,
-.edit-open .editFlight{display:block;}
+.add-open .add,
+.edit-open .edit{display:block;}
+
+.admin-open .home,
+.passenger-open .home,
+.add-open .admin,
+.edit-open .admin{display:none;}
 
 .card{
-  max-width:1100px;margin:auto;padding:25px;
-  background:rgba(20,25,60,0.7);
-  border-radius:20px;border:1px solid var(--border);
-}
-
-.flight-card{
-  padding:14px;border:1px solid var(--border);
-  border-radius:12px;margin-top:10px;
-  cursor:pointer;
+max-width:1100px;margin:auto;padding:25px;
+background:rgba(20,25,60,0.7);
+border-radius:20px;border:1px solid var(--border);
 }
 
 .btn{
-  padding:10px 14px;border-radius:10px;
-  border:none;background:linear-gradient(135deg,var(--purple),var(--blue));
-  color:white;cursor:pointer;margin-top:10px;
+padding:10px 14px;border:none;border-radius:10px;
+background:linear-gradient(135deg,var(--purple),var(--blue));
+color:white;cursor:pointer;margin-top:10px;
 }
 
 .red{background:#ff3b3b;}
 
+.flight{
+padding:14px;border:1px solid var(--border);
+border-radius:12px;margin-top:10px;cursor:pointer;
+}
+
+input{width:100%;padding:10px;margin-top:6px;}
 .popup{margin-top:10px;}
-input{padding:10px;margin-top:5px;width:100%;}
 </style>
 </head>
 
 <body>
 
-<div id="wrap">
+<div id="wrap" class="home">
+
+<!-- HOME -->
+<div class="screen home">
+<div class="card">
+<h2>MSFS Flight Planner</h2>
+<button class="btn" id="adminBtn">Admin</button>
+<button class="btn" id="passBtn">Passenger</button>
+</div>
+</div>
 
 <!-- ADMIN -->
 <div class="screen admin">
@@ -70,43 +83,40 @@ input{padding:10px;margin-top:5px;width:100%;}
 </div>
 
 <!-- ADD -->
-<div class="screen addFlight">
+<div class="screen add">
 <div class="card">
 <h2>Add Flight</h2>
 
 <input id="dep" placeholder="Departure">
 <input id="arr" placeholder="Arrival">
 <input id="num" placeholder="Flight Number">
+<input id="depTime" placeholder="Scheduled Departure">
+<input id="arrTime" placeholder="Scheduled Arrival">
 
-<button class="btn" id="saveNew">Add flight</button>
+<button class="btn" id="create">Add flight</button>
 </div>
 </div>
 
 <!-- EDIT -->
-<div class="screen editFlight">
+<div class="screen edit">
 <div class="card">
 <h2>Edit Flight</h2>
 
-<div>
-<button class="btn" id="departedBtn">Departed</button>
-<button class="btn" id="arrivedBtn">Arrived</button>
-<button class="btn" id="delayedBtn">Delayed</button>
-</div>
+<button class="btn" id="depBtn">Departed</button>
+<button class="btn" id="arrBtn">Arrived</button>
+<button class="btn" id="delayBtn">Delayed</button>
 
-<div id="popupArea" class="popup"></div>
+<div id="popup" class="popup"></div>
 
-<button class="btn" id="saveEdit">Save</button>
-
-<button class="btn red" id="deleteBtn">
-🗑 Delete flight
-</button>
-
+<button class="btn" id="save">Save</button>
+<button class="btn red" id="delete">🗑 Delete flight</button>
 </div>
 </div>
 
 <!-- PASSENGER -->
 <div class="screen passenger">
 <div class="card">
+<button class="btn" id="backPass">← Back</button>
 <h2>Flights (<span id="pCount">0</span>)</h2>
 <div id="pList"></div>
 </div>
@@ -117,118 +127,110 @@ input{padding:10px;margin-top:5px;width:100%;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs,
-  doc, updateDoc, deleteDoc
+getFirestore, collection, addDoc, getDocs,
+doc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDrFLJj44_ef4HVhu4QMbBFBtexn2HFMV4",
-  authDomain: "msfs-flight-planner-986ca.firebaseapp.com",
-  projectId: "msfs-flight-planner-986ca",
-  storageBucket: "msfs-flight-planner-986ca.firebasestorage.app",
-  messagingSenderId: "24985243023",
-  appId: "1:24985243023:web:b9649fb038b3219dc28ffa"
+apiKey:"AIzaSyDrFLJj44_ef4HVhu4QMbBFBtexn2HFMV4",
+authDomain:"msfs-flight-planner-986ca.firebaseapp.com",
+projectId:"msfs-flight-planner-986ca",
+storageBucket:"msfs-flight-planner-986ca.firebasestorage.app",
+messagingSenderId:"24985243023",
+appId:"1:24985243023:web:b9649fb038b3219dc28ffa"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const wrap = document.getElementById("wrap");
+const wrap=document.getElementById("wrap");
 
-let flights = [];
-let currentId = null;
-let editData = {};
+let flights=[];
+let current=null;
+let editType=null;
 
 // NAV
-wrap.className = "admin-open";
+adminBtn.onclick=()=>wrap.className="admin-open";
+passBtn.onclick=()=>wrap.className="passenger-open";
+backPass.onclick=()=>wrap.className="home";
 
 addBtn.onclick=()=>wrap.className="add-open";
 
-// ADD
-saveNew.onclick = async () => {
-  await addDoc(collection(db,"flights"),{
-    dep:dep.value,
-    arr:arr.value,
-    num:num.value
-  });
-  load();
-  wrap.className="admin-open";
+// CREATE
+create.onclick=async()=>{
+await addDoc(collection(db,"flights"),{
+dep:dep.value,
+arr:arr.value,
+num:num.value,
+depTime:depTime.value,
+arrTime:arrTime.value
+});
+load();
+wrap.className="admin-open";
 };
 
 // LOAD
 async function load(){
-  flights=[];
-  const snap = await getDocs(collection(db,"flights"));
-  snap.forEach(docSnap=>{
-    flights.push({id:docSnap.id,...docSnap.data()});
-  });
+flights=[];
+const snap=await getDocs(collection(db,"flights"));
+snap.forEach(d=>flights.push({id:d.id,...d.data()}));
 
-  count.textContent=flights.length;
-  pCount.textContent=flights.length;
+count.textContent=flights.length;
+pCount.textContent=flights.length;
 
-  adminList.innerHTML = flights.map(f=>`
-    <div class="flight-card" onclick="openEdit('${f.id}')">
-      ${f.num} — ${f.dep} → ${f.arr}
-    </div>
-  `).join("");
+adminList.innerHTML=flights.map(f=>`
+<div class="flight" onclick="editFlight('${f.id}')">
+${f.num} — ${f.dep} → ${f.arr}
+</div>`).join("");
 
-  pList.innerHTML = flights.map(f=>`
-    <div class="flight-card">
-      ${f.num} — ${f.dep} → ${f.arr}
-    </div>
-  `).join("");
+pList.innerHTML=flights.map(f=>`
+<div class="flight">
+${f.num} — ${f.dep} → ${f.arr}
+</div>`).join("");
 }
 
 // EDIT OPEN
-window.openEdit = (id)=>{
-  currentId=id;
-  editData={};
-  wrap.className="edit-open";
+window.editFlight=id=>{
+current=id;
+wrap.className="edit-open";
+popup.innerHTML="";
 };
 
-// POPUPS
-departedBtn.onclick=()=>{
-  popupArea.innerHTML=`Departure Time<input id="dTime">`;
-  editData.type="departed";
+// BUTTONS
+depBtn.onclick=()=>{
+editType="dep";
+popup.innerHTML=`Dep Time<input id="d">`;
 };
-arrivedBtn.onclick=()=>{
-  popupArea.innerHTML=`Arrival Time<input id="aTime">`;
-  editData.type="arrived";
+arrBtn.onclick=()=>{
+editType="arr";
+popup.innerHTML=`Arr Time<input id="a">`;
 };
-delayedBtn.onclick=()=>{
-  popupArea.innerHTML=`
-  New Dep<input id="nd">
-  New Arr<input id="na">
-  `;
-  editData.type="delayed";
+delayBtn.onclick=()=>{
+editType="delay";
+popup.innerHTML=`New Dep<input id="nd">New Arr<input id="na">`;
 };
 
-// SAVE EDIT
-saveEdit.onclick = async ()=>{
-  let update={};
+// SAVE
+save.onclick=async()=>{
+let update={};
 
-  if(editData.type==="departed"){
-    update.actualDep=document.getElementById("dTime").value;
-  }
-  if(editData.type==="arrived"){
-    update.actualArr=document.getElementById("aTime").value;
-  }
-  if(editData.type==="delayed"){
-    update.dep=document.getElementById("nd").value;
-    update.arr=document.getElementById("na").value;
-  }
+if(editType==="dep") update.actualDep=document.getElementById("d").value;
+if(editType==="arr") update.actualArr=document.getElementById("a").value;
+if(editType==="delay"){
+update.dep=document.getElementById("nd").value;
+update.arr=document.getElementById("na").value;
+}
 
-  await updateDoc(doc(db,"flights",currentId),update);
-
-  wrap.className="admin-open";
-  load();
+await updateDoc(doc(db,"flights",current),update);
+wrap.className="admin-open";
+load();
 };
 
 // DELETE
-deleteBtn.onclick = async ()=>{
-  await deleteDoc(doc(db,"flights",currentId));
-  wrap.className="admin-open";
-  load();
+delete.onclick=async()=>{
+await deleteDoc(doc(db,"flights",current));
+wrap.className="admin-open";
+load();
 };
 
 load();
