@@ -151,6 +151,12 @@ body{
 }
 
 .full{grid-column:span 2;}
+
+.simple-list{
+  margin-top:20px;
+  font-size:14px;
+  line-height:1.6;
+}
 </style>
 </head>
 
@@ -186,13 +192,15 @@ body{
       </div>
     </div>
 
-    <div class="title">Flights (0)</div>
+    <div class="title">Flights (<span id="flightCount">0</span>)</div>
     <div class="line"></div>
+
+    <div class="simple-list" id="flightList"></div>
 
   </div>
 </div>
 
-<!-- ADD FLIGHT PAGE -->
+<!-- ADD FLIGHT -->
 <div class="screen addFlight">
   <div class="card">
 
@@ -207,18 +215,21 @@ body{
     </div>
 
     <div class="form">
-      <input placeholder="Departure Airport (ICAO)">
-      <input placeholder="Arrival Airport (ICAO)">
+      <input id="dep" placeholder="Departure Airport">
+      <input id="arr" placeholder="Arrival Airport">
 
-      <input type="datetime-local">
-      <input type="datetime-local">
+      <input id="depTime" type="datetime-local">
+      <input id="arrTime" type="datetime-local">
 
-      <input placeholder="Airline ICAO">
-      <input placeholder="Flight Number">
+      <input id="icao" placeholder="Airline ICAO">
+      <input id="flightNum" placeholder="Flight Number">
 
-      <input placeholder="Distance (NM)">
-      <input placeholder="Timezone Difference (+/- Hours)">
+      <input id="dist" placeholder="Distance (NM)">
+      <input id="tz" placeholder="Timezone Diff">
     </div>
+
+    <br>
+    <button class="add-btn" id="submitFlight">Add flight</button>
 
   </div>
 </div>
@@ -226,22 +237,8 @@ body{
 <!-- PASSENGER -->
 <div class="screen passenger">
   <div class="card">
-
-    <div class="topbar">
-      <div class="left">
-        <button class="back" id="pBack">←</button>
-        <div>
-          <div style="font-size:12px;color:gray;">PASSENGER VIEW</div>
-          <div style="font-weight:600;">Passenger Dashboard</div>
-        </div>
-      </div>
-
-      <div class="badge">Flight Planning System</div>
-    </div>
-
     <div class="title">Flights (0)</div>
     <div class="line"></div>
-
   </div>
 </div>
 
@@ -250,18 +247,34 @@ body{
 <script>
 const wrap = document.getElementById("wrap");
 
+let flights = [];
+
 adminBtn.onclick=()=>{wrap.classList.add("admin-open");wrap.classList.remove("passenger-open");}
 passengerBtn.onclick=()=>{wrap.classList.add("passenger-open");wrap.classList.remove("admin-open");}
 backBtn.onclick=()=>wrap.classList.remove("admin-open");
-pBack.onclick=()=>wrap.classList.remove("passenger-open");
 
-/* NEW */
-addFlightBtn.onclick=()=>{
-  wrap.classList.add("add-open");
-}
-addBack.onclick=()=>{
+addFlightBtn.onclick=()=>wrap.classList.add("add-open");
+addBack.onclick=()=>wrap.classList.remove("add-open");
+
+/* ADD FLIGHT LOGIC */
+submitFlight.onclick=()=>{
+  const flight = {
+    dep: dep.value,
+    arr: arr.value,
+    num: flightNum.value
+  };
+
+  flights.push(flight);
+
+  document.getElementById("flightCount").textContent = flights.length;
+
+  const list = document.getElementById("flightList");
+  list.innerHTML = flights.map(f =>
+    `${f.num} — ${f.dep} → ${f.arr}`
+  ).join("<br>");
+
   wrap.classList.remove("add-open");
-}
+};
 </script>
 
 </body>
