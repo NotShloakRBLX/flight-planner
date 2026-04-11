@@ -14,267 +14,112 @@
   --text:#fff;
   --purple:#7c5cff;
   --blue:#4ca7ff;
-  --transition:0.4s cubic-bezier(0.22,1,0.36,1);
 }
 
 *{box-sizing:border-box;}
-
 body{
   margin:0;
-  font-family:Inter,system-ui;
+  font-family:Inter;
   color:var(--text);
-  background:
-    radial-gradient(circle at 15% 20%, rgba(124,92,255,0.2), transparent),
-    radial-gradient(circle at 85% 20%, rgba(76,167,255,0.15), transparent),
-    linear-gradient(160deg,var(--bg-1),var(--bg-2),var(--bg-3));
-  overflow:hidden;
+  background:linear-gradient(160deg,var(--bg-1),var(--bg-2),var(--bg-3));
 }
 
-.page-wrap{height:100vh;position:relative;}
-
-.screen{
-  position:absolute;
-  inset:0;
-  padding:24px;
-  transition:all var(--transition);
-}
-
-.home{display:flex;align-items:center;justify-content:center;}
-
-.admin,.passenger,.addFlight{
-  opacity:0;
-  transform:translateY(20px);
-  pointer-events:none;
-}
-
+.screen{position:absolute;inset:0;padding:24px;}
+.admin,.passenger,.addFlight,.editFlight{display:none;}
 .admin-open .admin,
 .passenger-open .passenger,
-.add-open .addFlight{
-  opacity:1;
-  transform:translateY(0);
-  pointer-events:all;
-}
-
-.admin-open .home,
-.passenger-open .home,
-.add-open .admin{
-  opacity:0;
-  pointer-events:none;
-}
+.add-open .addFlight,
+.edit-open .editFlight{display:block;}
 
 .card{
-  width:100%;
-  max-width:1200px;
-  margin:auto;
-  border-radius:30px;
-  padding:30px;
+  max-width:1100px;margin:auto;padding:25px;
   background:rgba(20,25,60,0.7);
-  border:1px solid var(--border);
+  border-radius:20px;border:1px solid var(--border);
 }
 
-.option{
-  margin-top:20px;
-  padding:20px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  cursor:pointer;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  margin-bottom:40px;
-}
-
-.left{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-.back{
-  width:40px;height:40px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,0.05);
-  cursor:pointer;
-}
-
-.right{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:10px;
-}
-
-.badge{
-  padding:8px 14px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  font-size:14px;
-}
-
-.add-btn{
-  padding:10px 16px;
-  border-radius:12px;
-  border:none;
-  background:linear-gradient(135deg,var(--purple),var(--blue));
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.title{
-  font-size:42px;
-  font-weight:800;
-}
-
-.line{
-  height:2px;
-  background:white;
-  margin-top:10px;
-}
-
-/* FORM */
-.form{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
-}
-
-.form input{
-  padding:12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,0.05);
-  color:white;
-}
-
-/* NEW PASSENGER CARDS */
 .flight-card{
-  padding:16px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,0.04);
-  margin-bottom:12px;
+  padding:14px;border:1px solid var(--border);
+  border-radius:12px;margin-top:10px;
+  cursor:pointer;
 }
 
-.flight-num{
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:6px;
+.btn{
+  padding:10px 14px;border-radius:10px;
+  border:none;background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:white;cursor:pointer;margin-top:10px;
 }
 
-.flight-route{
-  font-size:16px;
-  font-weight:600;
-}
+.red{background:#ff3b3b;}
 
-.simple-list{margin-top:20px;}
+.popup{margin-top:10px;}
+input{padding:10px;margin-top:5px;width:100%;}
 </style>
 </head>
 
 <body>
 
-<div class="page-wrap" id="wrap">
-
-<!-- HOME -->
-<div class="screen home">
-  <div class="card">
-    <h2>MSFS Flight Planner</h2>
-    <div class="option" id="adminBtn">Admin Login</div>
-    <div class="option" id="passengerBtn">Passenger Login</div>
-  </div>
-</div>
+<div id="wrap">
 
 <!-- ADMIN -->
 <div class="screen admin">
-  <div class="card">
-
-    <div class="topbar">
-      <div class="left">
-        <button class="back" id="backBtn">←</button>
-        <div>
-          <div style="font-size:12px;color:gray;">MANAGEMENT VIEW</div>
-          <div style="font-weight:600;">Admin Dashboard</div>
-        </div>
-      </div>
-
-      <div class="right">
-        <div class="badge">Flight Planning System</div>
-        <button class="add-btn" id="addFlightBtn">Add flight</button>
-      </div>
-    </div>
-
-    <div class="title">Flights (<span id="flightCount">0</span>)</div>
-    <div class="line"></div>
-
-    <div class="simple-list" id="flightList"></div>
-
-  </div>
+<div class="card">
+<h2>Flights (<span id="count">0</span>)</h2>
+<div id="adminList"></div>
+<button class="btn" id="addBtn">Add flight</button>
+</div>
 </div>
 
-<!-- ADD FLIGHT -->
+<!-- ADD -->
 <div class="screen addFlight">
-  <div class="card">
+<div class="card">
+<h2>Add Flight</h2>
 
-    <div class="topbar">
-      <div class="left">
-        <button class="back" id="addBack">←</button>
-        <div>
-          <div style="font-size:12px;color:gray;">CREATE FLIGHT</div>
-          <div style="font-weight:600;">New Flight</div>
-        </div>
-      </div>
-    </div>
+<input id="dep" placeholder="Departure">
+<input id="arr" placeholder="Arrival">
+<input id="num" placeholder="Flight Number">
 
-    <div class="form">
-      <input id="dep" placeholder="Departure Airport">
-      <input id="arr" placeholder="Arrival Airport">
-      <input id="depTime" type="datetime-local">
-      <input id="arrTime" type="datetime-local">
-      <input id="icao" placeholder="Airline ICAO">
-      <input id="flightNum" placeholder="Flight Number">
-      <input id="dist" placeholder="Distance (NM)">
-      <input id="tz" placeholder="Timezone Diff">
-    </div>
+<button class="btn" id="saveNew">Add flight</button>
+</div>
+</div>
 
-    <br>
-    <button class="add-btn" id="submitFlight">Add flight</button>
+<!-- EDIT -->
+<div class="screen editFlight">
+<div class="card">
+<h2>Edit Flight</h2>
 
-  </div>
+<div>
+<button class="btn" id="departedBtn">Departed</button>
+<button class="btn" id="arrivedBtn">Arrived</button>
+<button class="btn" id="delayedBtn">Delayed</button>
+</div>
+
+<div id="popupArea" class="popup"></div>
+
+<button class="btn" id="saveEdit">Save</button>
+
+<button class="btn red" id="deleteBtn">
+🗑 Delete flight
+</button>
+
+</div>
 </div>
 
 <!-- PASSENGER -->
 <div class="screen passenger">
-  <div class="card">
-
-    <div class="topbar">
-      <div class="left">
-        <button class="back" id="pBack">←</button>
-        <div>
-          <div style="font-size:12px;color:gray;">PASSENGER VIEW</div>
-          <div style="font-weight:600;">Passenger Dashboard</div>
-        </div>
-      </div>
-
-      <div class="badge">Flight Planning System</div>
-    </div>
-
-    <div class="title">Flights (<span id="pFlightCount">0</span>)</div>
-    <div class="line"></div>
-
-    <div id="passengerFlights" style="margin-top:20px;"></div>
-
-  </div>
+<div class="card">
+<h2>Flights (<span id="pCount">0</span>)</h2>
+<div id="pList"></div>
+</div>
 </div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  doc, updateDoc, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDrFLJj44_ef4HVhu4QMbBFBtexn2HFMV4",
@@ -290,54 +135,103 @@ const db = getFirestore(app);
 
 const wrap = document.getElementById("wrap");
 
-adminBtn.onclick=()=>{wrap.classList.add("admin-open");wrap.classList.remove("passenger-open");}
-passengerBtn.onclick=()=>{wrap.classList.add("passenger-open");wrap.classList.remove("admin-open");}
-backBtn.onclick=()=>wrap.classList.remove("admin-open");
-pBack.onclick=()=>wrap.classList.remove("passenger-open");
+let flights = [];
+let currentId = null;
+let editData = {};
 
-addFlightBtn.onclick=()=>wrap.classList.add("add-open");
-addBack.onclick=()=>wrap.classList.remove("add-open");
+// NAV
+wrap.className = "admin-open";
 
-submitFlight.onclick = async () => {
-  const flight = {
-    dep: dep.value,
-    arr: arr.value,
-    depTime: depTime.value,
-    arrTime: arrTime.value,
-    icao: icao.value,
-    flightNum: flightNum.value,
-    dist: dist.value,
-    tz: tz.value
-  };
+addBtn.onclick=()=>wrap.className="add-open";
 
-  await addDoc(collection(db, "flights"), flight);
-  loadFlights();
-  wrap.classList.remove("add-open");
+// ADD
+saveNew.onclick = async () => {
+  await addDoc(collection(db,"flights"),{
+    dep:dep.value,
+    arr:arr.value,
+    num:num.value
+  });
+  load();
+  wrap.className="admin-open";
 };
 
-async function loadFlights() {
-  const snapshot = await getDocs(collection(db, "flights"));
-  let flights = [];
-  snapshot.forEach(doc => flights.push(doc.data()));
+// LOAD
+async function load(){
+  flights=[];
+  const snap = await getDocs(collection(db,"flights"));
+  snap.forEach(docSnap=>{
+    flights.push({id:docSnap.id,...docSnap.data()});
+  });
 
-  flightCount.textContent = flights.length;
+  count.textContent=flights.length;
+  pCount.textContent=flights.length;
 
-  flightList.innerHTML = flights.map(f =>
-    `${f.flightNum} — ${f.dep} → ${f.arr}`
-  ).join("<br>");
+  adminList.innerHTML = flights.map(f=>`
+    <div class="flight-card" onclick="openEdit('${f.id}')">
+      ${f.num} — ${f.dep} → ${f.arr}
+    </div>
+  `).join("");
 
-  document.getElementById("pFlightCount").textContent = flights.length;
-
-  document.getElementById("passengerFlights").innerHTML =
-    flights.map(f => `
-      <div class="flight-card">
-        <div class="flight-num">${f.flightNum}</div>
-        <div class="flight-route">${f.dep} → ${f.arr}</div>
-      </div>
-    `).join("");
+  pList.innerHTML = flights.map(f=>`
+    <div class="flight-card">
+      ${f.num} — ${f.dep} → ${f.arr}
+    </div>
+  `).join("");
 }
 
-loadFlights();
+// EDIT OPEN
+window.openEdit = (id)=>{
+  currentId=id;
+  editData={};
+  wrap.className="edit-open";
+};
+
+// POPUPS
+departedBtn.onclick=()=>{
+  popupArea.innerHTML=`Departure Time<input id="dTime">`;
+  editData.type="departed";
+};
+arrivedBtn.onclick=()=>{
+  popupArea.innerHTML=`Arrival Time<input id="aTime">`;
+  editData.type="arrived";
+};
+delayedBtn.onclick=()=>{
+  popupArea.innerHTML=`
+  New Dep<input id="nd">
+  New Arr<input id="na">
+  `;
+  editData.type="delayed";
+};
+
+// SAVE EDIT
+saveEdit.onclick = async ()=>{
+  let update={};
+
+  if(editData.type==="departed"){
+    update.actualDep=document.getElementById("dTime").value;
+  }
+  if(editData.type==="arrived"){
+    update.actualArr=document.getElementById("aTime").value;
+  }
+  if(editData.type==="delayed"){
+    update.dep=document.getElementById("nd").value;
+    update.arr=document.getElementById("na").value;
+  }
+
+  await updateDoc(doc(db,"flights",currentId),update);
+
+  wrap.className="admin-open";
+  load();
+};
+
+// DELETE
+deleteBtn.onclick = async ()=>{
+  await deleteDoc(doc(db,"flights",currentId));
+  wrap.className="admin-open";
+  load();
+};
+
+load();
 </script>
 
 </body>
