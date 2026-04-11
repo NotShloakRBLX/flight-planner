@@ -4,748 +4,231 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MSFS Flight Planner</title>
+
   <style>
     :root {
       --bg-1: #050816;
       --bg-2: #0a1130;
       --bg-3: #04060f;
-      --card: rgba(15, 20, 42, 0.72);
-      --border: rgba(255, 255, 255, 0.09);
-      --line: rgba(255, 255, 255, 0.12);
-      --text: #f7f9ff;
+      --border: rgba(255,255,255,0.08);
+      --text: #ffffff;
       --muted: #aeb7d7;
       --purple: #7c5cff;
       --blue: #4ca7ff;
-      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
-      --radius-xl: 34px;
-      --radius-lg: 24px;
-      --transition: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      --transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
     body {
       margin: 0;
-      width: 100%;
-      min-height: 100%;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, system-ui, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 14% 18%, rgba(124, 92, 255, 0.18), transparent 24%),
-        radial-gradient(circle at 84% 22%, rgba(76, 167, 255, 0.14), transparent 24%),
-        radial-gradient(circle at 50% 90%, rgba(124, 92, 255, 0.10), transparent 28%),
-        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--bg-3) 100%);
+        radial-gradient(circle at 15% 20%, rgba(124,92,255,0.2), transparent),
+        radial-gradient(circle at 85% 20%, rgba(76,167,255,0.15), transparent),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2), var(--bg-3));
       overflow: hidden;
-    }
-
-    body {
-      position: relative;
-    }
-
-    .grid {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.14;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 34px 34px;
-      mask-image: radial-gradient(circle at center, black 32%, transparent 100%);
-      -webkit-mask-image: radial-gradient(circle at center, black 32%, transparent 100%);
-    }
-
-    .orb {
-      position: fixed;
-      border-radius: 999px;
-      filter: blur(70px);
-      pointer-events: none;
-      opacity: 0.42;
-      animation: drift 12s ease-in-out infinite;
-    }
-
-    .orb.one {
-      width: 260px;
-      height: 260px;
-      background: rgba(124, 92, 255, 0.18);
-      top: 6%;
-      left: 6%;
-    }
-
-    .orb.two {
-      width: 300px;
-      height: 300px;
-      background: rgba(76, 167, 255, 0.16);
-      right: 6%;
-      bottom: 8%;
-      animation-delay: -4s;
-    }
-
-    @keyframes drift {
-      0%, 100% {
-        transform: translateY(0px) scale(1);
-      }
-      50% {
-        transform: translateY(-16px) scale(1.04);
-      }
     }
 
     .page-wrap {
       position: relative;
+      height: 100vh;
       width: 100%;
-      min-height: 100vh;
     }
 
     .screen {
       position: absolute;
       inset: 0;
       padding: 24px;
-      transition:
-        opacity var(--transition),
-        transform var(--transition),
-        visibility var(--transition);
-    }
-
-    .screen.home {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 1;
-      transform: scale(1);
-      visibility: visible;
-      z-index: 2;
-    }
-
-    .screen.admin,
-    .screen.passenger {
-      opacity: 0;
-      transform: scale(1.02) translateY(18px);
-      visibility: hidden;
-      z-index: 1;
-    }
-
-    .page-wrap.admin-open .screen.home,
-    .page-wrap.passenger-open .screen.home {
-      opacity: 0;
-      transform: scale(0.985) translateY(-10px);
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .page-wrap.admin-open .screen.admin,
-    .page-wrap.passenger-open .screen.passenger {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      visibility: visible;
-      z-index: 3;
-    }
-
-    .hero-card {
-      width: 100%;
-      max-width: 1180px;
-      border-radius: 38px;
-      padding: 34px;
-      background: linear-gradient(180deg, rgba(17, 23, 49, 0.76), rgba(10, 14, 30, 0.72));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-card::before,
-    .admin-shell::before,
-    .passenger-shell::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      padding: 1px;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(124,92,255,0.58), rgba(76,167,255,0.42), rgba(255,255,255,0.12));
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      pointer-events: none;
-    }
-
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      right: -120px;
-      bottom: -120px;
-      width: 320px;
-      height: 320px;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(124,92,255,0.20), transparent 65%);
-      pointer-events: none;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 34px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .brand-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(145deg, rgba(124,92,255,0.22), rgba(76,167,255,0.16));
-      border: 1px solid rgba(255,255,255,0.10);
-      font-size: 1.25rem;
-    }
-
-    .brand-text h1 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .brand-text p {
-      margin: 4px 0 0;
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
-
-    .home-layout {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 28px;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .copy h2 {
-      margin: 0;
-      font-size: clamp(2.3rem, 5vw, 4.5rem);
-      line-height: 0.95;
-      letter-spacing: -0.05em;
-      font-weight: 800;
-      max-width: 630px;
-    }
-
-    .copy h2 span {
-      background: linear-gradient(135deg, #ffffff 0%, #cfdcff 38%, #9ec7ff 68%, #b89dff 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .copy p {
-      margin: 20px 0 0;
-      max-width: 560px;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.75;
-    }
-
-    .panel {
-      border-radius: 28px;
-      padding: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 100%;
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 6px 8px 0;
-    }
-
-    .panel-head h3 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    .panel-head p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.55;
-    }
-
-    .mini-badge {
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(124, 92, 255, 0.12);
-      border: 1px solid rgba(124, 92, 255, 0.16);
-      font-size: 1rem;
-    }
-
-    .option {
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 24px;
-      padding: 20px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
-        rgba(8, 12, 28, 0.58);
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      box-shadow: 0 18px 34px rgba(0,0,0,0.22);
-      transition:
-        transform var(--transition),
-        border-color var(--transition),
-        box-shadow var(--transition),
-        background var(--transition);
-    }
-
-    .option::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top right, rgba(124,92,255,0.16), transparent 40%);
-      pointer-events: none;
-    }
-
-    .option:hover {
-      transform: translateY(-4px);
-      border-color: rgba(155, 189, 255, 0.24);
-      box-shadow: 0 24px 42px rgba(0,0,0,0.28);
-    }
-
-    .option:active {
-      transform: translateY(-1px) scale(0.995);
-    }
-
-    .option-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .option-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 1.28rem;
-      background: linear-gradient(145deg, rgba(124,92,255,0.18), rgba(76,167,255,0.12));
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .option-tag {
-      padding: 9px 11px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #dce5ff;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .option h4 {
-      margin: 0;
-      font-size: 1.22rem;
-      font-weight: 700;
-      position: relative;
-      z-index: 1;
-    }
-
-    .option p {
-      margin: 10px 0 18px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.65;
-      position: relative;
-      z-index: 1;
-    }
-
-    .option-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .option-note {
-      color: #d8e1ff;
-      font-size: 0.88rem;
-    }
-
-    .arrow {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      transition: transform var(--transition), background var(--transition);
-    }
-
-    .option:hover .arrow {
-      transform: translateX(3px);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .admin-screen-inner,
-    .passenger-screen-inner {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 18px;
-    }
-
-    .admin-shell,
-    .passenger-shell {
-      position: relative;
-      width: 100%;
-      max-width: 1360px;
-      min-height: calc(100vh - 48px);
-      border-radius: 36px;
-      background: linear-gradient(180deg, rgba(14, 19, 42, 0.78), rgba(8, 11, 24, 0.74));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 34px 38px 30px;
-      overflow: hidden;
-    }
-
-    .admin-shell::after,
-    .passenger-shell::after {
-      content: "";
-      position: absolute;
-      top: -120px;
-      right: -120px;
-      width: 300px;
-      height: 300px;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(76,167,255,0.16), transparent 66%);
-      pointer-events: none;
-    }
-
-    .admin-topbar,
-    .passenger-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 42px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .admin-left,
-    .passenger-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .back-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition:
-        transform var(--transition),
-        background var(--transition),
-        border-color var(--transition);
-    }
-
-    .back-btn:hover {
-      transform: translateX(-2px);
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.14);
-    }
-
-    .admin-label,
-    .passenger-label {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .admin-label span:first-child,
-    .passenger-label span:first-child {
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .admin-label span:last-child,
-    .passenger-label span:last-child {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    .admin-badge,
-    .passenger-badge {
-      padding: 11px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.09);
-      background: rgba(255,255,255,0.045);
-      color: #dce4ff;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-
-    /* NEW: Add Flight Button */
-    .add-flight-btn {
-      margin-top: 12px;
-      padding: 12px 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: linear-gradient(135deg, rgba(124,92,255,0.22), rgba(76,167,255,0.18));
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
       transition: all var(--transition);
     }
 
-    .add-flight-btn:hover {
-      transform: translateY(-2px);
-      background: linear-gradient(135deg, rgba(124,92,255,0.35), rgba(76,167,255,0.28));
-      border-color: rgba(155,189,255,0.3);
+    .home { display: flex; justify-content: center; align-items: center; }
+
+    .admin, .passenger {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
     }
 
-    .flights-header {
-      position: relative;
-      z-index: 1;
-      margin-top: 8px;
+    .admin-open .admin,
+    .passenger-open .passenger {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
     }
 
-    .flights-title {
-      margin: 0;
-      font-size: clamp(2rem, 4vw, 3.35rem);
-      font-weight: 800;
-      letter-spacing: -0.045em;
-      color: #ffffff;
+    .admin-open .home,
+    .passenger-open .home {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .flights-title .count {
-      opacity: 0.96;
-    }
-
-    .header-line-wrap {
-      position: relative;
-      margin-top: 18px;
+    .card {
       width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      border-radius: 30px;
+      padding: 30px;
+      background: rgba(20,25,60,0.7);
+      border: 1px solid var(--border);
+    }
+
+    .option {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+    }
+
+    .left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .back {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+    }
+
+    /* ✅ FIXED ALIGNMENT */
+    .right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .badge {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .add-btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 42px;
+      font-weight: 800;
+    }
+
+    .line {
       height: 2px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      overflow: hidden;
-    }
-
-    .header-line {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(155,190,255,0.58) 48%, rgba(124,92,255,0.34) 100%);
-      transform-origin: left center;
-      animation: lineReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    @keyframes lineReveal {
-      0% {
-        transform: scaleX(0);
-        opacity: 0.2;
-      }
-      100% {
-        transform: scaleX(1);
-        opacity: 1;
-      }
+      background: white;
+      margin-top: 10px;
+      width: 100%;
     }
   </style>
 </head>
+
 <body>
-  <div class="grid"></div>
-  <div class="orb one"></div>
-  <div class="orb two"></div>
 
-  <div class="page-wrap" id="pageWrap">
-    <!-- Homepage (UNCHANGED) -->
-    <section class="screen home">
-      <div class="hero-card">
-        <div class="brand">
-          <div class="brand-icon">✈️</div>
-          <div class="brand-text">
-            <h1>MSFS Flight Planner</h1>
-            <p>Operations dashboard & passenger itinerary experience</p>
-          </div>
-        </div>
+<div class="page-wrap" id="wrap">
 
-        <div class="home-layout">
-          <div class="copy">
-            <h2>
-              Plan it.<br />
-              Manage it.<br />
-              <span>Track it beautifully.</span>
-            </h2>
-            <p>
-              A premium Microsoft Flight Simulator flight planner concept with separate admin and passenger experiences.
-              Choose how you want to enter the system below.
-            </p>
-          </div>
+  <!-- HOME -->
+  <div class="screen home">
+    <div class="card">
+      <h2>MSFS Flight Planner</h2>
 
-          <div class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Select Entry Point</h3>
-                <p>Both options are visual for now, with the admin page transition active.</p>
-              </div>
-              <div class="mini-badge">🛫</div>
-            </div>
-
-            <button class="option" id="adminButton" type="button">
-              <div class="option-top">
-                <div class="option-icon">🧑‍✈️</div>
-                <div class="option-tag">Admin Access</div>
-              </div>
-
-              <h4>Admin Login</h4>
-              <p>
-                Manage flights, update planning details, and control what appears on the passenger side.
-              </p>
-
-              <div class="option-bottom">
-                <span class="option-note">Desktop-optimized management portal</span>
-                <span class="arrow">→</span>
-              </div>
-            </button>
-
-            <button class="option" id="passengerButton" type="button">
-              <div class="option-top">
-                <div class="option-icon">🧳</div>
-                <div class="option-tag">Passenger View</div>
-              </div>
-
-              <h4>Passenger Login</h4>
-              <p>
-                Access a mobile-focused itinerary experience with polished flight cards and clean status styling.
-              </p>
-
-              <div class="option-bottom">
-                <span class="option-note">Visual only for now</span>
-                <span class="arrow">→</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Admin Page -->
-    <section class="screen admin">
-      <div class="admin-screen-inner">
-        <div class="admin-shell">
-          <div class="admin-topbar">
-            <div class="admin-left">
-              <button class="back-btn" id="backButton" type="button">←</button>
-              <div class="admin-label">
-                <span>Management View</span>
-                <span>Admin Dashboard</span>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-  <div class="admin-badge">Flight Planning System</div>
-  <button class="add-flight-btn">Add flight</button>
-</div>
-
-          <div class="flights-header">
-            <h1 class="flights-title">Flights <span class="count">(0)</span></h1>
-            <div class="header-line-wrap">
-              <div class="header-line"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Passenger Page (UNCHANGED) -->
-    <section class="screen passenger">
-      <div class="passenger-screen-inner">
-        <div class="passenger-shell">
-          <div class="passenger-topbar">
-            <div class="passenger-left">
-              <button class="back-btn" id="passengerBackButton" type="button">←</button>
-              <div class="passenger-label">
-                <span>Passenger View</span>
-                <span>Passenger Dashboard</span>
-              </div>
-            </div>
-
-            <div class="passenger-badge">Flight Planning System</div>
-          </div>
-
-          <div class="flights-header">
-            <h1 class="flights-title">Flights <span class="count">(0)</span></h1>
-            <div class="header-line-wrap">
-              <div class="header-line"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div class="option" id="adminBtn">Admin Login</div>
+      <div class="option" id="passengerBtn">Passenger Login</div>
+    </div>
   </div>
 
-  <script>
-    const pageWrap = document.getElementById('pageWrap');
-    const adminButton = document.getElementById('adminButton');
-    const passengerButton = document.getElementById('passengerButton');
-    const backButton = document.getElementById('backButton');
-    const passengerBackButton = document.getElementById('passengerBackButton');
+  <!-- ADMIN -->
+  <div class="screen admin">
+    <div class="card">
 
-    adminButton.addEventListener('click', () => {
-      pageWrap.classList.remove('passenger-open');
-      pageWrap.classList.add('admin-open');
-    });
+      <div class="topbar">
+        <div class="left">
+          <button class="back" id="backBtn">←</button>
+          <div>
+            <div style="font-size:12px;color:gray;">MANAGEMENT VIEW</div>
+            <div style="font-weight:600;">Admin Dashboard</div>
+          </div>
+        </div>
 
-    passengerButton.addEventListener('click', () => {
-      pageWrap.classList.remove('admin-open');
-      pageWrap.classList.add('passenger-open');
-    });
+        <!-- ✅ FIXED RIGHT SIDE -->
+        <div class="right">
+          <div class="badge">Flight Planning System</div>
+          <button class="add-btn">Add flight</button>
+        </div>
+      </div>
 
-    backButton.addEventListener('click', () => {
-      pageWrap.classList.remove('admin-open');
-    });
+      <div class="title">Flights (0)</div>
+      <div class="line"></div>
 
-    passengerBackButton.addEventListener('click', () => {
-      pageWrap.classList.remove('passenger-open');
-    });
-  </script>
+    </div>
+  </div>
+
+  <!-- PASSENGER -->
+  <div class="screen passenger">
+    <div class="card">
+
+      <div class="topbar">
+        <div class="left">
+          <button class="back" id="pBack">←</button>
+          <div>
+            <div style="font-size:12px;color:gray;">PASSENGER VIEW</div>
+            <div style="font-weight:600;">Passenger Dashboard</div>
+          </div>
+        </div>
+
+        <div class="badge">Flight Planning System</div>
+      </div>
+
+      <div class="title">Flights (0)</div>
+      <div class="line"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const wrap = document.getElementById("wrap");
+
+  document.getElementById("adminBtn").onclick = () => {
+    wrap.classList.add("admin-open");
+    wrap.classList.remove("passenger-open");
+  };
+
+  document.getElementById("passengerBtn").onclick = () => {
+    wrap.classList.add("passenger-open");
+    wrap.classList.remove("admin-open");
+  };
+
+  document.getElementById("backBtn").onclick = () => {
+    wrap.classList.remove("admin-open");
+  };
+
+  document.getElementById("pBack").onclick = () => {
+    wrap.classList.remove("passenger-open");
+  };
+</script>
+
 </body>
 </html>
