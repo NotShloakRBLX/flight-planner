@@ -20,6 +20,7 @@
         radial-gradient(circle at top right, rgba(0, 194, 255, 0.12), transparent 30%),
         #070b18;
       color: white;
+      overflow-x: hidden;
     }
 
     .app {
@@ -28,10 +29,12 @@
       min-height: 100vh;
       margin: 0 auto;
       padding: 22px 18px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
     }
 
     .page-header {
       padding-top: 12px;
+      position: relative;
     }
 
     .page-title {
@@ -52,15 +55,113 @@
         rgba(255, 255, 255, 0.08)
       );
     }
+
+    .edit-button {
+      position: absolute;
+      right: 0;
+      bottom: -18px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .edit-button:hover {
+      background: rgba(255, 255, 255, 0.13);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .edit-button:active {
+      transform: scale(0.92);
+    }
+
+    .edit-button svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+    }
+
+    .add-flight-page {
+      position: fixed;
+      inset: 0;
+      min-height: 100vh;
+      padding: 34px 44px;
+      background:
+        radial-gradient(circle at top left, rgba(91, 95, 255, 0.20), transparent 34%),
+        radial-gradient(circle at top right, rgba(0, 194, 255, 0.12), transparent 30%),
+        #070b18;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(34px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .add-flight-page.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .app.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-24px);
+    }
+
+    .add-flight-container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .add-flight-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.9px;
+      line-height: 1;
+    }
   </style>
 </head>
 
 <body>
-  <main class="app">
+  <main class="app" id="flightsPage">
     <header class="page-header">
       <h1 class="page-title">Flights</h1>
+
       <div class="header-line"></div>
+
+      <button class="edit-button" id="editButton" aria-label="Edit flights">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M16.86 3.49a1.75 1.75 0 0 1 2.48 0l1.17 1.17a1.75 1.75 0 0 1 0 2.48L9.62 18.03a2.25 2.25 0 0 1-.93.56l-4.05 1.16a.9.9 0 0 1-1.11-1.11l1.16-4.05c.1-.35.29-.67.56-.93L16.86 3.49Zm1.41 1.41L6.66 16.51l-.55 1.93 1.93-.55L19.65 6.28 18.27 4.9Z" />
+        </svg>
+      </button>
     </header>
   </main>
+
+  <section class="add-flight-page" id="addFlightPage">
+    <div class="add-flight-container">
+      <h1 class="add-flight-title">Add flight</h1>
+    </div>
+  </section>
+
+  <script>
+    const editButton = document.getElementById("editButton");
+    const flightsPage = document.getElementById("flightsPage");
+    const addFlightPage = document.getElementById("addFlightPage");
+
+    editButton.addEventListener("click", () => {
+      flightsPage.classList.add("hidden");
+      addFlightPage.classList.add("active");
+    });
+  </script>
 </body>
 </html>
