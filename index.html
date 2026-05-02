@@ -289,6 +289,77 @@
       fill: currentColor;
     }
 
+    .notification-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+
+    .notification-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .flight-added-popup {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 60;
+      width: min(420px, calc(100% - 36px));
+      padding: 3px;
+      border-radius: 26px;
+      background: linear-gradient(90deg, #16e18a, #5dffb5, #0fbf75);
+      box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.45),
+        0 18px 52px rgba(12, 190, 113, 0.24);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 90vh) scale(0.96);
+      transition:
+        opacity 0.42s ease,
+        transform 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .flight-added-popup.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .flight-added-popup.dismiss {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -125vh) scale(0.96);
+    }
+
+    .popup-inner {
+      min-height: 112px;
+      border-radius: 23px;
+      background:
+        radial-gradient(circle at top left, rgba(22, 225, 138, 0.15), transparent 45%),
+        rgba(7, 11, 24, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 26px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .popup-title {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: -0.45px;
+      color: white;
+    }
+
     @media (max-width: 760px) {
       .add-flight-page {
         padding: 28px 18px;
@@ -345,7 +416,7 @@
         <h1 class="add-flight-title">Add flight</h1>
       </header>
 
-      <form class="flight-form">
+      <form class="flight-form" id="flightForm">
         <div class="form-grid">
           <div class="form-field">
             <label for="airline">Airline</label>
@@ -399,7 +470,7 @@
         </div>
 
         <div class="form-actions">
-          <button class="add-flight-button" type="button">
+          <button class="add-flight-button" id="addFlightButton" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M21.72 4.56c.35.83.06 1.8-.68 2.3l-5.95 4.01 1.75 7.12a.86.86 0 0 1-1.29.93l-3.93-2.45-3.22 2.17.37 2.09a.74.74 0 0 1-1.1.77l-2.16-1.34-2.16 1.34a.74.74 0 0 1-1.1-.77l.72-4.07a1.7 1.7 0 0 1 .7-1.1l3.26-2.2-4.72-2.94a.86.86 0 0 1 .14-1.53l7.09-2.57 5.95-4.02a1.93 1.93 0 0 1 2.33.26ZM16.22 4.2 10.53 8.04a1 1 0 0 1-.22.11L4.6 10.22l4.34 2.71a.85.85 0 0 1 .02 1.43l-4.39 2.96-.35 1.98.88-.55a.74.74 0 0 1 .78 0l.88.55-.17-.96a.74.74 0 0 1 .31-.73l4.27-2.88a.85.85 0 0 1 .93-.02l2.62 1.64-1.43-5.82a1 1 0 0 1 .4-1.05l6.26-4.22a.43.43 0 0 0 .15-.51.43.43 0 0 0-.52-.25Z" />
             </svg>
@@ -410,11 +481,23 @@
     </div>
   </section>
 
+  <div class="notification-overlay" id="notificationOverlay"></div>
+
+  <div class="flight-added-popup" id="flightAddedPopup" role="button" tabindex="0" aria-label="Dismiss flight added notification">
+    <div class="popup-inner">
+      <div class="popup-title">Flight added!</div>
+    </div>
+  </div>
+
   <script>
     const editButton = document.getElementById("editButton");
     const backButton = document.getElementById("backButton");
     const flightsPage = document.getElementById("flightsPage");
     const addFlightPage = document.getElementById("addFlightPage");
+    const flightForm = document.getElementById("flightForm");
+    const addFlightButton = document.getElementById("addFlightButton");
+    const notificationOverlay = document.getElementById("notificationOverlay");
+    const flightAddedPopup = document.getElementById("flightAddedPopup");
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -424,6 +507,33 @@
     backButton.addEventListener("click", () => {
       addFlightPage.classList.remove("active");
       flightsPage.classList.remove("hidden");
+    });
+
+    addFlightButton.addEventListener("click", () => {
+      flightForm.reset();
+
+      notificationOverlay.classList.add("active");
+      flightAddedPopup.classList.remove("dismiss");
+      flightAddedPopup.classList.add("active");
+    });
+
+    function dismissNotification() {
+      flightAddedPopup.classList.remove("active");
+      flightAddedPopup.classList.add("dismiss");
+
+      setTimeout(() => {
+        notificationOverlay.classList.remove("active");
+        flightAddedPopup.classList.remove("dismiss");
+      }, 520);
+    }
+
+    flightAddedPopup.addEventListener("click", dismissNotification);
+
+    flightAddedPopup.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        dismissNotification();
+      }
     });
   </script>
 </body>
