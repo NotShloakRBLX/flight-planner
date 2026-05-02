@@ -105,8 +105,19 @@
       grid-template-columns: 74px 1fr auto;
       align-items: center;
       gap: 12px;
+      border: none;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: transparent;
+      color: white;
+      text-align: left;
+      cursor: pointer;
       animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .flight-card:active {
+      transform: scale(0.985);
+      opacity: 0.82;
     }
 
     @keyframes flightCardIn {
@@ -373,6 +384,231 @@
       fill: currentColor;
     }
 
+    .detail-page {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(10, 10, 18, 0.98);
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(28px);
+      transition:
+        opacity 0.38s ease,
+        transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .detail-page.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .detail-shell {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #12121a;
+    }
+
+    .detail-top {
+      position: relative;
+      padding: 38px 24px 34px;
+      display: grid;
+      grid-template-columns: 78px 1fr 74px;
+      align-items: center;
+      gap: 12px;
+      background: #15151d;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .detail-logo-space {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+        rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .detail-title-wrap {
+      min-width: 0;
+    }
+
+    .detail-meta {
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .detail-route-title {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -1px;
+      line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .detail-close-button {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+        rgba(255, 255, 255, 0.04);
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .detail-close-button:active {
+      transform: scale(0.92);
+    }
+
+    .detail-close-button svg {
+      width: 34px;
+      height: 34px;
+      stroke: currentColor;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .gate-status-panel {
+      padding: 28px 24px 30px;
+      background: linear-gradient(135deg, rgba(0, 78, 36, 0.92), rgba(0, 45, 22, 0.95));
+      border-bottom: 1px solid rgba(35, 220, 126, 0.18);
+    }
+
+    .gate-status-title {
+      color: #20d47a;
+      font-size: 28px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+    }
+
+    .detail-content {
+      padding: 34px 24px 44px;
+    }
+
+    .airport-row-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 24px;
+      font-weight: 950;
+      letter-spacing: -0.45px;
+      line-height: 1.15;
+    }
+
+    .direction-dot {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: white;
+      color: #15151d;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .direction-dot svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .airport-chevron {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 3.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.92;
+      flex: 0 0 auto;
+    }
+
+    .big-time {
+      margin-top: 20px;
+      color: #20d47a;
+      font-size: 56px;
+      font-weight: 1000;
+      letter-spacing: -2.4px;
+      line-height: 0.95;
+    }
+
+    .time-status-line {
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.25px;
+    }
+
+    .on-time {
+      color: #20d47a;
+      font-weight: 950;
+    }
+
+    .mid-flight-line {
+      margin: 30px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(255, 255, 255, 0.26);
+      font-size: 20px;
+      font-weight: 850;
+      letter-spacing: -0.35px;
+    }
+
+    .mid-flight-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.22);
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .mid-flight-icon::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 3px;
+      left: 7px;
+      top: 9px;
+      background: rgba(255, 255, 255, 0.26);
+      border-radius: 999px;
+      transform-origin: right center;
+      transform: rotate(-90deg);
+    }
+
+    .mid-flight-line::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.17);
+    }
+
     .notification-overlay {
       position: fixed;
       inset: 0;
@@ -502,6 +738,59 @@
       .flight-cities {
         font-size: 20px;
       }
+
+      .detail-top {
+        grid-template-columns: 58px 1fr 58px;
+        padding: 36px 20px 30px;
+      }
+
+      .detail-logo-space {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+      }
+
+      .detail-meta {
+        font-size: 18px;
+      }
+
+      .detail-route-title {
+        font-size: 26px;
+      }
+
+      .detail-close-button {
+        width: 56px;
+        height: 56px;
+      }
+
+      .detail-close-button svg {
+        width: 30px;
+        height: 30px;
+      }
+
+      .gate-status-panel {
+        padding: 26px 20px 28px;
+      }
+
+      .gate-status-title {
+        font-size: 25px;
+      }
+
+      .detail-content {
+        padding: 32px 20px 42px;
+      }
+
+      .airport-row-title {
+        font-size: 22px;
+      }
+
+      .big-time {
+        font-size: 52px;
+      }
+
+      .time-status-line {
+        font-size: 19px;
+      }
     }
   </style>
 </head>
@@ -620,6 +909,78 @@
     </div>
   </section>
 
+  <section class="detail-page" id="detailPage">
+    <div class="detail-shell">
+      <header class="detail-top">
+        <div class="detail-logo-space" aria-label="Airline logo space"></div>
+
+        <div class="detail-title-wrap">
+          <div class="detail-meta" id="detailMeta">AA 0000 • DEP → ARR</div>
+          <div class="detail-route-title" id="detailRouteTitle">Departure to Arrival</div>
+        </div>
+
+        <button class="detail-close-button" id="detailCloseButton" aria-label="Close flight details">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6L18 18M18 6L6 18"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="gate-status-panel">
+        <div class="gate-status-title" id="gateStatusTitle">Gate Departure in --</div>
+      </section>
+
+      <main class="detail-content">
+        <section class="airport-section">
+          <div class="airport-row-title">
+            <span class="direction-dot">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7.05 16.95a1.25 1.25 0 0 1 0-1.77L13.23 9H9.25a1.25 1.25 0 0 1 0-2.5h7a1.25 1.25 0 0 1 1.25 1.25v7a1.25 1.25 0 0 1-2.5 0v-3.98l-6.18 6.18a1.25 1.25 0 0 1-1.77 0Z" />
+              </svg>
+            </span>
+            <span id="detailDepartureAirport">DEP • Departure</span>
+            <svg class="airport-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 5l7 7-7 7"></path>
+            </svg>
+          </div>
+
+          <div class="big-time" id="detailDepartureTime">--:--</div>
+          <div class="time-status-line">
+            <span class="on-time">On Time</span>
+            <span> • </span>
+            <span id="detailDepartureCountdown">Departs in --</span>
+          </div>
+        </section>
+
+        <div class="mid-flight-line">
+          <span class="mid-flight-icon"></span>
+          <span id="detailFlightDuration">--</span>
+        </div>
+
+        <section class="airport-section">
+          <div class="airport-row-title">
+            <span class="direction-dot">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16.95 7.05a1.25 1.25 0 0 1 0 1.77L10.77 15h3.98a1.25 1.25 0 0 1 0 2.5h-7a1.25 1.25 0 0 1-1.25-1.25v-7a1.25 1.25 0 0 1 2.5 0v3.98l6.18-6.18a1.25 1.25 0 0 1 1.77 0Z" />
+              </svg>
+            </span>
+            <span id="detailArrivalAirport">ARR • Arrival</span>
+            <svg class="airport-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 5l7 7-7 7"></path>
+            </svg>
+          </div>
+
+          <div class="big-time" id="detailArrivalTime">--:--</div>
+          <div class="time-status-line">
+            <span class="on-time">On Time</span>
+            <span> • </span>
+            <span id="detailArrivalCountdown">Arrives in --</span>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
   <div class="notification-overlay" id="notificationOverlay"></div>
 
   <div class="flight-added-popup" id="flightAddedPopup" role="button" tabindex="0" aria-label="Dismiss flight added notification">
@@ -663,6 +1024,19 @@
     const flightAddedPopup = document.getElementById("flightAddedPopup");
     const flightsList = document.getElementById("flightsList");
 
+    const detailPage = document.getElementById("detailPage");
+    const detailCloseButton = document.getElementById("detailCloseButton");
+    const detailMeta = document.getElementById("detailMeta");
+    const detailRouteTitle = document.getElementById("detailRouteTitle");
+    const gateStatusTitle = document.getElementById("gateStatusTitle");
+    const detailDepartureAirport = document.getElementById("detailDepartureAirport");
+    const detailDepartureTime = document.getElementById("detailDepartureTime");
+    const detailDepartureCountdown = document.getElementById("detailDepartureCountdown");
+    const detailFlightDuration = document.getElementById("detailFlightDuration");
+    const detailArrivalAirport = document.getElementById("detailArrivalAirport");
+    const detailArrivalTime = document.getElementById("detailArrivalTime");
+    const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
+
     const airlineInput = document.getElementById("airline");
     const flightNumberInput = document.getElementById("flightNumber");
     const departureAirportInput = document.getElementById("departureAirport");
@@ -677,6 +1051,10 @@
     const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
     const airTimeInput = document.getElementById("airTime");
+
+    let allFlights = new Map();
+    let activeFlight = null;
+    let countdownTimer = null;
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -700,6 +1078,18 @@
       });
     }
 
+    function formatShortDate(dateValue) {
+      if (!dateValue) return "";
+
+      const date = new Date(dateValue + "T00:00:00");
+
+      return date.toLocaleDateString("en-US", {
+        weekday: "short",
+        day: "numeric",
+        month: "short"
+      }).toUpperCase();
+    }
+
     function escapeHTML(value) {
       return String(value)
         .replaceAll("&", "&amp;")
@@ -709,9 +1099,106 @@
         .replaceAll("'", "&#039;");
     }
 
+    function formatTime12Hour(timeValue) {
+      if (!timeValue) return "--:--";
+
+      const [hourText, minuteText] = timeValue.split(":");
+      let hour = Number(hourText);
+      const minute = minuteText || "00";
+      const suffix = hour >= 12 ? "PM" : "AM";
+
+      hour = hour % 12;
+      if (hour === 0) hour = 12;
+
+      return `${hour}:${minute} ${suffix}`;
+    }
+
+    function buildLocalDateTime(dateValue, timeValue) {
+      if (!dateValue || !timeValue) return null;
+
+      return new Date(`${dateValue}T${timeValue}:00`);
+    }
+
+    function getDepartureDateTime(flight) {
+      return buildLocalDateTime(flight.flightDateRaw, flight.scheduledDeparture);
+    }
+
+    function getArrivalDateTime(flight) {
+      const departure = getDepartureDateTime(flight);
+      const arrival = buildLocalDateTime(flight.flightDateRaw, flight.scheduledArrival);
+
+      if (!departure || !arrival) return arrival;
+
+      if (arrival <= departure) {
+        arrival.setDate(arrival.getDate() + 1);
+      }
+
+      return arrival;
+    }
+
+    function formatCountdown(targetDate, actionWord) {
+      if (!targetDate || Number.isNaN(targetDate.getTime())) {
+        return `${actionWord} in --`;
+      }
+
+      const now = new Date();
+      let diffMs = targetDate - now;
+
+      if (diffMs <= 0) {
+        if (actionWord === "Departs") return "Departing now";
+        if (actionWord === "Arrives") return "Arriving now";
+        return "Now";
+      }
+
+      const totalMinutes = Math.floor(diffMs / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+
+      if (days > 0) {
+        return `${actionWord} in ${days}d ${hours}h`;
+      }
+
+      if (hours > 0) {
+        return `${actionWord} in ${hours}h ${minutes}m`;
+      }
+
+      return `${actionWord} in ${minutes}m`;
+    }
+
+    function formatPanelCountdown(targetDate) {
+      if (!targetDate || Number.isNaN(targetDate.getTime())) {
+        return "Gate Departure in --";
+      }
+
+      const now = new Date();
+      let diffMs = targetDate - now;
+
+      if (diffMs <= 0) {
+        return "Gate Departure now";
+      }
+
+      const totalMinutes = Math.floor(diffMs / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+
+      if (days > 0) {
+        return `Gate Departure in ${days}d ${hours}h`;
+      }
+
+      if (hours > 0) {
+        return `Gate Departure in ${hours}h ${minutes}m`;
+      }
+
+      return `Gate Departure in ${minutes}m`;
+    }
+
     function createFlightCard(flight) {
-      const card = document.createElement("article");
+      const card = document.createElement("button");
       card.className = "flight-card";
+      card.type = "button";
+      card.dataset.flightId = flight.id;
 
       const airline = escapeHTML(flight.airline || "AA");
       const flightNumber = escapeHTML(flight.flightNumber || "0000");
@@ -738,8 +1225,62 @@
         <div class="flight-date-display">${flightDate}</div>
       `;
 
+      card.addEventListener("click", () => {
+        const selectedFlight = allFlights.get(flight.id);
+        if (selectedFlight) {
+          openFlightDetails(selectedFlight);
+        }
+      });
+
       flightsList.appendChild(card);
     }
+
+    function updateDetailCountdowns() {
+      if (!activeFlight) return;
+
+      const departureDateTime = getDepartureDateTime(activeFlight);
+      const arrivalDateTime = getArrivalDateTime(activeFlight);
+
+      gateStatusTitle.textContent = formatPanelCountdown(departureDateTime);
+      detailDepartureCountdown.textContent = formatCountdown(departureDateTime, "Departs");
+      detailArrivalCountdown.textContent = formatCountdown(arrivalDateTime, "Arrives");
+    }
+
+    function openFlightDetails(flight) {
+      activeFlight = flight;
+
+      detailMeta.textContent = `${flight.airline || "AA"} ${flight.flightNumber || "0000"} • ${formatShortDate(flight.flightDateRaw) || flight.flightDate || ""}`;
+      detailRouteTitle.textContent = `${flight.cityDeparture || "Departure"} to ${flight.cityArrival || "Arrival"}`;
+
+      detailDepartureAirport.textContent = `${flight.departureAirport || "DEP"} • ${flight.cityDeparture || "Departure"}`;
+      detailDepartureTime.textContent = formatTime12Hour(flight.scheduledDeparture);
+      detailFlightDuration.textContent = flight.flightTime || flight.airTime || "--";
+
+      detailArrivalAirport.textContent = `${flight.arrivalAirport || "ARR"} • ${flight.cityArrival || "Arrival"}`;
+      detailArrivalTime.textContent = formatTime12Hour(flight.scheduledArrival);
+
+      updateDetailCountdowns();
+
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownTimer = setInterval(updateDetailCountdowns, 1000);
+
+      detailPage.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeFlightDetails() {
+      detailPage.classList.remove("active");
+      activeFlight = null;
+
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+
+      document.body.style.overflow = "";
+    }
+
+    detailCloseButton.addEventListener("click", closeFlightDetails);
 
     function showNotification() {
       notificationOverlay.classList.add("active");
@@ -789,9 +1330,16 @@
 
     onSnapshot(flightsQuery, (snapshot) => {
       flightsList.innerHTML = "";
+      allFlights.clear();
 
       snapshot.forEach((doc) => {
-        createFlightCard(doc.data());
+        const flight = {
+          id: doc.id,
+          ...doc.data()
+        };
+
+        allFlights.set(flight.id, flight);
+        createFlightCard(flight);
       });
     }, (error) => {
       console.error("Error loading flights:", error);
