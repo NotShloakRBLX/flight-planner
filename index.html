@@ -1881,9 +1881,8 @@
     return "";
   }
 
-  return `./assets/logos/${code}.png`;
+  return `./${code}.png`;
 }
-
     function formatDisplayDate(dateValue) {
       if (!dateValue) return "";
 
@@ -2329,11 +2328,7 @@
 
       card.innerHTML = `
         <div class="logo-space" aria-label="Airline logo space">
-  <img
-    src="${getAirlineLogoPath(flight.airline)}"
-    alt="${airline} logo"
-    onerror="this.onerror=null; this.src='./logos/${String(flight.airline || '').trim().toLowerCase()}.png'; this.onerror=function(){this.style.display='none';};"
-  />
+  <img src="${getAirlineLogoPath(flight.airline)}" alt="${airline} logo" onerror="this.style.display='none';" />
 </div>
 
         <div class="flight-main">
