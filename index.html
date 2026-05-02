@@ -23,6 +23,11 @@
       overflow-x: hidden;
     }
 
+    button,
+    input {
+      font-family: inherit;
+    }
+
     .app {
       width: 100%;
       max-width: 430px;
@@ -30,6 +35,12 @@
       margin: 0 auto;
       padding: 22px 18px;
       transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .app.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-24px);
     }
 
     .page-header {
@@ -185,9 +196,11 @@
       white-space: nowrap;
     }
 
-    .add-flight-page {
+    .add-flight-page,
+    .edit-flight-page {
       position: fixed;
       inset: 0;
+      z-index: 35;
       min-height: 100vh;
       padding: 30px 38px;
       background:
@@ -201,25 +214,22 @@
       overflow-y: auto;
     }
 
-    .add-flight-page.active {
+    .add-flight-page.active,
+    .edit-flight-page.active {
       opacity: 1;
       pointer-events: auto;
       transform: translateX(0);
     }
 
-    .app.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(-24px);
-    }
-
-    .add-flight-container {
+    .add-flight-container,
+    .edit-flight-container {
       width: 100%;
       max-width: 1180px;
       margin: 0 auto;
     }
 
-    .add-flight-header {
+    .add-flight-header,
+    .edit-flight-header {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -256,14 +266,17 @@
       fill: currentColor;
     }
 
-    .add-flight-title {
+    .add-flight-title,
+    .edit-flight-title {
       font-size: 38px;
       font-weight: 800;
       letter-spacing: -0.9px;
       line-height: 1;
     }
 
-    .flight-form {
+    .flight-form,
+    .edit-form-card,
+    .phase-card {
       margin-top: 24px;
       padding: 22px;
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -282,6 +295,12 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 13px;
+    }
+
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .form-field label {
@@ -336,9 +355,11 @@
       margin-top: 22px;
       display: flex;
       justify-content: flex-end;
+      gap: 12px;
     }
 
-    .add-flight-button {
+    .add-flight-button,
+    .save-button {
       min-width: 190px;
       height: 54px;
       border: none;
@@ -362,7 +383,8 @@
         filter 0.25s ease;
     }
 
-    .add-flight-button:hover {
+    .add-flight-button:hover,
+    .save-button:hover {
       transform: translateY(-2px);
       filter: brightness(1.04);
       box-shadow:
@@ -370,11 +392,13 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
 
-    .add-flight-button:active {
+    .add-flight-button:active,
+    .save-button:active {
       transform: scale(0.97);
     }
 
-    .add-flight-button svg {
+    .add-flight-button svg,
+    .save-button svg {
       width: 18px;
       height: 18px;
       fill: currentColor;
@@ -490,6 +514,12 @@
       padding: 24px 22px 26px;
       background: linear-gradient(135deg, rgba(0, 78, 36, 0.92), rgba(0, 45, 22, 0.95));
       border-bottom: 1px solid rgba(35, 220, 126, 0.18);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .gate-status-panel.bad {
+      background: linear-gradient(135deg, rgba(78, 8, 0, 0.94), rgba(45, 6, 0, 0.96));
+      border-bottom-color: rgba(255, 75, 75, 0.18);
     }
 
     .gate-status-title {
@@ -498,6 +528,25 @@
       font-weight: 850;
       letter-spacing: -0.75px;
       line-height: 1.1;
+      transition: color 0.3s ease;
+    }
+
+    .gate-status-panel.bad .gate-status-title {
+      color: #ff4b4b;
+    }
+
+    .gate-status-subtitle {
+      margin-top: 8px;
+      color: rgba(32, 212, 122, 0.74);
+      font-size: 19px;
+      font-weight: 760;
+      letter-spacing: -0.35px;
+      line-height: 1.2;
+      transition: color 0.3s ease;
+    }
+
+    .gate-status-panel.bad .gate-status-subtitle {
+      color: rgba(255, 75, 75, 0.76);
     }
 
     .detail-content {
@@ -550,6 +599,20 @@
       font-weight: 850;
       letter-spacing: -2.1px;
       line-height: 0.95;
+      transition: color 0.3s ease;
+    }
+
+    .big-time.bad {
+      color: #ff4b4b;
+    }
+
+    .old-time {
+      margin-left: 8px;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 22px;
+      font-weight: 700;
+      text-decoration: line-through;
+      letter-spacing: -0.45px;
     }
 
     .time-status-line {
@@ -562,6 +625,11 @@
 
     .on-time {
       color: #20d47a;
+      font-weight: 850;
+    }
+
+    .late-text {
+      color: #ff4b4b;
       font-weight: 850;
     }
 
@@ -652,6 +720,344 @@
       color: rgba(255, 255, 255, 0.48);
     }
 
+    .timetable-card {
+      margin-top: 24px;
+      border-radius: 28px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.014)),
+        #12121a;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    }
+
+    .timetable-header {
+      padding: 22px 20px 18px;
+    }
+
+    .timetable-title {
+      font-size: 26px;
+      font-weight: 850;
+      letter-spacing: -0.65px;
+      line-height: 1.05;
+    }
+
+    .timetable-subtitle {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.48);
+      font-size: 16px;
+      font-weight: 720;
+      letter-spacing: -0.25px;
+      line-height: 1.2;
+    }
+
+    .timetable-section {
+      padding: 18px 20px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .timetable-section:first-of-type {
+      border-top: none;
+      padding-top: 8px;
+    }
+
+    .timetable-section-label {
+      margin-bottom: 16px;
+      color: rgba(255, 255, 255, 0.48);
+      font-size: 17px;
+      font-weight: 820;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .timetable-row {
+      display: grid;
+      grid-template-columns: 1.25fr 0.68fr 0.68fr;
+      align-items: start;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .timetable-row-name {
+      color: white;
+      font-size: 20px;
+      font-weight: 760;
+      letter-spacing: -0.35px;
+      line-height: 1.12;
+      padding-top: 18px;
+    }
+
+    .timetable-column-label {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 16px;
+      font-weight: 760;
+      letter-spacing: -0.25px;
+      line-height: 1.1;
+    }
+
+    .timetable-value {
+      margin-top: 6px;
+      color: white;
+      font-size: 20px;
+      font-weight: 780;
+      letter-spacing: -0.4px;
+      line-height: 1.08;
+      min-height: 22px;
+    }
+
+    .actual-good {
+      color: #24c36d;
+    }
+
+    .actual-bad {
+      color: #ff4b4b;
+    }
+
+    .actual-empty {
+      color: transparent;
+    }
+
+    .detail-action-stack {
+      margin-top: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .detail-action-button {
+      width: 100%;
+      height: 58px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
+        rgba(255, 255, 255, 0.04);
+      color: white;
+      font-size: 17px;
+      font-weight: 850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.25s ease, filter 0.25s ease, border-color 0.25s ease;
+    }
+
+    .detail-action-button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .detail-action-button:active {
+      transform: scale(0.98);
+    }
+
+    .detail-action-button svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    .delete-button {
+      border: 1px solid rgba(255, 75, 75, 0.5);
+      background:
+        linear-gradient(135deg, rgba(255, 75, 75, 0.94), rgba(155, 18, 18, 0.95)),
+        rgba(255, 75, 75, 0.12);
+      box-shadow:
+        0 18px 42px rgba(255, 75, 75, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .phase-title {
+      font-size: 24px;
+      font-weight: 850;
+      letter-spacing: -0.55px;
+      line-height: 1.05;
+    }
+
+    .phase-subtitle {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.48);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .phase-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .phase-button {
+      min-height: 76px;
+      border-radius: 20px;
+      padding: 3px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      background: linear-gradient(135deg, rgba(100, 130, 255, 0.9), rgba(0, 194, 255, 0.72));
+      transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+    }
+
+    .phase-button-inner {
+      width: 100%;
+      height: 100%;
+      min-height: 70px;
+      border-radius: 17px;
+      background: rgba(7, 11, 24, 0.94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: -0.15px;
+      line-height: 1.1;
+    }
+
+    .phase-button.active {
+      background: linear-gradient(135deg, #16e18a, #5dffb5, #0fbf75);
+      box-shadow: 0 16px 34px rgba(12, 190, 113, 0.18);
+    }
+
+    .phase-button.locked {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055));
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .phase-button.done {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+      opacity: 0.72;
+      cursor: default;
+    }
+
+    .phase-button:not(.locked):not(.done):hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .phase-button:not(.locked):not(.done):active {
+      transform: scale(0.97);
+    }
+
+    .mark-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, 0.64);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+
+    .mark-popup-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mark-popup {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 90;
+      width: min(430px, calc(100% - 32px));
+      padding: 24px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top left, rgba(91, 95, 255, 0.16), transparent 45%),
+        rgba(13, 17, 32, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.54),
+        inset 0 1px 0 rgba(255, 255, 255, 0.11);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 40px) scale(0.96);
+      transition:
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mark-popup.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .mark-popup-title {
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -0.7px;
+    }
+
+    .mark-popup-subtitle {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .mark-popup input {
+      margin-top: 18px;
+      width: 100%;
+      height: 54px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 17px;
+      outline: none;
+      padding: 0 16px;
+      background: rgba(5, 10, 24, 0.7);
+      color: white;
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .mark-popup input:focus {
+      border-color: rgba(22, 225, 138, 0.95);
+      box-shadow:
+        0 0 0 1px rgba(22, 225, 138, 0.38),
+        0 0 0 5px rgba(22, 225, 138, 0.12);
+    }
+
+    .mark-popup-actions {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mark-button,
+    .cancel-button {
+      height: 50px;
+      border-radius: 999px;
+      border: none;
+      color: white;
+      font-size: 15px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .mark-button {
+      background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+      box-shadow: 0 18px 40px rgba(12, 190, 113, 0.2);
+    }
+
+    .cancel-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .mark-button:hover,
+    .cancel-button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
     .notification-overlay {
       position: fixed;
       inset: 0;
@@ -724,26 +1130,33 @@
     }
 
     @media (max-width: 1000px) {
-      .form-grid {
+      .form-grid,
+      .phase-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 760px) {
-      .add-flight-page {
+      .add-flight-page,
+      .edit-flight-page {
         padding: 28px 18px;
       }
 
-      .add-flight-title {
+      .add-flight-title,
+      .edit-flight-title {
         font-size: 32px;
       }
 
-      .flight-form {
+      .flight-form,
+      .edit-form-card,
+      .phase-card {
         padding: 20px;
         border-radius: 24px;
       }
 
-      .form-grid {
+      .form-grid,
+      .edit-form-grid,
+      .phase-grid {
         grid-template-columns: 1fr;
       }
 
@@ -751,7 +1164,8 @@
         justify-content: stretch;
       }
 
-      .add-flight-button {
+      .add-flight-button,
+      .save-button {
         width: 100%;
       }
     }
@@ -819,6 +1233,10 @@
         font-size: 24px;
       }
 
+      .gate-status-subtitle {
+        font-size: 17px;
+      }
+
       .detail-content {
         padding: 30px 20px 42px;
       }
@@ -854,6 +1272,39 @@
 
       .timezone-subtitle {
         font-size: 16px;
+      }
+
+      .timetable-header {
+        padding: 20px 18px 16px;
+      }
+
+      .timetable-title {
+        font-size: 24px;
+      }
+
+      .timetable-subtitle {
+        font-size: 15px;
+      }
+
+      .timetable-section {
+        padding: 16px 18px 18px;
+      }
+
+      .timetable-row {
+        grid-template-columns: 1.15fr 0.72fr 0.72fr;
+        gap: 10px;
+      }
+
+      .timetable-row-name {
+        font-size: 18px;
+      }
+
+      .timetable-column-label {
+        font-size: 15px;
+      }
+
+      .timetable-value {
+        font-size: 18px;
       }
     }
   </style>
@@ -990,8 +1441,9 @@
         </button>
       </header>
 
-      <section class="gate-status-panel">
+      <section class="gate-status-panel" id="statusPanel">
         <div class="gate-status-title" id="gateStatusTitle">Gate Departure in --</div>
+        <div class="gate-status-subtitle" id="gateStatusSubtitle"></div>
       </section>
 
       <main class="detail-content">
@@ -1009,7 +1461,7 @@
           </div>
 
           <div class="big-time" id="detailDepartureTime">--:--</div>
-          <div class="time-status-line">
+          <div class="time-status-line" id="departureStatusLine">
             <span class="on-time">On Time</span>
             <span> • </span>
             <span id="detailDepartureCountdown">Departs in --</span>
@@ -1035,7 +1487,7 @@
           </div>
 
           <div class="big-time" id="detailArrivalTime">--:--</div>
-          <div class="time-status-line">
+          <div class="time-status-line" id="arrivalStatusLine">
             <span class="on-time">On Time</span>
             <span> • </span>
             <span id="detailArrivalCountdown">Arrives in --</span>
@@ -1054,7 +1506,215 @@
             <div class="timezone-subtitle" id="timezoneSubtitle">Both airports are in the same timezone</div>
           </div>
         </section>
+
+        <section class="timetable-card">
+          <div class="timetable-header">
+            <div class="timetable-title">Detailed Timetable</div>
+            <div class="timetable-subtitle">Scheduled, Estimated, Predicted, and Actual</div>
+          </div>
+
+          <div class="timetable-section">
+            <div class="timetable-section-label">Depart</div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Gate Departure</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledGateDeparture">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualGateDeparture">--</div>
+              </div>
+            </div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Taxi</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledDepartureTaxi">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualDepartureTaxi">--</div>
+              </div>
+            </div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Take Off</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledTakeoff">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualTakeoff">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timetable-section">
+            <div class="timetable-section-label">Arrive</div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Land</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledLand">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualLand">--</div>
+              </div>
+            </div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Taxi</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledArrivalTaxi">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualArrivalTaxi">--</div>
+              </div>
+            </div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Gate Arrival</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledGateArrival">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualGateArrival">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timetable-section">
+            <div class="timetable-section-label">Totals</div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Air Time</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledAirTime">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualAirTime">--</div>
+              </div>
+            </div>
+
+            <div class="timetable-row">
+              <div class="timetable-row-name">Total Time</div>
+              <div>
+                <div class="timetable-column-label">Scheduled</div>
+                <div class="timetable-value" id="ttScheduledTotalTime">--</div>
+              </div>
+              <div>
+                <div class="timetable-column-label">Actual</div>
+                <div class="timetable-value actual-empty" id="ttActualTotalTime">--</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-action-stack">
+          <button class="detail-action-button" id="openEditFlightButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16.86 3.49a1.75 1.75 0 0 1 2.48 0l1.17 1.17a1.75 1.75 0 0 1 0 2.48L9.62 18.03a2.25 2.25 0 0 1-.93.56l-4.05 1.16a.9.9 0 0 1-1.11-1.11l1.16-4.05c.1-.35.29-.67.56-.93L16.86 3.49Zm1.41 1.41L6.66 16.51l-.55 1.93 1.93-.55L19.65 6.28 18.27 4.9Z" />
+            </svg>
+            Edit
+          </button>
+
+          <button class="detail-action-button delete-button" id="deleteFlightButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 3.25A2.25 2.25 0 0 1 11.25 1h1.5A2.25 2.25 0 0 1 15 3.25V4h4.25a1 1 0 1 1 0 2H18.6l-.86 13.02A3.25 3.25 0 0 1 14.5 22h-5a3.25 3.25 0 0 1-3.24-2.98L5.4 6h-.65a1 1 0 0 1 0-2H9v-.75ZM11 4h2v-.75a.25.25 0 0 0-.25-.25h-1.5a.25.25 0 0 0-.25.25V4Zm-3.6 2 .85 12.89A1.25 1.25 0 0 0 9.5 20h5a1.25 1.25 0 0 0 1.25-1.11L16.6 6H7.4Zm3.1 3.25a1 1 0 0 1 1 1v5.5a1 1 0 1 1-2 0v-5.5a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v5.5a1 1 0 1 1-2 0v-5.5a1 1 0 0 1 1-1Z" />
+            </svg>
+            Delete flight
+          </button>
+        </section>
       </main>
+    </div>
+  </section>
+
+  <section class="edit-flight-page" id="editFlightPage">
+    <div class="edit-flight-container">
+      <header class="edit-flight-header">
+        <button class="back-button" id="editBackButton" aria-label="Back to flight details">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15.53 4.47a.75.75 0 0 1 0 1.06L9.06 12l6.47 6.47a.75.75 0 1 1-1.06 1.06l-7-7a.75.75 0 0 1 0-1.06l7-7a.75.75 0 0 1 1.06 0Z" />
+          </svg>
+        </button>
+
+        <h1 class="edit-flight-title">Edit flight</h1>
+      </header>
+
+      <section class="edit-form-card">
+        <div class="edit-form-grid">
+          <div class="form-field">
+            <label for="editScheduledDeparture">Scheduled departure time</label>
+            <input id="editScheduledDeparture" type="time" />
+          </div>
+
+          <div class="form-field">
+            <label for="editScheduledArrival">Scheduled arrival time</label>
+            <input id="editScheduledArrival" type="time" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="save-button" id="saveScheduleButton" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9.55 17.55a1.25 1.25 0 0 1-1.77 0l-4.1-4.1a1.25 1.25 0 0 1 1.77-1.77l3.21 3.22 9.89-9.9a1.25 1.25 0 0 1 1.77 1.77l-10.77 10.78Z" />
+            </svg>
+            Save
+          </button>
+        </div>
+      </section>
+
+      <section class="phase-card">
+        <div class="phase-title">Flight Phase</div>
+        <div class="phase-subtitle">Phases must be activated one by one. Active phase buttons are highlighted green.</div>
+
+        <div class="phase-grid">
+          <button class="phase-button" id="phaseGateDeparture" type="button">
+            <div class="phase-button-inner">Gate Departure</div>
+          </button>
+
+          <button class="phase-button" id="phaseTaxi" type="button">
+            <div class="phase-button-inner">Taxi</div>
+          </button>
+
+          <button class="phase-button" id="phaseTakeoff" type="button">
+            <div class="phase-button-inner">Takeoff</div>
+          </button>
+
+          <button class="phase-button" id="phaseLand" type="button">
+            <div class="phase-button-inner">Land</div>
+          </button>
+
+          <button class="phase-button" id="phaseGateArrival" type="button">
+            <div class="phase-button-inner">Gate Arrival</div>
+          </button>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <div class="mark-popup-overlay" id="markPopupOverlay"></div>
+
+  <section class="mark-popup" id="markPopup">
+    <div class="mark-popup-title" id="markPopupTitle">Mark phase</div>
+    <div class="mark-popup-subtitle">Enter the actual time for this flight phase.</div>
+    <input id="markTimeInput" type="time" />
+
+    <div class="mark-popup-actions">
+      <button class="cancel-button" id="cancelMarkButton" type="button">Cancel</button>
+      <button class="mark-button" id="confirmMarkButton" type="button">Mark</button>
     </div>
   </section>
 
@@ -1062,7 +1722,7 @@
 
   <div class="flight-added-popup" id="flightAddedPopup" role="button" tabindex="0" aria-label="Dismiss flight added notification">
     <div class="popup-inner">
-      <div class="popup-title">Flight added!</div>
+      <div class="popup-title" id="popupTitle">Flight added!</div>
     </div>
   </div>
 
@@ -1076,7 +1736,10 @@
       onSnapshot,
       query,
       orderBy,
-      serverTimestamp
+      serverTimestamp,
+      updateDoc,
+      deleteDoc,
+      doc
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -1099,22 +1762,65 @@
     const addFlightButton = document.getElementById("addFlightButton");
     const notificationOverlay = document.getElementById("notificationOverlay");
     const flightAddedPopup = document.getElementById("flightAddedPopup");
+    const popupTitle = document.getElementById("popupTitle");
     const flightsList = document.getElementById("flightsList");
 
     const detailPage = document.getElementById("detailPage");
     const detailCloseButton = document.getElementById("detailCloseButton");
     const detailMeta = document.getElementById("detailMeta");
     const detailRouteTitle = document.getElementById("detailRouteTitle");
+    const statusPanel = document.getElementById("statusPanel");
     const gateStatusTitle = document.getElementById("gateStatusTitle");
+    const gateStatusSubtitle = document.getElementById("gateStatusSubtitle");
     const detailDepartureAirport = document.getElementById("detailDepartureAirport");
     const detailDepartureTime = document.getElementById("detailDepartureTime");
     const detailDepartureCountdown = document.getElementById("detailDepartureCountdown");
+    const departureStatusLine = document.getElementById("departureStatusLine");
     const detailFlightDuration = document.getElementById("detailFlightDuration");
     const detailArrivalAirport = document.getElementById("detailArrivalAirport");
     const detailArrivalTime = document.getElementById("detailArrivalTime");
     const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
+    const arrivalStatusLine = document.getElementById("arrivalStatusLine");
     const timezoneTitle = document.getElementById("timezoneTitle");
     const timezoneSubtitle = document.getElementById("timezoneSubtitle");
+    const openEditFlightButton = document.getElementById("openEditFlightButton");
+    const deleteFlightButton = document.getElementById("deleteFlightButton");
+
+    const editFlightPage = document.getElementById("editFlightPage");
+    const editBackButton = document.getElementById("editBackButton");
+    const editScheduledDeparture = document.getElementById("editScheduledDeparture");
+    const editScheduledArrival = document.getElementById("editScheduledArrival");
+    const saveScheduleButton = document.getElementById("saveScheduleButton");
+
+    const phaseGateDeparture = document.getElementById("phaseGateDeparture");
+    const phaseTaxi = document.getElementById("phaseTaxi");
+    const phaseTakeoff = document.getElementById("phaseTakeoff");
+    const phaseLand = document.getElementById("phaseLand");
+    const phaseGateArrival = document.getElementById("phaseGateArrival");
+
+    const markPopupOverlay = document.getElementById("markPopupOverlay");
+    const markPopup = document.getElementById("markPopup");
+    const markPopupTitle = document.getElementById("markPopupTitle");
+    const markTimeInput = document.getElementById("markTimeInput");
+    const cancelMarkButton = document.getElementById("cancelMarkButton");
+    const confirmMarkButton = document.getElementById("confirmMarkButton");
+
+    const ttScheduledGateDeparture = document.getElementById("ttScheduledGateDeparture");
+    const ttActualGateDeparture = document.getElementById("ttActualGateDeparture");
+    const ttScheduledDepartureTaxi = document.getElementById("ttScheduledDepartureTaxi");
+    const ttActualDepartureTaxi = document.getElementById("ttActualDepartureTaxi");
+    const ttScheduledTakeoff = document.getElementById("ttScheduledTakeoff");
+    const ttActualTakeoff = document.getElementById("ttActualTakeoff");
+    const ttScheduledLand = document.getElementById("ttScheduledLand");
+    const ttActualLand = document.getElementById("ttActualLand");
+    const ttScheduledArrivalTaxi = document.getElementById("ttScheduledArrivalTaxi");
+    const ttActualArrivalTaxi = document.getElementById("ttActualArrivalTaxi");
+    const ttScheduledGateArrival = document.getElementById("ttScheduledGateArrival");
+    const ttActualGateArrival = document.getElementById("ttActualGateArrival");
+    const ttScheduledAirTime = document.getElementById("ttScheduledAirTime");
+    const ttActualAirTime = document.getElementById("ttActualAirTime");
+    const ttScheduledTotalTime = document.getElementById("ttScheduledTotalTime");
+    const ttActualTotalTime = document.getElementById("ttActualTotalTime");
 
     const airlineInput = document.getElementById("airline");
     const flightNumberInput = document.getElementById("flightNumber");
@@ -1134,6 +1840,7 @@
     let allFlights = new Map();
     let activeFlight = null;
     let countdownTimer = null;
+    let pendingMarkPhase = null;
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -1144,6 +1851,10 @@
       addFlightPage.classList.remove("active");
       flightsPage.classList.remove("hidden");
     });
+
+    function getFlightRef(id) {
+      return doc(db, "flights", id);
+    }
 
     function formatDisplayDate(dateValue) {
       if (!dateValue) return "";
@@ -1208,8 +1919,24 @@
       return new Date(`${dateValue}T${timeValue}:00`);
     }
 
+    function buildActualDateTime(flight, timeValue, compareDate) {
+      const actual = buildLocalDateTime(flight.flightDateRaw, timeValue);
+
+      if (!actual) return null;
+
+      if (compareDate && actual < new Date(compareDate.getTime() - 12 * 60 * 60 * 1000)) {
+        actual.setDate(actual.getDate() + 1);
+      }
+
+      return actual;
+    }
+
     function getDepartureDateTime(flight) {
       return buildLocalDateTime(flight.flightDateRaw, flight.scheduledDeparture);
+    }
+
+    function getOriginalDepartureDateTime(flight) {
+      return buildLocalDateTime(flight.flightDateRaw, flight.originalScheduledDeparture || flight.scheduledDeparture);
     }
 
     function getArrivalDateTime(flight) {
@@ -1225,6 +1952,90 @@
       return arrival;
     }
 
+    function getOriginalArrivalDateTime(flight) {
+      const originalDeparture = getOriginalDepartureDateTime(flight);
+      const originalArrival = buildLocalDateTime(flight.flightDateRaw, flight.originalScheduledArrival || flight.scheduledArrival);
+
+      if (!originalDeparture || !originalArrival) return originalArrival;
+
+      if (originalArrival <= originalDeparture) {
+        originalArrival.setDate(originalArrival.getDate() + 1);
+      }
+
+      return originalArrival;
+    }
+
+    function parseDurationToMinutes(value) {
+      const text = String(value || "").trim().toLowerCase();
+
+      if (!text) return 0;
+
+      let total = 0;
+      const hourMatch = text.match(/(\d+)\s*h/);
+      const minuteMatch = text.match(/(\d+)\s*m/);
+
+      if (hourMatch) total += Number(hourMatch[1]) * 60;
+      if (minuteMatch) total += Number(minuteMatch[1]);
+
+      if (!hourMatch && !minuteMatch) {
+        const numberOnly = Number(text.replace(/[^\d.-]/g, ""));
+        if (!Number.isNaN(numberOnly)) total += numberOnly;
+      }
+
+      return total;
+    }
+
+    function formatDurationFromMinutes(minutes) {
+      const safeMinutes = Math.max(0, Math.round(minutes || 0));
+      const hours = Math.floor(safeMinutes / 60);
+      const mins = safeMinutes % 60;
+
+      if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${mins}m`;
+    }
+
+    function addMinutes(date, minutes) {
+      if (!date || Number.isNaN(date.getTime())) return null;
+
+      const newDate = new Date(date);
+      newDate.setMinutes(newDate.getMinutes() + minutes);
+      return newDate;
+    }
+
+    function diffMinutes(later, earlier) {
+      if (!later || !earlier) return 0;
+      return Math.round((later - earlier) / 60000);
+    }
+
+    function describeDifference(actualDate, scheduledDate, lateLabel = "Late", earlyLabel = "Early") {
+      if (!actualDate || !scheduledDate) return {
+        text: "On Time",
+        good: true
+      };
+
+      const difference = Math.round((actualDate - scheduledDate) / 60000);
+
+      if (difference > 0) {
+        return {
+          text: `${formatDurationFromMinutes(difference)} ${lateLabel}`,
+          good: false
+        };
+      }
+
+      if (difference < 0) {
+        return {
+          text: `${formatDurationFromMinutes(Math.abs(difference))} ${earlyLabel}`,
+          good: true
+        };
+      }
+
+      return {
+        text: "On Time",
+        good: true
+      };
+    }
+
     function formatCountdown(targetDate, actionWord) {
       if (!targetDate || Number.isNaN(targetDate.getTime())) {
         return `${actionWord} in --`;
@@ -1236,6 +2047,7 @@
       if (diffMs <= 0) {
         if (actionWord === "Departs") return "Departing now";
         if (actionWord === "Arrives") return "Arriving now";
+        if (actionWord === "Landing") return "Landing shortly";
         return "Now";
       }
 
@@ -1269,6 +2081,17 @@
       if (hours > 0) return `Gate Departure in ${hours}h ${minutes}m`;
 
       return `Gate Departure in ${minutes}m`;
+    }
+
+    function formatTimerCountdown(startMs, durationMinutes, label, shortlyLabel) {
+      if (!startMs) return `${label} in ${durationMinutes}m`;
+
+      const elapsedMinutes = Math.floor((Date.now() - startMs) / 60000);
+      const remaining = Math.max(0, durationMinutes - elapsedMinutes);
+
+      if (remaining <= 0) return shortlyLabel;
+
+      return `${label} in ${remaining}m`;
     }
 
     function parseTimezoneDifference(value) {
@@ -1337,6 +2160,133 @@
       timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityDeparture || "departure"} time`;
     }
 
+    function setActualValue(element, value, isGood) {
+      if (!value) {
+        element.textContent = "--";
+        element.className = "timetable-value actual-empty";
+        return;
+      }
+
+      element.textContent = value;
+      element.className = `timetable-value ${isGood ? "actual-good" : "actual-bad"}`;
+    }
+
+    function getScheduleTimes(flight) {
+      const gateDeparture = getDepartureDateTime(flight);
+      const gateArrival = getArrivalDateTime(flight);
+      const departureTaxiMinutes = parseDurationToMinutes(flight.departureTaxiTime);
+      const arrivalTaxiMinutes = parseDurationToMinutes(flight.arrivalTaxiTime);
+      const takeoff = addMinutes(gateDeparture, departureTaxiMinutes);
+      const land = addMinutes(gateArrival, -arrivalTaxiMinutes);
+
+      return {
+        gateDeparture,
+        gateArrival,
+        departureTaxiMinutes,
+        arrivalTaxiMinutes,
+        takeoff,
+        land
+      };
+    }
+
+    function getActualTimes(flight) {
+      const schedule = getScheduleTimes(flight);
+
+      const actualGateDeparture = flight.actualGateDeparture
+        ? buildActualDateTime(flight, flight.actualGateDeparture, schedule.gateDeparture)
+        : null;
+
+      const actualTakeoff = flight.actualTakeoff
+        ? buildActualDateTime(flight, flight.actualTakeoff, schedule.takeoff)
+        : null;
+
+      const actualLand = flight.actualLand
+        ? buildActualDateTime(flight, flight.actualLand, schedule.land)
+        : null;
+
+      const actualGateArrival = flight.actualGateArrival
+        ? buildActualDateTime(flight, flight.actualGateArrival, schedule.gateArrival)
+        : null;
+
+      return {
+        actualGateDeparture,
+        actualTakeoff,
+        actualLand,
+        actualGateArrival
+      };
+    }
+
+    function updateTimetable(flight) {
+      const schedule = getScheduleTimes(flight);
+      const actuals = getActualTimes(flight);
+
+      const scheduledDepartureTaxi = formatDurationFromMinutes(schedule.departureTaxiMinutes);
+      const scheduledArrivalTaxi = formatDurationFromMinutes(schedule.arrivalTaxiMinutes);
+      const scheduledAirTime = flight.airTime || formatDurationFromMinutes(diffMinutes(schedule.land, schedule.takeoff));
+      const scheduledTotalTime = flight.flightTime || formatDurationFromMinutes(diffMinutes(schedule.gateArrival, schedule.gateDeparture));
+
+      ttScheduledGateDeparture.textContent = formatDateTime12Hour(schedule.gateDeparture);
+      ttScheduledDepartureTaxi.textContent = scheduledDepartureTaxi;
+      ttScheduledTakeoff.textContent = formatDateTime12Hour(schedule.takeoff);
+      ttScheduledLand.textContent = formatDateTime12Hour(schedule.land);
+      ttScheduledArrivalTaxi.textContent = scheduledArrivalTaxi;
+      ttScheduledGateArrival.textContent = formatDateTime12Hour(schedule.gateArrival);
+      ttScheduledAirTime.textContent = scheduledAirTime;
+      ttScheduledTotalTime.textContent = scheduledTotalTime;
+
+      setActualValue(
+        ttActualGateDeparture,
+        flight.actualGateDeparture ? formatTime12Hour(flight.actualGateDeparture) : "",
+        actuals.actualGateDeparture <= schedule.gateDeparture
+      );
+
+      setActualValue(
+        ttActualDepartureTaxi,
+        flight.actualDepartureTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualDepartureTaxiMinutes) : "",
+        Number(flight.actualDepartureTaxiMinutes || 0) <= schedule.departureTaxiMinutes
+      );
+
+      setActualValue(
+        ttActualTakeoff,
+        flight.actualTakeoff ? formatTime12Hour(flight.actualTakeoff) : "",
+        actuals.actualTakeoff <= schedule.takeoff
+      );
+
+      setActualValue(
+        ttActualLand,
+        flight.actualLand ? formatTime12Hour(flight.actualLand) : "",
+        actuals.actualLand <= schedule.land
+      );
+
+      setActualValue(
+        ttActualArrivalTaxi,
+        flight.actualArrivalTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualArrivalTaxiMinutes) : "",
+        Number(flight.actualArrivalTaxiMinutes || 0) <= schedule.arrivalTaxiMinutes
+      );
+
+      setActualValue(
+        ttActualGateArrival,
+        flight.actualGateArrival ? formatTime12Hour(flight.actualGateArrival) : "",
+        actuals.actualGateArrival <= schedule.gateArrival
+      );
+
+      setActualValue(
+        ttActualAirTime,
+        flight.actualAirTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualAirTimeMinutes) : "",
+        Number(flight.actualAirTimeMinutes || 0) <= parseDurationToMinutes(scheduledAirTime)
+      );
+
+      setActualValue(
+        ttActualTotalTime,
+        flight.actualTotalTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualTotalTimeMinutes) : "",
+        Number(flight.actualTotalTimeMinutes || 0) <= parseDurationToMinutes(scheduledTotalTime)
+      );
+    }
+
+    function getFlightPhase(flight) {
+      return flight.phase || "scheduled";
+    }
+
     function createFlightCard(flight) {
       const card = document.createElement("button");
       card.className = "flight-card";
@@ -1378,15 +2328,120 @@
       flightsList.appendChild(card);
     }
 
+    function setStatusPanel(isBad, title, subtitle = "") {
+      statusPanel.classList.toggle("bad", isBad);
+      gateStatusTitle.textContent = title;
+      gateStatusSubtitle.textContent = subtitle;
+    }
+
     function updateDetailCountdowns() {
       if (!activeFlight) return;
 
-      const departureDateTime = getDepartureDateTime(activeFlight);
-      const arrivalDateTime = getArrivalDateTime(activeFlight);
+      const flight = activeFlight;
+      const phase = getFlightPhase(flight);
+      const schedule = getScheduleTimes(flight);
+      const actuals = getActualTimes(flight);
 
-      gateStatusTitle.textContent = formatPanelCountdown(departureDateTime);
-      detailDepartureCountdown.textContent = formatCountdown(departureDateTime, "Departs");
-      detailArrivalCountdown.textContent = formatCountdown(arrivalDateTime, "Arrives");
+      const departureDiff = describeDifference(actuals.actualGateDeparture || schedule.gateDeparture, schedule.gateDeparture);
+      const arrivalDiff = describeDifference(actuals.actualGateArrival || schedule.gateArrival, schedule.gateArrival);
+
+      detailDepartureCountdown.textContent = flight.actualGateDeparture
+        ? departureDiff.text
+        : formatCountdown(schedule.gateDeparture, "Departs");
+
+      detailArrivalCountdown.textContent = flight.actualGateArrival
+        ? arrivalDiff.text
+        : formatCountdown(schedule.gateArrival, "Arrives");
+
+      if (phase === "scheduled") {
+        const isDelayed = schedule.gateDeparture > getOriginalDepartureDateTime(flight);
+        setStatusPanel(isDelayed, formatPanelCountdown(schedule.gateDeparture), "");
+      }
+
+      if (phase === "gateDeparture") {
+        const isLate = actuals.actualGateDeparture > schedule.gateDeparture;
+        setStatusPanel(isLate, "Gate Departed", departureDiff.text);
+      }
+
+      if (phase === "taxi") {
+        const title = formatTimerCountdown(flight.departureTaxiStartMs, schedule.departureTaxiMinutes, "Takeoff", "Takeoff shortly");
+        const elapsed = flight.departureTaxiStartMs ? Math.floor((Date.now() - flight.departureTaxiStartMs) / 60000) : 0;
+        const late = elapsed > schedule.departureTaxiMinutes;
+        setStatusPanel(late, title, "Taxiing to runway");
+      }
+
+      if (phase === "takeoff") {
+        const takeoffDiff = describeDifference(actuals.actualTakeoff, schedule.takeoff);
+        setStatusPanel(!takeoffDiff.good, formatCountdown(schedule.land, "Landing"), "");
+      }
+
+      if (phase === "land") {
+        const title = formatTimerCountdown(flight.arrivalTaxiStartMs, schedule.arrivalTaxiMinutes, "Arrives at gate", "Arrives at gate shortly");
+        const elapsed = flight.arrivalTaxiStartMs ? Math.floor((Date.now() - flight.arrivalTaxiStartMs) / 60000) : 0;
+        const late = elapsed > schedule.arrivalTaxiMinutes;
+        setStatusPanel(late, title, "");
+      }
+
+      if (phase === "gateArrival") {
+        setStatusPanel(!arrivalDiff.good, "Arrived at Gate", arrivalDiff.text);
+      }
+
+      updateTimetable(flight);
+    }
+
+    function updateMainTimes(flight) {
+      const schedule = getScheduleTimes(flight);
+      const actuals = getActualTimes(flight);
+
+      const originalDeparture = getOriginalDepartureDateTime(flight);
+      const originalArrival = getOriginalArrivalDateTime(flight);
+
+      const displayedDepartureTime = flight.actualGateDeparture || flight.scheduledDeparture;
+      const displayedArrivalTime = flight.actualGateArrival || flight.scheduledArrival;
+
+      const departureBad = flight.actualGateDeparture
+        ? actuals.actualGateDeparture > schedule.gateDeparture
+        : schedule.gateDeparture > originalDeparture;
+
+      const arrivalBad = flight.actualGateArrival
+        ? actuals.actualGateArrival > schedule.gateArrival
+        : schedule.gateArrival > originalArrival;
+
+      detailDepartureTime.classList.toggle("bad", departureBad);
+      detailArrivalTime.classList.toggle("bad", arrivalBad);
+
+      const departureOld = flight.scheduledDeparture !== (flight.originalScheduledDeparture || flight.scheduledDeparture)
+        ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledDeparture)}</span>`
+        : "";
+
+      const arrivalOld = flight.scheduledArrival !== (flight.originalScheduledArrival || flight.scheduledArrival)
+        ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledArrival)}</span>`
+        : "";
+
+      detailDepartureTime.innerHTML = `${formatTime12Hour(displayedDepartureTime)}${departureOld}`;
+      detailArrivalTime.innerHTML = `${formatTime12Hour(displayedArrivalTime)}${arrivalOld}`;
+
+      const departureDiff = describeDifference(
+        flight.actualGateDeparture ? actuals.actualGateDeparture : schedule.gateDeparture,
+        flight.actualGateDeparture ? schedule.gateDeparture : originalDeparture
+      );
+
+      const arrivalDiff = describeDifference(
+        flight.actualGateArrival ? actuals.actualGateArrival : schedule.gateArrival,
+        flight.actualGateArrival ? schedule.gateArrival : originalArrival
+      );
+
+      departureStatusLine.innerHTML = `
+        <span class="${departureDiff.good ? "on-time" : "late-text"}">${departureDiff.text}</span>
+        <span> • </span>
+        <span id="detailDepartureCountdown">${flight.actualGateDeparture ? departureDiff.text : formatCountdown(schedule.gateDeparture, "Departs")}</span>
+      `;
+
+      arrivalStatusLine.innerHTML = `
+        <span class="${arrivalDiff.good ? "on-time" : "late-text"}">${arrivalDiff.text}</span>
+        <span> • </span>
+        <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
+      `;
     }
 
     function openFlightDetails(flight) {
@@ -1396,17 +2451,23 @@
       detailRouteTitle.textContent = `${flight.cityDeparture || "Departure"} to ${flight.cityArrival || "Arrival"}`;
 
       detailDepartureAirport.textContent = `${flight.departureAirport || "DEP"} • ${flight.cityDeparture || "Departure"}`;
-      detailDepartureTime.textContent = formatTime12Hour(flight.scheduledDeparture);
       detailFlightDuration.textContent = flight.flightTime || flight.airTime || "--";
 
       detailArrivalAirport.textContent = `${flight.arrivalAirport || "ARR"} • ${flight.cityArrival || "Arrival"}`;
-      detailArrivalTime.textContent = formatTime12Hour(flight.scheduledArrival);
 
+      updateMainTimes(flight);
       updateTimezoneBox(flight);
       updateDetailCountdowns();
 
       if (countdownTimer) clearInterval(countdownTimer);
-      countdownTimer = setInterval(updateDetailCountdowns, 1000);
+      countdownTimer = setInterval(() => {
+        if (activeFlight) {
+          const latest = allFlights.get(activeFlight.id) || activeFlight;
+          activeFlight = latest;
+          updateMainTimes(latest);
+          updateDetailCountdowns();
+        }
+      }, 1000);
 
       detailPage.classList.add("active");
       document.body.style.overflow = "hidden";
@@ -1426,7 +2487,8 @@
 
     detailCloseButton.addEventListener("click", closeFlightDetails);
 
-    function showNotification() {
+    function showNotification(message = "Flight added!") {
+      popupTitle.textContent = message;
       notificationOverlay.classList.add("active");
       flightAddedPopup.classList.remove("dismiss");
       flightAddedPopup.classList.add("active");
@@ -1444,11 +2506,14 @@
         flightDateRaw: flightDateInput.value || "",
         scheduledDeparture: scheduledDepartureInput.value || "",
         scheduledArrival: scheduledArrivalInput.value || "",
+        originalScheduledDeparture: scheduledDepartureInput.value || "",
+        originalScheduledArrival: scheduledArrivalInput.value || "",
         flightTime: flightTimeInput.value.trim() || "",
         timezoneDifference: timezoneDifferenceInput.value.trim() || "",
         departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
         arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
         airTime: airTimeInput.value.trim() || "",
+        phase: "scheduled",
         createdAt: serverTimestamp()
       };
 
@@ -1459,7 +2524,7 @@
       try {
         await addDoc(collection(db, "flights"), flight);
         flightForm.reset();
-        showNotification();
+        showNotification("Flight added!");
       } catch (error) {
         console.error("Error adding flight:", error);
         alert("Flight could not be added. Check your Firestore rules and Firebase setup.");
@@ -1470,20 +2535,47 @@
       }
     });
 
+    function refreshActiveFlight(updatedFlight) {
+      if (activeFlight && updatedFlight.id === activeFlight.id) {
+        activeFlight = updatedFlight;
+
+        if (detailPage.classList.contains("active")) {
+          openFlightDetails(updatedFlight);
+        }
+
+        if (editFlightPage.classList.contains("active")) {
+          renderPhaseButtons(updatedFlight);
+        }
+      }
+    }
+
     const flightsQuery = query(collection(db, "flights"), orderBy("createdAt", "desc"));
 
     onSnapshot(flightsQuery, (snapshot) => {
       flightsList.innerHTML = "";
       allFlights.clear();
 
-      snapshot.forEach((doc) => {
+      snapshot.forEach((snapshotDoc) => {
         const flight = {
-          id: doc.id,
-          ...doc.data()
+          id: snapshotDoc.id,
+          ...snapshotDoc.data()
         };
+
+        if (!flight.originalScheduledDeparture) {
+          flight.originalScheduledDeparture = flight.scheduledDeparture;
+        }
+
+        if (!flight.originalScheduledArrival) {
+          flight.originalScheduledArrival = flight.scheduledArrival;
+        }
+
+        if (!flight.phase) {
+          flight.phase = "scheduled";
+        }
 
         allFlights.set(flight.id, flight);
         createFlightCard(flight);
+        refreshActiveFlight(flight);
       });
     }, (error) => {
       console.error("Error loading flights:", error);
@@ -1505,6 +2597,301 @@
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         dismissNotification();
+      }
+    });
+
+    function openEditFlightPage() {
+      if (!activeFlight) return;
+
+      editScheduledDeparture.value = activeFlight.scheduledDeparture || "";
+      editScheduledArrival.value = activeFlight.scheduledArrival || "";
+
+      renderPhaseButtons(activeFlight);
+
+      detailPage.classList.remove("active");
+      editFlightPage.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeEditFlightPage() {
+      editFlightPage.classList.remove("active");
+
+      if (activeFlight) {
+        detailPage.classList.add("active");
+      } else {
+        document.body.style.overflow = "";
+      }
+    }
+
+    openEditFlightButton.addEventListener("click", openEditFlightPage);
+    editBackButton.addEventListener("click", closeEditFlightPage);
+
+    saveScheduleButton.addEventListener("click", async () => {
+      if (!activeFlight) return;
+
+      const updates = {
+        scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
+        scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || "",
+        originalScheduledDeparture: activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || "",
+        originalScheduledArrival: activeFlight.originalScheduledArrival || activeFlight.scheduledArrival || ""
+      };
+
+      saveScheduleButton.disabled = true;
+      saveScheduleButton.style.opacity = "0.72";
+
+      try {
+        await updateDoc(getFlightRef(activeFlight.id), updates);
+        editFlightPage.classList.remove("active");
+        detailPage.classList.add("active");
+        showNotification("Flight updated!");
+      } catch (error) {
+        console.error("Error saving schedule:", error);
+        alert("Schedule could not be updated. Check your Firestore rules.");
+      } finally {
+        saveScheduleButton.disabled = false;
+        saveScheduleButton.style.opacity = "1";
+      }
+    });
+
+    function renderPhaseButtons(flight) {
+      const phase = getFlightPhase(flight);
+
+      const phaseOrder = ["scheduled", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"];
+      const currentIndex = phaseOrder.indexOf(phase);
+
+      const buttons = [
+        {
+          key: "gateDeparture",
+          button: phaseGateDeparture
+        },
+        {
+          key: "taxi",
+          button: phaseTaxi
+        },
+        {
+          key: "takeoff",
+          button: phaseTakeoff
+        },
+        {
+          key: "land",
+          button: phaseLand
+        },
+        {
+          key: "gateArrival",
+          button: phaseGateArrival
+        }
+      ];
+
+      buttons.forEach((item) => {
+        item.button.className = "phase-button";
+        item.button.disabled = false;
+
+        const itemIndex = phaseOrder.indexOf(item.key);
+
+        if (phase === "scheduled") {
+          if (item.key === "gateDeparture") {
+            item.button.classList.add("active");
+          } else {
+            item.button.classList.add("locked");
+            item.button.disabled = true;
+          }
+          return;
+        }
+
+        if (item.key === phase) {
+          item.button.classList.add("active");
+          item.button.disabled = true;
+          return;
+        }
+
+        if (itemIndex < currentIndex) {
+          item.button.classList.add("done");
+          item.button.disabled = true;
+          return;
+        }
+
+        if (itemIndex === currentIndex + 1) {
+          item.button.classList.add("active");
+          return;
+        }
+
+        item.button.classList.add("locked");
+        item.button.disabled = true;
+      });
+
+      if (phase === "gateArrival") {
+        buttons.forEach((item) => {
+          item.button.className = "phase-button done";
+          item.button.disabled = true;
+        });
+      }
+    }
+
+    function openMarkPopup(phase) {
+      pendingMarkPhase = phase;
+
+      const titles = {
+        gateDeparture: "Mark Gate Departure",
+        takeoff: "Mark Takeoff",
+        land: "Mark Landing",
+        gateArrival: "Mark Gate Arrival"
+      };
+
+      markPopupTitle.textContent = titles[phase] || "Mark Phase";
+      markTimeInput.value = "";
+      markPopupOverlay.classList.add("active");
+      markPopup.classList.add("active");
+
+      setTimeout(() => {
+        markTimeInput.focus();
+      }, 240);
+    }
+
+    function closeMarkPopup() {
+      pendingMarkPhase = null;
+      markPopupOverlay.classList.remove("active");
+      markPopup.classList.remove("active");
+    }
+
+    cancelMarkButton.addEventListener("click", closeMarkPopup);
+    markPopupOverlay.addEventListener("click", closeMarkPopup);
+
+    phaseGateDeparture.addEventListener("click", () => {
+      if (!activeFlight || getFlightPhase(activeFlight) !== "scheduled") return;
+      openMarkPopup("gateDeparture");
+    });
+
+    phaseTaxi.addEventListener("click", async () => {
+      if (!activeFlight || getFlightPhase(activeFlight) !== "gateDeparture") return;
+
+      try {
+        await updateDoc(getFlightRef(activeFlight.id), {
+          phase: "taxi",
+          departureTaxiStartMs: Date.now()
+        });
+
+        editFlightPage.classList.remove("active");
+        detailPage.classList.add("active");
+      } catch (error) {
+        console.error("Error starting taxi:", error);
+        alert("Taxi phase could not be started.");
+      }
+    });
+
+    phaseTakeoff.addEventListener("click", () => {
+      if (!activeFlight || getFlightPhase(activeFlight) !== "taxi") return;
+      openMarkPopup("takeoff");
+    });
+
+    phaseLand.addEventListener("click", () => {
+      if (!activeFlight || getFlightPhase(activeFlight) !== "takeoff") return;
+      openMarkPopup("land");
+    });
+
+    phaseGateArrival.addEventListener("click", () => {
+      if (!activeFlight || getFlightPhase(activeFlight) !== "land") return;
+      openMarkPopup("gateArrival");
+    });
+
+    confirmMarkButton.addEventListener("click", async () => {
+      if (!activeFlight || !pendingMarkPhase || !markTimeInput.value) return;
+
+      const time = markTimeInput.value;
+      const updates = {};
+      const flight = activeFlight;
+
+      if (pendingMarkPhase === "gateDeparture") {
+        updates.phase = "gateDeparture";
+        updates.actualGateDeparture = time;
+        updates.totalStartMs = Date.now();
+      }
+
+      if (pendingMarkPhase === "takeoff") {
+        const taxiMinutes = flight.departureTaxiStartMs
+          ? Math.max(0, Math.round((Date.now() - flight.departureTaxiStartMs) / 60000))
+          : parseDurationToMinutes(flight.departureTaxiTime);
+
+        updates.phase = "takeoff";
+        updates.actualTakeoff = time;
+        updates.actualDepartureTaxiMinutes = taxiMinutes;
+        updates.airStartMs = Date.now();
+      }
+
+      if (pendingMarkPhase === "land") {
+        const actualTakeoffDate = flight.actualTakeoff
+          ? buildActualDateTime(flight, flight.actualTakeoff, getScheduleTimes(flight).takeoff)
+          : null;
+
+        const actualLandDate = buildActualDateTime(flight, time, actualTakeoffDate || getScheduleTimes(flight).land);
+        const airMinutes = actualTakeoffDate
+          ? Math.max(0, diffMinutes(actualLandDate, actualTakeoffDate))
+          : Math.max(0, Math.round((Date.now() - (flight.airStartMs || Date.now())) / 60000));
+
+        updates.phase = "land";
+        updates.actualLand = time;
+        updates.actualAirTimeMinutes = airMinutes;
+        updates.arrivalTaxiStartMs = Date.now();
+      }
+
+      if (pendingMarkPhase === "gateArrival") {
+        const actualGateDepartureDate = flight.actualGateDeparture
+          ? buildActualDateTime(flight, flight.actualGateDeparture, getScheduleTimes(flight).gateDeparture)
+          : null;
+
+        const actualLandDate = flight.actualLand
+          ? buildActualDateTime(flight, flight.actualLand, getScheduleTimes(flight).land)
+          : null;
+
+        const actualGateArrivalDate = buildActualDateTime(flight, time, actualLandDate || getScheduleTimes(flight).gateArrival);
+
+        const arrivalTaxiMinutes = actualLandDate
+          ? Math.max(0, diffMinutes(actualGateArrivalDate, actualLandDate))
+          : Math.max(0, Math.round((Date.now() - (flight.arrivalTaxiStartMs || Date.now())) / 60000));
+
+        const totalMinutes = actualGateDepartureDate
+          ? Math.max(0, diffMinutes(actualGateArrivalDate, actualGateDepartureDate))
+          : Math.max(0, Math.round((Date.now() - (flight.totalStartMs || Date.now())) / 60000));
+
+        updates.phase = "gateArrival";
+        updates.actualGateArrival = time;
+        updates.actualArrivalTaxiMinutes = arrivalTaxiMinutes;
+        updates.actualTotalTimeMinutes = totalMinutes;
+      }
+
+      confirmMarkButton.disabled = true;
+      confirmMarkButton.style.opacity = "0.72";
+
+      try {
+        await updateDoc(getFlightRef(activeFlight.id), updates);
+        closeMarkPopup();
+        editFlightPage.classList.remove("active");
+        detailPage.classList.add("active");
+      } catch (error) {
+        console.error("Error marking phase:", error);
+        alert("Phase could not be marked.");
+      } finally {
+        confirmMarkButton.disabled = false;
+        confirmMarkButton.style.opacity = "1";
+      }
+    });
+
+    deleteFlightButton.addEventListener("click", async () => {
+      if (!activeFlight) return;
+
+      const shouldDelete = confirm("Delete this flight completely?");
+
+      if (!shouldDelete) return;
+
+      try {
+        const deletingId = activeFlight.id;
+        await deleteDoc(getFlightRef(deletingId));
+
+        closeFlightDetails();
+        allFlights.delete(deletingId);
+        showNotification("Flight deleted!");
+      } catch (error) {
+        console.error("Error deleting flight:", error);
+        alert("Flight could not be deleted. Check your Firestore rules.");
       }
     });
   </script>
