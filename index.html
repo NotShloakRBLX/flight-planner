@@ -151,6 +151,16 @@
         linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
         rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+
+    .logo-space img,
+    .detail-logo-space img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      padding: 6px;
     }
 
     .flight-main {
@@ -452,6 +462,7 @@
         linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
         rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
     }
 
     .detail-title-wrap {
@@ -1427,7 +1438,7 @@
   <section class="detail-page" id="detailPage">
     <div class="detail-shell">
       <header class="detail-top">
-        <div class="detail-logo-space" aria-label="Airline logo space"></div>
+        <div class="detail-logo-space" aria-label="Airline logo space" id="detailLogoSpace"></div>
 
         <div class="detail-title-wrap">
           <div class="detail-meta" id="detailMeta">AA 0000 • DEP → ARR</div>
@@ -1767,6 +1778,7 @@
 
     const detailPage = document.getElementById("detailPage");
     const detailCloseButton = document.getElementById("detailCloseButton");
+    const detailLogoSpace = document.getElementById("detailLogoSpace");
     const detailMeta = document.getElementById("detailMeta");
     const detailRouteTitle = document.getElementById("detailRouteTitle");
     const statusPanel = document.getElementById("statusPanel");
@@ -1854,6 +1866,16 @@
 
     function getFlightRef(id) {
       return doc(db, "flights", id);
+    }
+
+    function getAirlineLogoPath(airlineCode) {
+      const code = String(airlineCode || "").trim().toLowerCase();
+
+      if (!code) {
+        return "";
+      }
+
+      return `assets/logos/${code}.png`;
     }
 
     function formatDisplayDate(dateValue) {
@@ -2302,7 +2324,9 @@
       const flightDate = escapeHTML(flight.flightDate || "");
 
       card.innerHTML = `
-        <div class="logo-space" aria-label="Airline logo space"></div>
+        <div class="logo-space" aria-label="Airline logo space">
+          <img src="${getAirlineLogoPath(flight.airline)}" alt="${airline} logo" onerror="this.style.display='none';" />
+        </div>
 
         <div class="flight-main">
           <div class="flight-meta">
@@ -2446,6 +2470,10 @@
 
     function openFlightDetails(flight) {
       activeFlight = flight;
+
+      detailLogoSpace.innerHTML = `
+        <img src="${getAirlineLogoPath(flight.airline)}" alt="${escapeHTML(flight.airline || "Airline")} logo" onerror="this.style.display='none';" />
+      `;
 
       detailMeta.textContent = `${flight.airline || "AA"} ${flight.flightNumber || "0000"} • ${formatShortDate(flight.flightDateRaw) || flight.flightDate || ""}`;
       detailRouteTitle.textContent = `${flight.cityDeparture || "Departure"} to ${flight.cityArrival || "Arrival"}`;
