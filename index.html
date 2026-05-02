@@ -628,7 +628,31 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAehW0Ab5c0bpb824JyPBa43YBvyR7zwig",
+      authDomain: "msfs-flight-tracker.firebaseapp.com",
+      projectId: "msfs-flight-tracker",
+      storageBucket: "msfs-flight-tracker.firebasestorage.app",
+      messagingSenderId: "477994284624",
+      appId: "1:477994284624:web:50bef41d84258420ea8355"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const editButton = document.getElementById("editButton");
     const backButton = document.getElementById("backButton");
     const flightsPage = document.getElementById("flightsPage");
@@ -646,6 +670,13 @@
     const cityDepartureInput = document.getElementById("cityDeparture");
     const cityArrivalInput = document.getElementById("cityArrival");
     const flightDateInput = document.getElementById("flightDate");
+    const scheduledDepartureInput = document.getElementById("scheduledDeparture");
+    const scheduledArrivalInput = document.getElementById("scheduledArrival");
+    const flightTimeInput = document.getElementById("flightTime");
+    const timezoneDifferenceInput = document.getElementById("timezoneDifference");
+    const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
+    const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
+    const airTimeInput = document.getElementById("airTime");
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -661,6 +692,7 @@
       if (!dateValue) return "";
 
       const date = new Date(dateValue + "T00:00:00");
+
       return date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -668,31 +700,54 @@
       });
     }
 
+    function escapeHTML(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     function createFlightCard(flight) {
       const card = document.createElement("article");
       card.className = "flight-card";
+
+      const airline = escapeHTML(flight.airline || "AA");
+      const flightNumber = escapeHTML(flight.flightNumber || "0000");
+      const departureAirport = escapeHTML(flight.departureAirport || "DEP");
+      const arrivalAirport = escapeHTML(flight.arrivalAirport || "ARR");
+      const cityDeparture = escapeHTML(flight.cityDeparture || "Departure");
+      const cityArrival = escapeHTML(flight.cityArrival || "Arrival");
+      const flightDate = escapeHTML(flight.flightDate || "");
 
       card.innerHTML = `
         <div class="logo-space" aria-label="Airline logo space"></div>
 
         <div class="flight-main">
           <div class="flight-meta">
-            <span>${flight.airline} ${flight.flightNumber}</span>
-            <span>${flight.departureAirport}</span>
+            <span>${airline} ${flightNumber}</span>
+            <span>${departureAirport}</span>
             <span class="flight-route-arrow">→</span>
-            <span>${flight.arrivalAirport}</span>
+            <span>${arrivalAirport}</span>
           </div>
 
-          <div class="flight-cities">${flight.cityDeparture} to ${flight.cityArrival}</div>
+          <div class="flight-cities">${cityDeparture} to ${cityArrival}</div>
         </div>
 
-        <div class="flight-date-display">${flight.flightDate}</div>
+        <div class="flight-date-display">${flightDate}</div>
       `;
 
-      flightsList.prepend(card);
+      flightsList.appendChild(card);
     }
 
-    addFlightButton.addEventListener("click", () => {
+    function showNotification() {
+      notificationOverlay.classList.add("active");
+      flightAddedPopup.classList.remove("dismiss");
+      flightAddedPopup.classList.add("active");
+    }
+
+    addFlightButton.addEventListener("click", async () => {
       const flight = {
         airline: airlineInput.value.trim().toUpperCase() || "AA",
         flightNumber: flightNumberInput.value.trim() || "0000",
@@ -700,15 +755,46 @@
         arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
         cityDeparture: cityDepartureInput.value.trim() || "Departure",
         cityArrival: cityArrivalInput.value.trim() || "Arrival",
-        flightDate: formatDisplayDate(flightDateInput.value)
+        flightDate: formatDisplayDate(flightDateInput.value),
+        flightDateRaw: flightDateInput.value || "",
+        scheduledDeparture: scheduledDepartureInput.value || "",
+        scheduledArrival: scheduledArrivalInput.value || "",
+        flightTime: flightTimeInput.value.trim() || "",
+        timezoneDifference: timezoneDifferenceInput.value.trim() || "",
+        departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
+        arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
+        airTime: airTimeInput.value.trim() || "",
+        createdAt: serverTimestamp()
       };
 
-      createFlightCard(flight);
-      flightForm.reset();
+      addFlightButton.disabled = true;
+      addFlightButton.style.opacity = "0.72";
+      addFlightButton.style.cursor = "not-allowed";
 
-      notificationOverlay.classList.add("active");
-      flightAddedPopup.classList.remove("dismiss");
-      flightAddedPopup.classList.add("active");
+      try {
+        await addDoc(collection(db, "flights"), flight);
+        flightForm.reset();
+        showNotification();
+      } catch (error) {
+        console.error("Error adding flight:", error);
+        alert("Flight could not be added. Check your Firestore rules and Firebase setup.");
+      } finally {
+        addFlightButton.disabled = false;
+        addFlightButton.style.opacity = "1";
+        addFlightButton.style.cursor = "pointer";
+      }
+    });
+
+    const flightsQuery = query(collection(db, "flights"), orderBy("createdAt", "desc"));
+
+    onSnapshot(flightsQuery, (snapshot) => {
+      flightsList.innerHTML = "";
+
+      snapshot.forEach((doc) => {
+        createFlightCard(doc.data());
+      });
+    }, (error) => {
+      console.error("Error loading flights:", error);
     });
 
     function dismissNotification() {
