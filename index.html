@@ -144,24 +144,26 @@
     }
 
     .logo-space {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
-        rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      overflow: hidden;
-    }
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
     .logo-space img,
-    .detail-logo-space img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      padding: 6px;
-    }
+.detail-logo-space img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  padding: 0;
+  background: transparent;
+}
 
     .flight-main {
       min-width: 0;
@@ -457,12 +459,13 @@
     .detail-logo-space {
   width: 48px;
   height: 48px;
-  border-radius: 15px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
-    rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
     .detail-title-wrap {
@@ -1224,7 +1227,7 @@
       .detail-logo-space {
         width: 42px;
         height: 42px;
-        border-radius: 14px;
+        border-radius: 0px;
       }
 
       .detail-meta {
