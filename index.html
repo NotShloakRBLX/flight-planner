@@ -362,6 +362,78 @@
         0 16px 38px rgba(0, 0, 0, 0.22);
       transform: translateY(-1px);
     }
+    .toggle-field {
+  min-height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 0 14px;
+  background: rgba(5, 10, 24, 0.58);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.toggle-text {
+  min-width: 0;
+}
+
+.toggle-title {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.toggle-subtitle {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 2px;
+  top: 2px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.25s ease;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, #16e18a, #0fbf75);
+  border-color: rgba(22, 225, 138, 0.5);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
 
     .form-actions {
       margin-top: 22px;
@@ -1421,6 +1493,18 @@
             <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
           </div>
 
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">EDT Arrival</div>
+    <div class="toggle-subtitle">Convert arrival time back to origin time</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="edtArrivalToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
           <div class="form-field">
             <label for="departureTaxiTime">Departure taxi time</label>
             <input id="departureTaxiTime" type="text" placeholder="18m" />
@@ -1859,6 +1943,7 @@
     const scheduledArrivalInput = document.getElementById("scheduledArrival");
     const flightTimeInput = document.getElementById("flightTime");
     const timezoneDifferenceInput = document.getElementById("timezoneDifference");
+    const edtArrivalToggle = document.getElementById("edtArrivalToggle");
     const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
     const airTimeInput = document.getElementById("airTime");
@@ -2177,14 +2262,30 @@
   return `${signText}${timezoneInfo.hours} ${hourWord} Timezone Change`;
 }
     function updateTimezoneBox(flight) {
-      const timezoneInfo = parseTimezoneDifference(flight.timezoneDifference);
-      const arrivalDateTime = getArrivalDateTime(flight);
+  const timezoneInfo = parseTimezoneDifference(flight.timezoneDifference);
+  const arrivalDateTime = getArrivalDateTime(flight);
 
-      if (!timezoneInfo) {
-        timezoneTitle.textContent = "No Timezone Change";
-        timezoneSubtitle.textContent = "Both airports are in the same timezone";
-        return;
-      }
+  if (!timezoneInfo) {
+    timezoneTitle.textContent = "No Timezone Change";
+    timezoneSubtitle.textContent = "Both airports are in the same timezone";
+    return;
+  }
+
+  const convertedTime = new Date(arrivalDateTime);
+
+  if (flight.edtArrival) {
+    convertedTime.setMinutes(convertedTime.getMinutes() - timezoneInfo.totalMinutes);
+
+    timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
+    timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityDeparture || "departure"} time`;
+    return;
+  }
+
+  convertedTime.setMinutes(convertedTime.getMinutes() + timezoneInfo.totalMinutes);
+
+  timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
+  timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityArrival || "arrival"} time`;
+}
 
       const convertedTime = new Date(arrivalDateTime);
       convertedTime.setMinutes(convertedTime.getMinutes() + timezoneInfo.totalMinutes);
@@ -2553,7 +2654,8 @@
         originalScheduledArrival: scheduledArrivalInput.value || "",
         flightTime: flightTimeInput.value.trim() || "",
         timezoneDifference: timezoneDifferenceInput.value.trim() || "",
-        departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
+edtArrival: edtArrivalToggle.checked,
+departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
         arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
         airTime: airTimeInput.value.trim() || "",
         phase: "scheduled",
