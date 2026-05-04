@@ -2287,13 +2287,6 @@
   timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityArrival || "arrival"} time`;
 }
 
-      const convertedTime = new Date(arrivalDateTime);
-      convertedTime.setMinutes(convertedTime.getMinutes() + timezoneInfo.totalMinutes);
-
-      timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
-      timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityDeparture || "departure"} time`;
-    }
-
     function setActualValue(element, value, isGood) {
       if (!value) {
         element.textContent = "--";
