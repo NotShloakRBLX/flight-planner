@@ -657,6 +657,24 @@
       line-height: 1.15;
     }
 
+    .airport-row-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: visible;
+  font-size: 1em;
+  transition: font-size 0.25s ease, letter-spacing 0.25s ease;
+}
+
+.airport-row-name.compact {
+  font-size: 0.9em;
+  letter-spacing: -0.35px;
+}
+
+.airport-row-name.extra-compact {
+  font-size: 0.8em;
+  letter-spacing: -0.45px;
+}
+
     .direction-dot {
       width: 20px;
       height: 20px;
@@ -1459,6 +1477,16 @@
           </div>
 
           <div class="form-field">
+  <label for="departureAirportName">Departure airport name</label>
+  <input id="departureAirportName" type="text" placeholder="Washington Dulles Intl." />
+</div>
+
+<div class="form-field">
+  <label for="arrivalAirportName">Arrival airport name</label>
+  <input id="arrivalAirportName" type="text" placeholder="Murtala Muhammed Intl." />
+</div>
+
+          <div class="form-field">
             <label for="cityDeparture">City departure</label>
             <input id="cityDeparture" type="text" placeholder="Charlotte" />
           </div>
@@ -1563,7 +1591,7 @@
                 <path d="M7.05 16.95a1.25 1.25 0 0 1 0-1.77L13.23 9H9.25a1.25 1.25 0 0 1 0-2.5h7a1.25 1.25 0 0 1 1.25 1.25v7a1.25 1.25 0 0 1-2.5 0v-3.98l-6.18 6.18a1.25 1.25 0 0 1-1.77 0Z" />
               </svg>
             </span>
-            <span id="detailDepartureAirport">DEP • Departure</span>
+            <span class="airport-row-name" id="detailDepartureAirport">DEP • Departure</span>
             <svg class="airport-chevron" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 5l7 7-7 7"></path>
             </svg>
@@ -1589,7 +1617,7 @@
                 <path d="M16.95 7.05a1.25 1.25 0 0 1 0 1.77L10.77 15h3.98a1.25 1.25 0 0 1 0 2.5h-7a1.25 1.25 0 0 1-1.25-1.25v-7a1.25 1.25 0 0 1 2.5 0v3.98l6.18-6.18a1.25 1.25 0 0 1 1.77 0Z" />
               </svg>
             </span>
-            <span id="detailArrivalAirport">ARR • Arrival</span>
+            <span class="airport-row-name" id="detailArrivalAirport">ARR • Arrival</span>
             <svg class="airport-chevron" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 5l7 7-7 7"></path>
             </svg>
@@ -1936,6 +1964,8 @@
     const flightNumberInput = document.getElementById("flightNumber");
     const departureAirportInput = document.getElementById("departureAirport");
     const arrivalAirportInput = document.getElementById("arrivalAirport");
+    const departureAirportNameInput = document.getElementById("departureAirportName");
+    const arrivalAirportNameInput = document.getElementById("arrivalAirportName");
     const cityDepartureInput = document.getElementById("cityDeparture");
     const cityArrivalInput = document.getElementById("cityArrival");
     const flightDateInput = document.getElementById("flightDate");
@@ -2410,6 +2440,22 @@
       );
     }
 
+    function setAirportRowText(element, text) {
+  const safeText = String(text || "").trim();
+
+  element.textContent = safeText;
+  element.classList.remove("compact", "extra-compact");
+
+  if (safeText.length > 34) {
+    element.classList.add("extra-compact");
+    return;
+  }
+
+  if (safeText.length > 26) {
+    element.classList.add("compact");
+  }
+}
+    
     function getFlightPhase(flight) {
       return flight.phase || "scheduled";
     }
@@ -2587,10 +2633,20 @@
       detailMeta.textContent = `${flight.airline || "AA"} ${flight.flightNumber || "0000"} • ${formatShortDate(flight.flightDateRaw) || flight.flightDate || ""}`;
       detailRouteTitle.textContent = `${flight.cityDeparture || "Departure"} to ${flight.cityArrival || "Arrival"}`;
 
-      detailDepartureAirport.textContent = `${flight.departureAirport || "DEP"} • ${flight.cityDeparture || "Departure"}`;
-      detailFlightDuration.textContent = flight.flightTime || flight.airTime || "--";
+      const departureAirportDisplayName = flight.departureAirportName || flight.cityDeparture || "Departure";
+const arrivalAirportDisplayName = flight.arrivalAirportName || flight.cityArrival || "Arrival";
 
-      detailArrivalAirport.textContent = `${flight.arrivalAirport || "ARR"} • ${flight.cityArrival || "Arrival"}`;
+setAirportRowText(
+  detailDepartureAirport,
+  `${flight.departureAirport || "DEP"} • ${departureAirportDisplayName}`
+);
+
+detailFlightDuration.textContent = flight.flightTime || flight.airTime || "--";
+
+setAirportRowText(
+  detailArrivalAirport,
+  `${flight.arrivalAirport || "ARR"} • ${arrivalAirportDisplayName}`
+);
 
       updateMainTimes(flight);
       updateTimezoneBox(flight);
@@ -2635,10 +2691,12 @@
       const flight = {
         airline: airlineInput.value.trim().toUpperCase() || "AA",
         flightNumber: flightNumberInput.value.trim() || "0000",
-        departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
-        arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
-        cityDeparture: cityDepartureInput.value.trim() || "Departure",
-        cityArrival: cityArrivalInput.value.trim() || "Arrival",
+       departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
+arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
+departureAirportName: departureAirportNameInput.value.trim() || "",
+arrivalAirportName: arrivalAirportNameInput.value.trim() || "",
+cityDeparture: cityDepartureInput.value.trim() || "Departure",
+cityArrival: cityArrivalInput.value.trim() || "Arrival",
         flightDate: formatDisplayDate(flightDateInput.value),
         flightDateRaw: flightDateInput.value || "",
         scheduledDeparture: scheduledDepartureInput.value || "",
