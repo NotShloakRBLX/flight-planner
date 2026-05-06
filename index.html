@@ -435,6 +435,38 @@
   transform: translateX(18px);
 }
 
+    .boarding-options {
+  grid-column: span 2;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition:
+    max-height 0.38s ease,
+    opacity 0.3s ease,
+    transform 0.38s ease;
+}
+
+.boarding-options.active {
+  max-height: 130px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.boarding-options-inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  padding-top: 4px;
+}
+
+.boarding-row.hidden,
+.phase-button.hidden {
+  display: none;
+}
+
     .form-actions {
       margin-top: 22px;
       display: flex;
@@ -1247,6 +1279,13 @@
       .phase-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+      .boarding-options {
+  grid-column: span 1;
+}
+
+.boarding-options-inner {
+  grid-template-columns: 1fr;
+}
     }
 
     @media (max-width: 760px) {
@@ -1533,6 +1572,32 @@
   </label>
 </div>
 
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Enable boarding</div>
+    <div class="toggle-subtitle">Show boarding countdown and boarding phase</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="enableBoardingToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+<div class="boarding-options" id="boardingOptions">
+  <div class="boarding-options-inner">
+    <div class="form-field">
+      <label for="boardingTime">Boarding time</label>
+      <input id="boardingTime" type="time" />
+    </div>
+
+    <div class="form-field">
+      <label for="boardingDuration">Estimated boarding duration</label>
+      <input id="boardingDuration" type="text" placeholder="30m" />
+    </div>
+  </div>
+</div>
+
           <div class="form-field">
             <label for="departureTaxiTime">Departure taxi time</label>
             <input id="departureTaxiTime" type="text" placeholder="18m" />
@@ -1652,6 +1717,17 @@
 
           <div class="timetable-section">
             <div class="timetable-section-label">Depart</div>
+            <div class="timetable-row boarding-row hidden" id="ttBoardingRow">
+  <div class="timetable-row-name">Boarding</div>
+  <div>
+    <div class="timetable-column-label">Scheduled</div>
+    <div class="timetable-value" id="ttScheduledBoarding">--</div>
+  </div>
+  <div>
+    <div class="timetable-column-label">Actual</div>
+    <div class="timetable-value actual-empty" id="ttActualBoarding">--</div>
+  </div>
+</div>
 
             <div class="timetable-row">
               <div class="timetable-row-name">Gate Departure</div>
@@ -1818,6 +1894,9 @@
         <div class="phase-subtitle">Phases must be activated one by one. Active phase buttons are highlighted green.</div>
 
         <div class="phase-grid">
+          <button class="phase-button hidden" id="phaseBoarding" type="button">
+  <div class="phase-button-inner">Boarding</div>
+</button>
           <button class="phase-button" id="phaseGateDeparture" type="button">
             <div class="phase-button-inner">Gate Departure</div>
           </button>
@@ -1848,6 +1927,7 @@
     <div class="mark-popup-title" id="markPopupTitle">Mark phase</div>
     <div class="mark-popup-subtitle">Enter the actual time for this flight phase.</div>
     <input id="markTimeInput" type="time" />
+    <input id="markGateInput" type="text" placeholder="Gate C12" style="display: none;" />
 
     <div class="mark-popup-actions">
       <button class="cancel-button" id="cancelMarkButton" type="button">Cancel</button>
@@ -1930,6 +2010,7 @@
     const editScheduledArrival = document.getElementById("editScheduledArrival");
     const saveScheduleButton = document.getElementById("saveScheduleButton");
 
+    const phaseBoarding = document.getElementById("phaseBoarding");
     const phaseGateDeparture = document.getElementById("phaseGateDeparture");
     const phaseTaxi = document.getElementById("phaseTaxi");
     const phaseTakeoff = document.getElementById("phaseTakeoff");
@@ -1940,9 +2021,13 @@
     const markPopup = document.getElementById("markPopup");
     const markPopupTitle = document.getElementById("markPopupTitle");
     const markTimeInput = document.getElementById("markTimeInput");
+    const markGateInput = document.getElementById("markGateInput");
     const cancelMarkButton = document.getElementById("cancelMarkButton");
     const confirmMarkButton = document.getElementById("confirmMarkButton");
 
+    const ttBoardingRow = document.getElementById("ttBoardingRow");
+const ttScheduledBoarding = document.getElementById("ttScheduledBoarding");
+const ttActualBoarding = document.getElementById("ttActualBoarding");
     const ttScheduledGateDeparture = document.getElementById("ttScheduledGateDeparture");
     const ttActualGateDeparture = document.getElementById("ttActualGateDeparture");
     const ttScheduledDepartureTaxi = document.getElementById("ttScheduledDepartureTaxi");
@@ -1973,8 +2058,12 @@
     const scheduledArrivalInput = document.getElementById("scheduledArrival");
     const flightTimeInput = document.getElementById("flightTime");
     const timezoneDifferenceInput = document.getElementById("timezoneDifference");
-    const edtArrivalToggle = document.getElementById("edtArrivalToggle");
-    const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
+const edtArrivalToggle = document.getElementById("edtArrivalToggle");
+const enableBoardingToggle = document.getElementById("enableBoardingToggle");
+const boardingOptions = document.getElementById("boardingOptions");
+const boardingTimeInput = document.getElementById("boardingTime");
+const boardingDurationInput = document.getElementById("boardingDuration");
+const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
     const airTimeInput = document.getElementById("airTime");
 
@@ -1982,6 +2071,15 @@
     let activeFlight = null;
     let countdownTimer = null;
     let pendingMarkPhase = null;
+
+    enableBoardingToggle.addEventListener("change", () => {
+  boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
+
+  if (!enableBoardingToggle.checked) {
+    boardingTimeInput.value = "";
+    boardingDurationInput.value = "";
+  }
+});
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -2212,6 +2310,41 @@
       return `${actionWord} in ${minutes}m`;
     }
 
+    function formatBoardingCountdown(targetDate) {
+  if (!targetDate || Number.isNaN(targetDate.getTime())) {
+    return "Boards in --";
+  }
+
+  const now = new Date();
+  const diffMs = targetDate - now;
+
+  if (diffMs <= 0) {
+    return "Boards shortly";
+  }
+
+  const totalMinutes = Math.floor(diffMs / 60000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) return `Boards in ${days}d ${hours}h`;
+  if (hours > 0) return `Boards in ${hours}h ${minutes}m`;
+
+  return `Boards in ${minutes}m`;
+}
+
+function formatBoardingPanel(flight) {
+  const boardingDateTime = buildLocalDateTime(flight.flightDateRaw, flight.boardingTime);
+
+  const shouldShowBoardingTime = Math.floor(Date.now() / 6000) % 2 === 1;
+
+  if (shouldShowBoardingTime) {
+    return `Boards at ${formatTime12Hour(flight.boardingTime)}`;
+  }
+
+  return formatBoardingCountdown(boardingDateTime);
+}
+    
     function formatPanelCountdown(targetDate) {
       if (!targetDate || Number.isNaN(targetDate.getTime())) {
         return "Gate Departure in --";
@@ -2329,22 +2462,26 @@
     }
 
     function getScheduleTimes(flight) {
-      const gateDeparture = getDepartureDateTime(flight);
-      const gateArrival = getArrivalDateTime(flight);
-      const departureTaxiMinutes = parseDurationToMinutes(flight.departureTaxiTime);
-      const arrivalTaxiMinutes = parseDurationToMinutes(flight.arrivalTaxiTime);
-      const takeoff = addMinutes(gateDeparture, departureTaxiMinutes);
-      const land = addMinutes(gateArrival, -arrivalTaxiMinutes);
+  const gateDeparture = getDepartureDateTime(flight);
+  const gateArrival = getArrivalDateTime(flight);
+  const boarding = buildLocalDateTime(flight.flightDateRaw, flight.boardingTime);
+  const boardingDurationMinutes = parseDurationToMinutes(flight.boardingDuration);
+  const departureTaxiMinutes = parseDurationToMinutes(flight.departureTaxiTime);
+  const arrivalTaxiMinutes = parseDurationToMinutes(flight.arrivalTaxiTime);
+  const takeoff = addMinutes(gateDeparture, departureTaxiMinutes);
+  const land = addMinutes(gateArrival, -arrivalTaxiMinutes);
 
-      return {
-        gateDeparture,
-        gateArrival,
-        departureTaxiMinutes,
-        arrivalTaxiMinutes,
-        takeoff,
-        land
-      };
-    }
+  return {
+    boarding,
+    boardingDurationMinutes,
+    gateDeparture,
+    gateArrival,
+    departureTaxiMinutes,
+    arrivalTaxiMinutes,
+    takeoff,
+    land
+  };
+}
 
     function getActualTimes(flight) {
       const schedule = getScheduleTimes(flight);
@@ -2377,6 +2514,19 @@
       const schedule = getScheduleTimes(flight);
       const actuals = getActualTimes(flight);
 
+      const hasBoarding = flight.enableBoarding === true;
+
+ttBoardingRow.classList.toggle("hidden", !hasBoarding);
+
+if (hasBoarding) {
+  ttScheduledBoarding.textContent = formatDurationFromMinutes(schedule.boardingDurationMinutes);
+
+  setActualValue(
+    ttActualBoarding,
+    flight.actualBoardingMinutes !== undefined ? formatDurationFromMinutes(flight.actualBoardingMinutes) : "",
+    Number(flight.actualBoardingMinutes || 0) <= schedule.boardingDurationMinutes
+  );
+}
       const scheduledDepartureTaxi = formatDurationFromMinutes(schedule.departureTaxiMinutes);
       const scheduledArrivalTaxi = formatDurationFromMinutes(schedule.arrivalTaxiMinutes);
       const scheduledAirTime = flight.airTime || formatDurationFromMinutes(diffMinutes(schedule.land, schedule.takeoff));
@@ -2529,9 +2679,22 @@
         : formatCountdown(schedule.gateArrival, "Arrives");
 
       if (phase === "scheduled") {
-        const isDelayed = schedule.gateDeparture > getOriginalDepartureDateTime(flight);
-        setStatusPanel(isDelayed, formatPanelCountdown(schedule.gateDeparture), "");
-      }
+  if (flight.enableBoarding === true) {
+    setStatusPanel(false, formatBoardingPanel(flight), "");
+  } else {
+    const isDelayed = schedule.gateDeparture > getOriginalDepartureDateTime(flight);
+    setStatusPanel(isDelayed, formatPanelCountdown(schedule.gateDeparture), "");
+  }
+}
+
+if (phase === "boarding") {
+  setStatusPanel(false, `Now boarding at Gate ${flight.boardingGate || "--"}`, "");
+}
+
+if (phase === "boardingComplete") {
+  const isDelayed = schedule.gateDeparture > getOriginalDepartureDateTime(flight);
+  setStatusPanel(isDelayed, formatPanelCountdown(schedule.gateDeparture), "");
+}
 
       if (phase === "gateDeparture") {
         const isLate = actuals.actualGateDeparture > schedule.gateDeparture;
@@ -2658,7 +2821,8 @@ setAirportRowText(
           const latest = allFlights.get(activeFlight.id) || activeFlight;
           activeFlight = latest;
           updateMainTimes(latest);
-          updateDetailCountdowns();
+updateTimezoneBox(latest);
+updateDetailCountdowns();
         }
       }, 1000);
 
@@ -2706,6 +2870,9 @@ cityArrival: cityArrivalInput.value.trim() || "Arrival",
         flightTime: flightTimeInput.value.trim() || "",
         timezoneDifference: timezoneDifferenceInput.value.trim() || "",
 edtArrival: edtArrivalToggle.checked,
+enableBoarding: enableBoardingToggle.checked,
+boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
+boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
 departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
         arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
         airTime: airTimeInput.value.trim() || "",
@@ -2720,7 +2887,8 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
       try {
         await addDoc(collection(db, "flights"), flight);
         flightForm.reset();
-        showNotification("Flight added!");
+boardingOptions.classList.remove("active");
+showNotification("Flight added!");
       } catch (error) {
         console.error("Error adding flight:", error);
         alert("Flight could not be added. Check your Firestore rules and Firebase setup.");
@@ -2768,6 +2936,10 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
         if (!flight.phase) {
           flight.phase = "scheduled";
         }
+
+        if (flight.enableBoarding !== true) {
+  flight.enableBoarding = false;
+}
 
         allFlights.set(flight.id, flight);
         createFlightCard(flight);
@@ -2852,14 +3024,24 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     function renderPhaseButtons(flight) {
       const phase = getFlightPhase(flight);
 
-      const phaseOrder = ["scheduled", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"];
+      const hasBoarding = flight.enableBoarding === true;
+
+phaseBoarding.classList.toggle("hidden", !hasBoarding);
+
+const phaseOrder = hasBoarding
+  ? ["scheduled", "boarding", "boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"]
+  : ["scheduled", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"];
       const currentIndex = phaseOrder.indexOf(phase);
 
       const buttons = [
-        {
-          key: "gateDeparture",
-          button: phaseGateDeparture
-        },
+  {
+    key: "boarding",
+    button: phaseBoarding
+  },
+  {
+    key: "gateDeparture",
+    button: phaseGateDeparture
+  },
         {
           key: "taxi",
           button: phaseTaxi
@@ -2885,20 +3067,26 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
         const itemIndex = phaseOrder.indexOf(item.key);
 
         if (phase === "scheduled") {
-          if (item.key === "gateDeparture") {
-            item.button.classList.add("active");
-          } else {
-            item.button.classList.add("locked");
-            item.button.disabled = true;
-          }
-          return;
-        }
+  const firstPhase = hasBoarding ? "boarding" : "gateDeparture";
+
+  if (item.key === firstPhase) {
+    item.button.classList.add("active");
+  } else {
+    item.button.classList.add("locked");
+    item.button.disabled = true;
+  }
+  return;
+}
 
         if (item.key === phase) {
-          item.button.classList.add("active");
-          item.button.disabled = true;
-          return;
-        }
+  item.button.classList.add("active");
+
+  if (item.key !== "boarding") {
+    item.button.disabled = true;
+  }
+
+  return;
+}
 
         if (itemIndex < currentIndex) {
           item.button.classList.add("done");
@@ -2927,20 +3115,35 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
       pendingMarkPhase = phase;
 
       const titles = {
-        gateDeparture: "Mark Gate Departure",
-        takeoff: "Mark Takeoff",
-        land: "Mark Landing",
-        gateArrival: "Mark Gate Arrival"
-      };
+  boarding: "Start Boarding",
+  gateDeparture: "Mark Gate Departure",
+  takeoff: "Mark Takeoff",
+  land: "Mark Landing",
+  gateArrival: "Mark Gate Arrival"
+};
 
       markPopupTitle.textContent = titles[phase] || "Mark Phase";
       markTimeInput.value = "";
-      markPopupOverlay.classList.add("active");
+markGateInput.value = "";
+
+if (phase === "boarding") {
+  markTimeInput.style.display = "none";
+  markGateInput.style.display = "block";
+} else {
+  markTimeInput.style.display = "block";
+  markGateInput.style.display = "none";
+}
+
+markPopupOverlay.classList.add("active");
       markPopup.classList.add("active");
 
       setTimeout(() => {
-        markTimeInput.focus();
-      }, 240);
+  if (phase === "boarding") {
+    markGateInput.focus();
+  } else {
+    markTimeInput.focus();
+  }
+}, 240);
     }
 
     function closeMarkPopup() {
@@ -2952,10 +3155,53 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     cancelMarkButton.addEventListener("click", closeMarkPopup);
     markPopupOverlay.addEventListener("click", closeMarkPopup);
 
+    phaseBoarding.addEventListener("click", async () => {
+  if (!activeFlight || activeFlight.enableBoarding !== true) return;
+
+  const phase = getFlightPhase(activeFlight);
+
+  if (phase === "scheduled") {
+    openMarkPopup("boarding");
+    return;
+  }
+
+  if (phase === "boarding") {
+    const shouldEndBoarding = confirm("End boarding for this flight?");
+
+    if (!shouldEndBoarding) return;
+
+    const actualBoardingMinutes = activeFlight.boardingStartMs
+      ? Math.max(0, Math.round((Date.now() - activeFlight.boardingStartMs) / 60000))
+      : parseDurationToMinutes(activeFlight.boardingDuration);
+
+    try {
+      await updateDoc(getFlightRef(activeFlight.id), {
+        phase: "boardingComplete",
+        actualBoardingMinutes
+      });
+
+      editFlightPage.classList.remove("active");
+      detailPage.classList.add("active");
+    } catch (error) {
+      console.error("Error ending boarding:", error);
+      alert("Boarding could not be ended.");
+    }
+  }
+});
+    
     phaseGateDeparture.addEventListener("click", () => {
-      if (!activeFlight || getFlightPhase(activeFlight) !== "scheduled") return;
-      openMarkPopup("gateDeparture");
-    });
+  if (!activeFlight) return;
+
+  const phase = getFlightPhase(activeFlight);
+
+  if (activeFlight.enableBoarding === true) {
+    if (phase !== "boardingComplete") return;
+  } else {
+    if (phase !== "scheduled") return;
+  }
+
+  openMarkPopup("gateDeparture");
+});
 
     phaseTaxi.addEventListener("click", async () => {
       if (!activeFlight || getFlightPhase(activeFlight) !== "gateDeparture") return;
@@ -2990,12 +3236,23 @@ departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     });
 
     confirmMarkButton.addEventListener("click", async () => {
-      if (!activeFlight || !pendingMarkPhase || !markTimeInput.value) return;
+      if (!activeFlight || !pendingMarkPhase) return;
+
+if (pendingMarkPhase === "boarding" && !markGateInput.value.trim()) return;
+
+if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 
       const time = markTimeInput.value;
+      const gate = markGateInput.value.trim();
       const updates = {};
       const flight = activeFlight;
 
+      if (pendingMarkPhase === "boarding") {
+  updates.phase = "boarding";
+  updates.boardingGate = gate;
+  updates.boardingStartMs = Date.now();
+}
+      
       if (pendingMarkPhase === "gateDeparture") {
         updates.phase = "gateDeparture";
         updates.actualGateDeparture = time;
