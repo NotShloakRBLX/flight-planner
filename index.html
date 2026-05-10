@@ -67,6 +67,44 @@
       );
     }
 
+    .passport-button {
+  position: absolute;
+  right: 92px;
+  bottom: -18px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  background:
+    linear-gradient(145deg, rgba(160, 170, 255, 0.16), rgba(255, 255, 255, 0.045)),
+    rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c8d3ff;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.passport-button:hover {
+  background:
+    linear-gradient(145deg, rgba(160, 170, 255, 0.24), rgba(255, 255, 255, 0.07)),
+    rgba(255, 255, 255, 0.11);
+  border-color: rgba(160, 170, 255, 0.28);
+}
+
+.passport-button:active {
+  transform: scale(0.92);
+}
+
+.passport-button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+    
     .miles-button {
   position: absolute;
   right: 46px;
@@ -584,6 +622,434 @@
       fill: currentColor;
     }
 
+    .passport-page {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  background:
+    radial-gradient(circle at top, rgba(160, 170, 255, 0.13), transparent 34%),
+    radial-gradient(circle at top right, rgba(255, 215, 80, 0.10), transparent 32%),
+    #070b18;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(28px);
+  transition:
+    opacity 0.38s ease,
+    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.passport-page.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.passport-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 18px 42px;
+}
+
+.passport-header {
+  position: relative;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passport-back-button {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.passport-back-button:active {
+  transform: scale(0.92);
+}
+
+.passport-back-button svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.passport-page-title {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+}
+
+.passport-card-wrap {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.passport-card {
+  width: min(300px, 100%);
+  min-height: 430px;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.13), transparent 38%),
+    radial-gradient(circle at bottom right, rgba(64, 156, 255, 0.16), transparent 42%),
+    linear-gradient(145deg, #151724, #050712);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.28s ease, border-color 0.28s ease;
+}
+
+.passport-card:active {
+  transform: scale(0.985);
+}
+
+.passport-card::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.passport-top-line {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.passport-name-label,
+.passport-timer-label {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.passport-name {
+  margin-top: 6px;
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.05;
+}
+
+.passport-timer {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.passport-expired-badge {
+  display: none;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 75, 75, 0.95), rgba(155, 18, 18, 0.95));
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.8px;
+  text-align: center;
+}
+
+.passport-card.expired .passport-expired-badge {
+  display: block;
+}
+
+.passport-emblem {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  width: 126px;
+  height: 126px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(255, 215, 80, 0.22), transparent 58%),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 215, 80, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 215, 80, 0.72);
+}
+
+.passport-emblem svg {
+  width: 74px;
+  height: 74px;
+  fill: currentColor;
+}
+
+.passport-footer {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 24px;
+  z-index: 1;
+}
+
+.passport-footer-title {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.passport-footer-value {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -0.25px;
+}
+
+.no-passport-card {
+  margin-top: 24px;
+  padding: 26px 20px;
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  text-align: center;
+}
+
+.no-passport-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+}
+
+.no-passport-subtitle {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.create-passport-button {
+  margin-top: 18px;
+  width: 100%;
+  height: 52px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  color: white;
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow:
+    0 18px 42px rgba(12, 190, 113, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.recent-arrivals-section {
+  margin-top: 28px;
+}
+
+.recent-arrivals-title {
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
+}
+
+.recent-arrivals-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.passport-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 115;
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.34s ease;
+}
+
+.passport-popup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.passport-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 120;
+  width: min(430px, calc(100% - 32px));
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(160, 170, 255, 0.14), transparent 45%),
+    rgba(13, 17, 32, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 40px) scale(0.96);
+  transition:
+    opacity 0.34s ease,
+    transform 0.46s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.passport-popup.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.passport-popup-title {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+}
+
+.passport-popup-subtitle {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.passport-popup input {
+  margin-top: 18px;
+  width: 100%;
+  height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 17px;
+  outline: none;
+  padding: 0 16px;
+  background: rgba(5, 10, 24, 0.7);
+  color: white;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.passport-popup input:focus {
+  border-color: rgba(160, 170, 255, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(160, 170, 255, 0.34),
+    0 0 0 5px rgba(160, 170, 255, 0.12);
+}
+
+.passport-popup-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.passport-green-button,
+.passport-red-button {
+  height: 50px;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+}
+
+.passport-green-button {
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  box-shadow: 0 18px 40px rgba(12, 190, 113, 0.2);
+}
+
+.passport-red-button {
+  background: linear-gradient(135deg, rgba(255, 75, 75, 0.94), rgba(155, 18, 18, 0.95));
+  box-shadow: 0 18px 40px rgba(255, 75, 75, 0.16);
+}
+
+.passport-green-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  box-shadow: none;
+}
+
+.passport-payment-card {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.14), transparent 45%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.passport-payment-label {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+}
+
+.passport-payment-value {
+  margin-top: 6px;
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.9px;
+}
+
+.passport-insufficient {
+  display: none;
+  margin-top: 16px;
+  color: #ff4b4b;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.passport-insufficient.active {
+  display: block;
+}
+    
     .miles-page {
   position: fixed;
   inset: 0;
@@ -2221,6 +2687,12 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
       <div class="header-line"></div>
 
+      <button class="passport-button" id="passportButton" aria-label="Passport">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M7 2.5h8.75A3.25 3.25 0 0 1 19 5.75v12.5a3.25 3.25 0 0 1-3.25 3.25H7A2.75 2.75 0 0 1 4.25 18.75V5.25A2.75 2.75 0 0 1 7 2.5Zm0 2a.75.75 0 0 0-.75.75v13.5c0 .41.34.75.75.75h8.75c.69 0 1.25-.56 1.25-1.25V5.75c0-.69-.56-1.25-1.25-1.25H7Zm2.1 4.05a3.4 3.4 0 1 1 5.8 2.4 3.4 3.4 0 0 1-5.8-2.4Zm3.4-1.4a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.65 7.1c0-1.3 1.05-2.35 2.35-2.35h2.6c1.3 0 2.35 1.05 2.35 2.35v.25a1 1 0 0 1-1 1h-5.3a1 1 0 0 1-1-1v-.25Zm2.15-.25h3c-.05-.06-.12-.1-.2-.1h-2.6c-.08 0-.15.04-.2.1Z" />
+  </svg>
+</button>
+      
       <button class="miles-button" id="milesButton" aria-label="Miles balance">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M12 2.5c-5.25 0-9.5 2.07-9.5 4.63v9.74c0 2.56 4.25 4.63 9.5 4.63s9.5-2.07 9.5-4.63V7.13C21.5 4.57 17.25 2.5 12 2.5Zm0 2c4.28 0 7.5 1.52 7.5 2.63S16.28 9.75 12 9.75 4.5 8.23 4.5 7.13 7.72 4.5 12 4.5Zm0 15c-4.28 0-7.5-1.52-7.5-2.63v-1.62c1.7 1.2 4.4 1.98 7.5 1.98s5.8-.78 7.5-1.98v1.62c0 1.11-3.22 2.63-7.5 2.63Zm0-4.27c-4.28 0-7.5-1.52-7.5-2.63v-1.62c1.7 1.2 4.4 1.98 7.5 1.98s5.8-.78 7.5-1.98v1.62c0 1.11-3.22 2.63-7.5 2.63Z" />
@@ -2237,6 +2709,61 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <section class="flights-list" id="flightsList"></section>
   </main>
 
+  <section class="passport-page" id="passportPage">
+  <div class="passport-shell">
+    <header class="passport-header">
+      <button class="passport-back-button" id="passportBackButton" aria-label="Back to flights">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15.53 4.47a.75.75 0 0 1 0 1.06L9.06 12l6.47 6.47a.75.75 0 1 1-1.06 1.06l-7-7a.75.75 0 0 1 0-1.06l7-7a.75.75 0 0 1 1.06 0Z" />
+        </svg>
+      </button>
+
+      <div class="passport-page-title">Passport</div>
+    </header>
+
+    <section class="passport-card-wrap" id="passportCardWrap">
+      <article class="passport-card" id="passportCard">
+        <div class="passport-top-line">
+          <div>
+            <div class="passport-name-label">Name</div>
+            <div class="passport-name" id="passportNameDisplay">--</div>
+          </div>
+
+          <div>
+            <div class="passport-timer-label">Expires in</div>
+            <div class="passport-timer" id="passportTimerDisplay">--</div>
+            <div class="passport-expired-badge">EXPIRED</div>
+          </div>
+        </div>
+
+        <div class="passport-emblem">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 8.66 15H22a1 1 0 0 0 .9-1.44l-2-4a1 1 0 0 0-1.8 0l-2 4A1 1 0 0 0 18 17h.37A8 8 0 1 1 12 4a7.95 7.95 0 0 1 6.1 2.84 1 1 0 0 0 1.53-1.28A9.94 9.94 0 0 0 12 2Zm1 5a1 1 0 1 0-2 0v5a1 1 0 0 0 .45.83l3.5 2.33a1 1 0 1 0 1.1-1.66L13 11.46V7Z" />
+          </svg>
+        </div>
+
+        <div class="passport-footer">
+          <div class="passport-footer-title">United States Entry Document</div>
+          <div class="passport-footer-value">International Arrival Passport</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="no-passport-card" id="noPassportCard">
+      <div class="no-passport-title">No passport</div>
+      <div class="no-passport-subtitle">Create a passport to allow International US arrival flights.</div>
+      <button class="create-passport-button" id="createPassportButton" type="button">Create a passport</button>
+    </section>
+
+    <section class="recent-arrivals-section">
+      <h2 class="recent-arrivals-title">Recent arrivals</h2>
+      <div class="recent-arrivals-list" id="recentArrivalsList">
+        <div class="empty-transactions">No arrivals yet</div>
+      </div>
+    </section>
+  </div>
+</section>
+  
   <section class="miles-page" id="milesPage">
   <div class="miles-shell">
     <header class="miles-header">
@@ -2405,6 +2932,18 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
   <label class="toggle-switch">
     <input id="edtArrivalToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">International US arrival</div>
+    <div class="toggle-subtitle">Requires an active passport before adding flight</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="intlUSArrivalToggle" type="checkbox" />
     <span class="toggle-slider"></span>
   </label>
 </div>
@@ -2779,6 +3318,50 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </div>
   </section>
 
+  <div class="passport-popup-overlay" id="passportPopupOverlay"></div>
+
+<section class="passport-popup" id="createPassportPopup">
+  <div class="passport-popup-title">Create Passport</div>
+  <div class="passport-popup-subtitle">Enter the full name that should appear on your passport.</div>
+
+  <input id="passportFullNameInput" type="text" placeholder="Full name" />
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="cancelCreatePassportButton" type="button">Cancel</button>
+    <button class="passport-green-button" id="confirmCreatePassportButton" type="button">Create</button>
+  </div>
+</section>
+
+<section class="passport-popup" id="passportActionPopup">
+  <div class="passport-popup-title">Passport</div>
+  <div class="passport-popup-subtitle" id="passportActionSubtitle">Manage your passport.</div>
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="cancelPassportActionButton" type="button">Cancel</button>
+    <button class="passport-green-button" id="openRenewPassportButton" type="button">Renew</button>
+  </div>
+</section>
+
+<section class="passport-popup" id="renewPassportPopup">
+  <div class="passport-popup-title">Passport Renewal</div>
+  <div class="passport-popup-subtitle">Renewing your passport costs 1,000 miles.</div>
+
+  <div class="passport-payment-card">
+    <div class="passport-payment-label">Current balance</div>
+    <div class="passport-payment-value" id="renewBalanceDisplay">0 mi</div>
+
+    <div class="passport-payment-label" style="margin-top: 16px;">Renewal cost</div>
+    <div class="passport-payment-value">1,000 mi</div>
+
+    <div class="passport-insufficient" id="passportInsufficientText">Insufficient balance</div>
+  </div>
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="cancelRenewPassportButton" type="button">Cancel</button>
+    <button class="passport-green-button" id="confirmRenewPassportButton" type="button">Renew</button>
+  </div>
+</section>
+  
   <div class="seat-flow-overlay" id="seatFlowOverlay"></div>
 
 <section class="seat-popup" id="cabinSelectPopup">
@@ -2882,7 +3465,32 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-   const milesButton = document.getElementById("milesButton");
+   const passportButton = document.getElementById("passportButton");
+const passportPage = document.getElementById("passportPage");
+const passportBackButton = document.getElementById("passportBackButton");
+const passportCardWrap = document.getElementById("passportCardWrap");
+const passportCard = document.getElementById("passportCard");
+const passportNameDisplay = document.getElementById("passportNameDisplay");
+const passportTimerDisplay = document.getElementById("passportTimerDisplay");
+const noPassportCard = document.getElementById("noPassportCard");
+const createPassportButton = document.getElementById("createPassportButton");
+const recentArrivalsList = document.getElementById("recentArrivalsList");
+
+const passportPopupOverlay = document.getElementById("passportPopupOverlay");
+const createPassportPopup = document.getElementById("createPassportPopup");
+const passportFullNameInput = document.getElementById("passportFullNameInput");
+const cancelCreatePassportButton = document.getElementById("cancelCreatePassportButton");
+const confirmCreatePassportButton = document.getElementById("confirmCreatePassportButton");
+const passportActionPopup = document.getElementById("passportActionPopup");
+const passportActionSubtitle = document.getElementById("passportActionSubtitle");
+const cancelPassportActionButton = document.getElementById("cancelPassportActionButton");
+const openRenewPassportButton = document.getElementById("openRenewPassportButton");
+const renewPassportPopup = document.getElementById("renewPassportPopup");
+const renewBalanceDisplay = document.getElementById("renewBalanceDisplay");
+const passportInsufficientText = document.getElementById("passportInsufficientText");
+const cancelRenewPassportButton = document.getElementById("cancelRenewPassportButton");
+const confirmRenewPassportButton = document.getElementById("confirmRenewPassportButton");
+    const milesButton = document.getElementById("milesButton");
 const milesPage = document.getElementById("milesPage");
 const milesBackButton = document.getElementById("milesBackButton");
 const milesBalanceDisplay = document.getElementById("milesBalanceDisplay");
@@ -3006,6 +3614,7 @@ const economyLettersInput = document.getElementById("economyLetters");
 const overnightToggle = document.getElementById("overnightToggle");
 const timezoneDifferenceInput = document.getElementById("timezoneDifference");
 const edtArrivalToggle = document.getElementById("edtArrivalToggle");
+const intlUSArrivalToggle = document.getElementById("intlUSArrivalToggle");
 const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
 const boardingTimeInput = document.getElementById("boardingTime");
@@ -3023,6 +3632,8 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
+    let currentPassport = null;
+    let passportCountdownTimer = null;
 
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
@@ -3043,6 +3654,19 @@ let pendingPremiumCost = 0;
       flightsPage.classList.remove("hidden");
     });
 
+    passportButton.addEventListener("click", () => {
+  flightsPage.classList.add("hidden");
+  passportPage.classList.add("active");
+  document.body.style.overflow = "hidden";
+  updatePassportUI();
+});
+
+passportBackButton.addEventListener("click", () => {
+  passportPage.classList.remove("active");
+  flightsPage.classList.remove("hidden");
+  document.body.style.overflow = "";
+});
+
     milesButton.addEventListener("click", () => {
   flightsPage.classList.add("hidden");
   milesPage.classList.add("active");
@@ -3058,6 +3682,75 @@ milesBackButton.addEventListener("click", () => {
     function getFlightRef(id) {
       return doc(db, "flights", id);
     }
+
+    function getPassportExpiresAtMs(passport) {
+  return Number(passport?.expiresAtMs || 0);
+}
+
+function isPassportActive() {
+  return currentPassport && getPassportExpiresAtMs(currentPassport) > Date.now();
+}
+
+function getPassportTimeRemainingText() {
+  if (!currentPassport) return "--";
+
+  const diffMs = getPassportExpiresAtMs(currentPassport) - Date.now();
+
+  if (diffMs <= 0) return "Expired";
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+
+  return `${seconds}s`;
+}
+
+function updatePassportUI() {
+  const hasPassport = !!currentPassport;
+
+  passportCardWrap.style.display = hasPassport ? "flex" : "none";
+  noPassportCard.style.display = hasPassport ? "none" : "block";
+
+  if (!hasPassport) {
+    passportNameDisplay.textContent = "--";
+    passportTimerDisplay.textContent = "--";
+    passportCard.classList.remove("expired");
+    return;
+  }
+
+  passportNameDisplay.textContent = currentPassport.fullName || "--";
+  passportTimerDisplay.textContent = getPassportTimeRemainingText();
+  passportCard.classList.toggle("expired", !isPassportActive());
+}
+
+function openPassportPopup(popup) {
+  passportPopupOverlay.classList.add("active");
+  popup.classList.add("active");
+}
+
+function closePassportPopups() {
+  passportPopupOverlay.classList.remove("active");
+  createPassportPopup.classList.remove("active");
+  passportActionPopup.classList.remove("active");
+  renewPassportPopup.classList.remove("active");
+}
+
+function showRenewPassportPopup() {
+  passportActionPopup.classList.remove("active");
+  renewPassportPopup.classList.add("active");
+
+  renewBalanceDisplay.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
+
+  const hasEnough = currentMilesBalance >= 1000;
+  passportInsufficientText.classList.toggle("active", !hasEnough);
+  confirmRenewPassportButton.disabled = !hasEnough;
+}
 
     function formatMilesAmount(amount) {
   const safeAmount = Number(amount || 0);
@@ -4187,7 +4880,8 @@ updateCompleteFlightButton(latest);
     overnight: overnightToggle.checked,
     timezoneDifference: timezoneDifferenceInput.value.trim() || "",
     edtArrival: edtArrivalToggle.checked,
-    enableBoarding: enableBoardingToggle.checked,
+internationalUSArrival: intlUSArrivalToggle.checked,
+enableBoarding: enableBoardingToggle.checked,
     boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
     boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
     departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
@@ -4196,7 +4890,12 @@ updateCompleteFlightButton(latest);
     createdAt: serverTimestamp()
   };
 
-  pendingFlightToAdd = flight;
+  if (flight.internationalUSArrival === true && !isPassportActive()) {
+  showNotification("Active passport required!");
+  return;
+}
+
+      pendingFlightToAdd = flight;
 
   addFlightButton.disabled = true;
   addFlightButton.style.opacity = "0.72";
@@ -4219,6 +4918,19 @@ updateCompleteFlightButton(latest);
       }
     }
 
+    onSnapshot(doc(db, "passport", "main"), (snapshot) => {
+  currentPassport = snapshot.exists() ? snapshot.data() : null;
+  updatePassportUI();
+
+  if (passportCountdownTimer) clearInterval(passportCountdownTimer);
+
+  passportCountdownTimer = setInterval(() => {
+    updatePassportUI();
+  }, 1000);
+}, (error) => {
+  console.error("Error loading passport:", error);
+});
+    
     onSnapshot(doc(db, "miles", "balance"), (snapshot) => {
   const data = snapshot.exists() ? snapshot.data() : {};
   const balance = Number(data.balance || 0);
@@ -4312,6 +5024,10 @@ if (!flight.seatCabin) {
 
 if (flight.premiumSeat !== true) {
   flight.premiumSeat = false;
+}
+
+if (flight.internationalUSArrival !== true) {
+  flight.internationalUSArrival = false;
 }
 
 if (!flight.premiumSeatCost) {
@@ -4761,6 +5477,112 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
   }
 });
     
+    passportPopupOverlay.addEventListener("click", closePassportPopups);
+
+createPassportButton.addEventListener("click", () => {
+  passportFullNameInput.value = "";
+  openPassportPopup(createPassportPopup);
+
+  setTimeout(() => {
+    passportFullNameInput.focus();
+  }, 220);
+});
+
+cancelCreatePassportButton.addEventListener("click", closePassportPopups);
+cancelPassportActionButton.addEventListener("click", closePassportPopups);
+cancelRenewPassportButton.addEventListener("click", closePassportPopups);
+
+passportCard.addEventListener("click", () => {
+  if (!currentPassport) return;
+
+  passportActionSubtitle.textContent = isPassportActive()
+    ? "Your passport is active. You can renew it for another week."
+    : "Your passport is expired. Renew it to add International US arrival flights.";
+
+  openPassportPopup(passportActionPopup);
+});
+
+openRenewPassportButton.addEventListener("click", showRenewPassportPopup);
+
+confirmCreatePassportButton.addEventListener("click", async () => {
+  const fullName = passportFullNameInput.value.trim();
+
+  if (!fullName) {
+    alert("Enter a full name for the passport.");
+    return;
+  }
+
+  confirmCreatePassportButton.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, "passport", "main"), {
+      fullName,
+      expiresAtMs: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    closePassportPopups();
+    showNotification("Passport created!");
+  } catch (error) {
+    console.error("Error creating passport:", error);
+    alert("Passport could not be created. Check Firestore rules.");
+  } finally {
+    confirmCreatePassportButton.disabled = false;
+  }
+});
+
+confirmRenewPassportButton.addEventListener("click", async () => {
+  if (currentMilesBalance < 1000 || !currentPassport) return;
+
+  confirmRenewPassportButton.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    batch.set(
+      doc(db, "passport", "main"),
+      {
+        fullName: currentPassport.fullName || "",
+        expiresAtMs: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(
+      doc(db, "miles", "balance"),
+      {
+        balance: increment(-1000),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(doc(collection(db, "mileTransactions")), {
+      type: "spent",
+      title: "Passport Renewal",
+      amount: 1000,
+      airline: "cbp",
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    closePassportPopups();
+    showNotification("Passport renewed!");
+  } catch (error) {
+    console.error("Error renewing passport:", error);
+    alert("Passport could not be renewed. Check Firestore rules.");
+  } finally {
+    confirmRenewPassportButton.disabled = false;
+  }
+});
+
     seatFlowOverlay.addEventListener("click", () => {
   if (seatAssignedPopup.classList.contains("active")) {
     closeSeatPopups();
