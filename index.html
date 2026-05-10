@@ -5935,50 +5935,6 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
   }
 });
 
-    batch.set(
-      lockRef,
-      {
-        active: false,
-        submittedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
-
-    batch.set(arrivalRef, {
-      airline: currentCBPLock.airline || "",
-      flightNumber: currentCBPLock.flightNumber || "",
-      flightDate: currentCBPLock.flightDate || "",
-      flightDateRaw: currentCBPLock.flightDateRaw || "",
-      departureAirport: currentCBPLock.departureAirport || "",
-      arrivalAirport: currentCBPLock.arrivalAirport || "",
-      arrivalAirportName: currentCBPLock.arrivalAirportName || "",
-      passportName: currentCBPLock.passportName || "",
-      createdAt: serverTimestamp()
-    });
-
-    await batch.commit();
-
-    const returnedFlight = allFlights.get(currentCBPLock.flightId);
-
-    closeCBPPage();
-    flightsPage.classList.remove("hidden");
-
-    if (returnedFlight) {
-      openFlightDetails({
-        ...returnedFlight,
-        cbpSubmitted: true
-      });
-    }
-
-    showNotification("CBP form submitted!");
-  } catch (error) {
-    console.error("Error submitting CBP form:", error);
-    alert("CBP form could not be submitted. Check Firestore rules.");
-  } finally {
-    cbpSubmitButton.disabled = false;
-  }
-});
-
     passportPopupOverlay.addEventListener("click", closePassportPopups);
 
 createPassportButton.addEventListener("click", () => {
