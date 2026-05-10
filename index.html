@@ -5934,17 +5934,6 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
     cbpSubmitButton.disabled = false;
   }
 });
-    const lockRef = doc(db, "cbpLock", "main");
-    const arrivalRef = doc(collection(db, "cbpArrivals"));
-
-    batch.set(
-  flightRef,
-  {
-    cbpSubmitted: true,
-    cbpSubmittedAt: serverTimestamp()
-  },
-  { merge: true }
-);
 
     batch.set(
       lockRef,
