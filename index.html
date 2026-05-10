@@ -1721,6 +1721,15 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   font-weight: 720;
 }
 
+    .payment-seat-value {
+  margin-top: 6px;
+  color: white;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+  line-height: 1;
+}
+
 .payment-cost {
   margin-top: 7px;
   color: white;
@@ -2432,22 +2441,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 </div>
 </div>
 
-          <div class="form-field">
-            <label for="departureTaxiTime">Departure taxi time</label>
-            <input id="departureTaxiTime" type="text" placeholder="18m" />
-          </div>
-
-          <div class="form-field">
-            <label for="arrivalTaxiTime">Arrival taxi time</label>
-            <input id="arrivalTaxiTime" type="text" placeholder="9m" />
-          </div>
-
-          <div class="form-field">
-            <label for="airTime">Air time</label>
-            <input id="airTime" type="text" placeholder="1h 43m" />
-          </div>
-        </div>
-
     </div>
           <div class="form-actions">
           <button class="add-flight-button" id="addFlightButton" type="button">
@@ -2810,16 +2803,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <div class="seat-popup-subtitle">Review your assigned seat and mileage cost.</div>
 
   <div class="payment-card">
-    <div class="payment-small-label">Current balance</div>
-    <div class="payment-balance" id="premiumBalanceDisplay">0 mi</div>
+  <div class="payment-small-label">Seat</div>
+  <div class="payment-balance" id="premiumBalanceDisplay">--</div>
 
-    <div class="payment-seat" id="premiumSeatDisplay">Seat --</div>
+  <div class="payment-small-label" style="margin-top: 18px;">Current balance</div>
+  <div class="payment-seat-value" id="premiumSeatDisplay">0 mi</div>
 
-    <div class="payment-small-label" style="margin-top: 16px;">Miles cost</div>
-    <div class="payment-cost" id="premiumCostDisplay">0 mi</div>
+  <div class="payment-small-label" style="margin-top: 16px;">Miles cost</div>
+  <div class="payment-cost" id="premiumCostDisplay">0 mi</div>
 
-    <div class="insufficient-text" id="insufficientBalanceText">Insufficient balance</div>
-  </div>
+  <div class="insufficient-text" id="insufficientBalanceText">Insufficient balance</div>
+</div>
 
   <div class="seat-popup-actions">
     <button class="seat-cancel-button" id="premiumCancelButton" type="button">Cancel</button>
@@ -3821,9 +3815,9 @@ function showPremiumPaymentPopup() {
   cabinSelectPopup.classList.remove("active");
   premiumPaymentPopup.classList.add("active");
 
-  premiumBalanceDisplay.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
-  premiumSeatDisplay.textContent = `Seat ${pendingSeatAssignment?.seat || "--"}`;
-  premiumCostDisplay.textContent = `${pendingPremiumCost.toLocaleString("en-US")} mi`;
+  premiumBalanceDisplay.textContent = pendingSeatAssignment?.seat || "--";
+premiumSeatDisplay.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
+premiumCostDisplay.textContent = `${pendingPremiumCost.toLocaleString("en-US")} mi`;
 
   const hasEnoughMiles = currentMilesBalance >= pendingPremiumCost;
 
