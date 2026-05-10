@@ -5454,49 +5454,31 @@ if (!flight.premiumSeatCost) {
     editBackButton.addEventListener("click", closeEditFlightPage);
 
     saveScheduleButton.addEventListener("click", async () => {
-      if (!activeFlight) return;
+  if (!activeFlight) return;
 
-      const updates = {
-        scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
-        scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || "",
-        originalScheduledDeparture: activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || "",
-        originalScheduledArrival: activeFlight.originalScheduledArrival || activeFlight.scheduledArrival || ""
-      };
-
-      saveScheduleButton.disabled = true;
-      saveScheduleButton.style.opacity = "0.72";
-
-      try {
-  await updateDoc(getFlightRef(activeFlight.id), updates);
-
-  const completedPhaseFlight = {
-    ...activeFlight,
-    ...updates,
-    id: activeFlight.id
+  const updates = {
+    scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
+    scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || "",
+    originalScheduledDeparture: activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || "",
+    originalScheduledArrival: activeFlight.originalScheduledArrival || activeFlight.scheduledArrival || ""
   };
 
-  closeMarkPopup();
-  editFlightPage.classList.remove("active");
+  saveScheduleButton.disabled = true;
+  saveScheduleButton.style.opacity = "0.72";
 
-  if (
-    pendingMarkPhase === "gateArrival" &&
-    completedPhaseFlight.internationalUSArrival === true &&
-    completedPhaseFlight.cbpSubmitted !== true
-  ) {
-    detailPage.classList.remove("active");
-    await createCBPLockForFlight(completedPhaseFlight);
-    return;
+  try {
+    await updateDoc(getFlightRef(activeFlight.id), updates);
+    editFlightPage.classList.remove("active");
+    detailPage.classList.add("active");
+    showNotification("Flight updated!");
+  } catch (error) {
+    console.error("Error saving schedule:", error);
+    alert("Schedule could not be updated. Check your Firestore rules.");
+  } finally {
+    saveScheduleButton.disabled = false;
+    saveScheduleButton.style.opacity = "1";
   }
-
-  detailPage.classList.add("active");
-} catch (error) {
-        console.error("Error saving schedule:", error);
-        alert("Schedule could not be updated. Check your Firestore rules.");
-      } finally {
-        saveScheduleButton.disabled = false;
-        saveScheduleButton.style.opacity = "1";
-      }
-    });
+});
 
     function renderPhaseButtons(flight) {
       const phase = getFlightPhase(flight);
@@ -5792,11 +5774,31 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
       confirmMarkButton.style.opacity = "0.72";
 
       try {
-        await updateDoc(getFlightRef(activeFlight.id), updates);
-        closeMarkPopup();
-        editFlightPage.classList.remove("active");
-        detailPage.classList.add("active");
-      } catch (error) {
+  const markedPhase = pendingMarkPhase;
+
+  await updateDoc(getFlightRef(activeFlight.id), updates);
+
+  const completedPhaseFlight = {
+    ...activeFlight,
+    ...updates,
+    id: activeFlight.id
+  };
+
+  closeMarkPopup();
+  editFlightPage.classList.remove("active");
+
+  if (
+    markedPhase === "gateArrival" &&
+    completedPhaseFlight.internationalUSArrival === true &&
+    completedPhaseFlight.cbpSubmitted !== true
+  ) {
+    detailPage.classList.remove("active");
+    await createCBPLockForFlight(completedPhaseFlight);
+    return;
+  }
+
+  detailPage.classList.add("active");
+} catch (error) {
         console.error("Error marking phase:", error);
         alert("Phase could not be marked.");
       } finally {
