@@ -622,6 +622,198 @@
       fill: currentColor;
     }
 
+    .cbp-page {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background:
+    radial-gradient(circle at top, rgba(64, 156, 255, 0.14), transparent 34%),
+    radial-gradient(circle at bottom, rgba(22, 225, 138, 0.09), transparent 38%),
+    #070b18;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(28px);
+  transition:
+    opacity 0.38s ease,
+    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.cbp-page.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.cbp-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 38px 20px 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cbp-logo {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.34));
+}
+
+.cbp-title {
+  margin-top: 22px;
+  font-size: 28px;
+  font-weight: 950;
+  letter-spacing: -0.85px;
+  line-height: 1.08;
+  text-align: center;
+}
+
+.cbp-title-line {
+  width: 100%;
+  height: 1px;
+  margin-top: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.72),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+
+.cbp-form-box {
+  width: 100%;
+  margin-top: 30px;
+  padding: 22px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(64, 156, 255, 0.14), transparent 44%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.035)),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.cbp-field {
+  padding: 16px 0;
+}
+
+.cbp-field:first-child {
+  padding-top: 0;
+}
+
+.cbp-field:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.cbp-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.cbp-value {
+  margin-top: 7px;
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.45px;
+  line-height: 1.12;
+}
+
+.cbp-submit-button {
+  width: 100%;
+  height: 56px;
+  margin-top: 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  color: white;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.15px;
+  cursor: pointer;
+  box-shadow:
+    0 18px 42px rgba(12, 190, 113, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+}
+
+.cbp-submit-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.cbp-submit-button:active {
+  transform: scale(0.97);
+}
+
+.cbp-submit-button:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.arrival-card {
+  min-height: 72px;
+  padding: 14px;
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 12px;
+  animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arrival-logo {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrival-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.arrival-main {
+  min-width: 0;
+}
+
+.arrival-route {
+  color: white;
+  font-size: 16px;
+  font-weight: 820;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrival-date {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 13px;
+  font-weight: 650;
+}
+    
     .passport-page {
   position: fixed;
   inset: 0;
@@ -2709,6 +2901,31 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <section class="flights-list" id="flightsList"></section>
   </main>
 
+  <section class="cbp-page" id="cbpPage">
+  <div class="cbp-shell">
+    <img class="cbp-logo" src="./cbp.png" alt="CBP logo" />
+
+    <div class="cbp-title">US Customs &amp; Border Protection</div>
+    <div class="cbp-title-line"></div>
+
+    <section class="cbp-form-box">
+      <div class="cbp-field">
+        <div class="cbp-label">Arrival Airport</div>
+        <div class="cbp-value" id="cbpArrivalAirport">--</div>
+      </div>
+
+      <div class="cbp-field">
+        <div class="cbp-label">Passport</div>
+        <div class="cbp-value" id="cbpPassportName">--</div>
+      </div>
+    </section>
+
+    <button class="cbp-submit-button" id="cbpSubmitButton" type="button">
+      Submit Form
+    </button>
+  </div>
+</section>
+  
   <section class="passport-page" id="passportPage">
   <div class="passport-shell">
     <header class="passport-header">
@@ -3465,7 +3682,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-   const passportButton = document.getElementById("passportButton");
+   const cbpPage = document.getElementById("cbpPage");
+const cbpArrivalAirport = document.getElementById("cbpArrivalAirport");
+const cbpPassportName = document.getElementById("cbpPassportName");
+const cbpSubmitButton = document.getElementById("cbpSubmitButton");
+    const passportButton = document.getElementById("passportButton");
 const passportPage = document.getElementById("passportPage");
 const passportBackButton = document.getElementById("passportBackButton");
 const passportCardWrap = document.getElementById("passportCardWrap");
@@ -3634,6 +3855,7 @@ let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
     let currentPassport = null;
     let passportCountdownTimer = null;
+    let currentCBPLock = null;
 
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
@@ -3750,6 +3972,101 @@ function showRenewPassportPopup() {
   const hasEnough = currentMilesBalance >= 1000;
   passportInsufficientText.classList.toggle("active", !hasEnough);
   confirmRenewPassportButton.disabled = !hasEnough;
+}
+    function getArrivalAirportDisplayName(flight) {
+  return flight.arrivalAirportName || flight.cityArrival || flight.arrivalAirport || "Arrival";
+}
+
+function openCBPPage(lockData) {
+  currentCBPLock = lockData;
+
+  cbpArrivalAirport.textContent = lockData.arrivalAirportName || "--";
+  cbpPassportName.textContent = lockData.passportName || "--";
+
+  flightsPage.classList.add("hidden");
+  addFlightPage.classList.remove("active");
+  editFlightPage.classList.remove("active");
+  detailPage.classList.remove("active");
+  milesPage.classList.remove("active");
+  passportPage.classList.remove("active");
+
+  cbpPage.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeCBPPage() {
+  cbpPage.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+async function createCBPLockForFlight(flight) {
+  const lockData = {
+    active: true,
+    flightId: flight.id,
+    airline: flight.airline || "",
+    flightNumber: flight.flightNumber || "",
+    flightDate: flight.flightDate || "",
+    flightDateRaw: flight.flightDateRaw || "",
+    departureAirport: flight.departureAirport || "",
+    arrivalAirport: flight.arrivalAirport || "",
+    arrivalAirportName: getArrivalAirportDisplayName(flight),
+    passportName: currentPassport?.fullName || "",
+    createdAt: serverTimestamp()
+  };
+
+  await updateDoc(getFlightRef(flight.id), {
+    cbpRequired: true,
+    cbpSubmitted: false
+  });
+
+  const batch = writeBatch(db);
+
+  batch.set(
+    doc(db, "cbpLock", "main"),
+    lockData,
+    { merge: true }
+  );
+
+  await batch.commit();
+
+  openCBPPage(lockData);
+}
+
+function formatArrivalDate(value) {
+  if (!value) return "";
+
+  const date = new Date(value + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function createRecentArrivalCard(arrival) {
+  const card = document.createElement("div");
+  card.className = "arrival-card";
+
+  const airline = escapeHTML(arrival.airline || "");
+  const departureAirport = escapeHTML(arrival.departureAirport || "DEP");
+  const arrivalAirport = escapeHTML(arrival.arrivalAirport || "ARR");
+  const dateText = escapeHTML(formatArrivalDate(arrival.flightDateRaw) || arrival.flightDate || "");
+
+  card.innerHTML = `
+    <div class="arrival-logo">
+      <img src="${getAirlineLogoPath(airline)}" alt="${airline} logo" onerror="this.style.display='none';" />
+    </div>
+
+    <div class="arrival-main">
+      <div class="arrival-route">${departureAirport} → ${arrivalAirport}</div>
+      <div class="arrival-date">${dateText}</div>
+    </div>
+  `;
+
+  return card;
 }
 
     function formatMilesAmount(amount) {
@@ -4404,7 +4721,12 @@ function getEarnedMiles(flight) {
 function updateCompleteFlightButton(flight) {
   if (!completeFlightButton) return;
 
-  const canComplete = flight && getFlightPhase(flight) === "gateArrival";
+  const arrivedAtGate = flight && getFlightPhase(flight) === "gateArrival";
+  const cbpClear = flight?.internationalUSArrival === true
+    ? flight?.cbpSubmitted === true
+    : true;
+
+  const canComplete = arrivedAtGate && cbpClear;
 
   completeFlightButton.disabled = !canComplete;
   completeFlightButton.classList.toggle("disabled", !canComplete);
@@ -4881,6 +5203,8 @@ updateCompleteFlightButton(latest);
     timezoneDifference: timezoneDifferenceInput.value.trim() || "",
     edtArrival: edtArrivalToggle.checked,
 internationalUSArrival: intlUSArrivalToggle.checked,
+    cbpRequired: intlUSArrivalToggle.checked,
+    cbpSubmitted: false,
 enableBoarding: enableBoardingToggle.checked,
     boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
     boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
@@ -4918,6 +5242,19 @@ enableBoarding: enableBoardingToggle.checked,
       }
     }
 
+    onSnapshot(doc(db, "cbpLock", "main"), (snapshot) => {
+  const data = snapshot.exists() ? snapshot.data() : null;
+
+  if (data && data.active === true) {
+    openCBPPage(data);
+    return;
+  }
+
+  currentCBPLock = null;
+}, (error) => {
+  console.error("Error loading CBP lock:", error);
+});
+    
     onSnapshot(doc(db, "passport", "main"), (snapshot) => {
   currentPassport = snapshot.exists() ? snapshot.data() : null;
   updatePassportUI();
@@ -4939,6 +5276,27 @@ enableBoarding: enableBoardingToggle.checked,
   milesBalanceDisplay.textContent = balance.toLocaleString("en-US");
 }, (error) => {
   console.error("Error loading miles balance:", error);
+});
+    const arrivalsQuery = query(collection(db, "cbpArrivals"), orderBy("createdAt", "desc"));
+
+onSnapshot(arrivalsQuery, (snapshot) => {
+  recentArrivalsList.innerHTML = "";
+
+  if (snapshot.empty) {
+    recentArrivalsList.innerHTML = `<div class="empty-transactions">No arrivals yet</div>`;
+    return;
+  }
+
+  snapshot.forEach((snapshotDoc) => {
+    const arrival = {
+      id: snapshotDoc.id,
+      ...snapshotDoc.data()
+    };
+
+    recentArrivalsList.appendChild(createRecentArrivalCard(arrival));
+  });
+}, (error) => {
+  console.error("Error loading recent arrivals:", error);
 });
     const transactionsQuery = query(collection(db, "mileTransactions"), orderBy("createdAt", "desc"));
 
@@ -5030,6 +5388,14 @@ if (flight.internationalUSArrival !== true) {
   flight.internationalUSArrival = false;
 }
 
+        if (flight.cbpRequired !== true) {
+  flight.cbpRequired = false;
+}
+
+if (flight.cbpSubmitted !== true) {
+  flight.cbpSubmitted = false;
+}
+
 if (!flight.premiumSeatCost) {
   flight.premiumSeatCost = 0;
 }
@@ -5101,11 +5467,29 @@ if (!flight.premiumSeatCost) {
       saveScheduleButton.style.opacity = "0.72";
 
       try {
-        await updateDoc(getFlightRef(activeFlight.id), updates);
-        editFlightPage.classList.remove("active");
-        detailPage.classList.add("active");
-        showNotification("Flight updated!");
-      } catch (error) {
+  await updateDoc(getFlightRef(activeFlight.id), updates);
+
+  const completedPhaseFlight = {
+    ...activeFlight,
+    ...updates,
+    id: activeFlight.id
+  };
+
+  closeMarkPopup();
+  editFlightPage.classList.remove("active");
+
+  if (
+    pendingMarkPhase === "gateArrival" &&
+    completedPhaseFlight.internationalUSArrival === true &&
+    completedPhaseFlight.cbpSubmitted !== true
+  ) {
+    detailPage.classList.remove("active");
+    await createCBPLockForFlight(completedPhaseFlight);
+    return;
+  }
+
+  detailPage.classList.add("active");
+} catch (error) {
         console.error("Error saving schedule:", error);
         alert("Schedule could not be updated. Check your Firestore rules.");
       } finally {
@@ -5477,6 +5861,67 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
   }
 });
     
+    cbpSubmitButton.addEventListener("click", async () => {
+  if (!currentCBPLock || currentCBPLock.active !== true) return;
+
+  cbpSubmitButton.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    const flightRef = getFlightRef(currentCBPLock.flightId);
+    const lockRef = doc(db, "cbpLock", "main");
+    const arrivalRef = doc(collection(db, "cbpArrivals"));
+
+    batch.update(flightRef, {
+      cbpSubmitted: true,
+      cbpSubmittedAt: serverTimestamp()
+    });
+
+    batch.set(
+      lockRef,
+      {
+        active: false,
+        submittedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(arrivalRef, {
+      airline: currentCBPLock.airline || "",
+      flightNumber: currentCBPLock.flightNumber || "",
+      flightDate: currentCBPLock.flightDate || "",
+      flightDateRaw: currentCBPLock.flightDateRaw || "",
+      departureAirport: currentCBPLock.departureAirport || "",
+      arrivalAirport: currentCBPLock.arrivalAirport || "",
+      arrivalAirportName: currentCBPLock.arrivalAirportName || "",
+      passportName: currentCBPLock.passportName || "",
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    const returnedFlight = allFlights.get(currentCBPLock.flightId);
+
+    closeCBPPage();
+    flightsPage.classList.remove("hidden");
+
+    if (returnedFlight) {
+      openFlightDetails({
+        ...returnedFlight,
+        cbpSubmitted: true
+      });
+    }
+
+    showNotification("CBP form submitted!");
+  } catch (error) {
+    console.error("Error submitting CBP form:", error);
+    alert("CBP form could not be submitted. Check Firestore rules.");
+  } finally {
+    cbpSubmitButton.disabled = false;
+  }
+});
+
     passportPopupOverlay.addEventListener("click", closePassportPopups);
 
 createPassportButton.addEventListener("click", () => {
