@@ -347,6 +347,32 @@
       gap: 13px;
     }
 
+    .form-section-heading {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding-top: 6px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -0.35px;
+}
+
+.form-section-heading:not(:first-child) {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.form-section-subtitle {
+  grid-column: 1 / -1;
+  margin-top: -7px;
+  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
     .edit-form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1956,11 +1982,146 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       </header>
 
       <form class="flight-form" id="flightForm">
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="airline">Airline</label>
-            <input id="airline" type="text" maxlength="2" placeholder="AA" />
-          </div>
+        <div class="form-section-heading">Flight Information</div>
+<div class="form-section-subtitle">Main route, schedule, airport, and timing details.</div>
+
+<div class="form-field">
+  <label for="airline">Airline</label>
+  <input id="airline" type="text" maxlength="2" placeholder="AA" />
+</div>
+
+<div class="form-field">
+  <label for="flightNumber">Flight number</label>
+  <input id="flightNumber" type="text" inputmode="numeric" maxlength="4" placeholder="2247" />
+</div>
+
+<div class="form-field">
+  <label for="departureAirport">Departure airport</label>
+  <input id="departureAirport" type="text" maxlength="4" placeholder="CLT" />
+</div>
+
+<div class="form-field">
+  <label for="arrivalAirport">Arrival airport</label>
+  <input id="arrivalAirport" type="text" maxlength="4" placeholder="JFK" />
+</div>
+
+<div class="form-field">
+  <label for="departureAirportName">Departure airport name</label>
+  <input id="departureAirportName" type="text" placeholder="Washington Dulles Intl." />
+</div>
+
+<div class="form-field">
+  <label for="arrivalAirportName">Arrival airport name</label>
+  <input id="arrivalAirportName" type="text" placeholder="Murtala Muhammed Intl." />
+</div>
+
+<div class="form-field">
+  <label for="cityDeparture">City departure</label>
+  <input id="cityDeparture" type="text" placeholder="Washington" />
+</div>
+
+<div class="form-field">
+  <label for="cityArrival">City arrival</label>
+  <input id="cityArrival" type="text" placeholder="Lagos" />
+</div>
+
+<div class="form-field">
+  <label for="flightDate">Flight date</label>
+  <input id="flightDate" type="date" />
+</div>
+
+<div class="form-field">
+  <label for="scheduledDeparture">Scheduled departure time</label>
+  <input id="scheduledDeparture" type="time" />
+</div>
+
+<div class="form-field">
+  <label for="scheduledArrival">Scheduled arrival time</label>
+  <input id="scheduledArrival" type="time" />
+</div>
+
+<div class="form-field">
+  <label for="flightTime">Flight time</label>
+  <input id="flightTime" type="text" placeholder="6h 16m" />
+</div>
+
+<div class="form-field">
+  <label for="airTime">Air time</label>
+  <input id="airTime" type="text" placeholder="5h 54m" />
+</div>
+
+<div class="form-field">
+  <label for="routeDistance">Route distance</label>
+  <input id="routeDistance" type="text" placeholder="2698 mi" />
+</div>
+
+<div class="form-field">
+  <label for="departureTaxiTime">Departure taxi time</label>
+  <input id="departureTaxiTime" type="text" placeholder="18m" />
+</div>
+
+<div class="form-field">
+  <label for="arrivalTaxiTime">Arrival taxi time</label>
+  <input id="arrivalTaxiTime" type="text" placeholder="9m" />
+</div>
+
+<div class="form-section-heading">Extras</div>
+<div class="form-section-subtitle">Optional display and timing features for this flight.</div>
+
+<div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Overnight</div>
+    <div class="toggle-subtitle">Show overnight label beside duration</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="overnightToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+<div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">EDT Arrival</div>
+    <div class="toggle-subtitle">Convert arrival time back to origin time</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="edtArrivalToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+<div class="form-field">
+  <label for="timezoneDifference">Timezone difference</label>
+  <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
+</div>
+
+<div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Enable boarding</div>
+    <div class="toggle-subtitle">Show boarding countdown and boarding phase</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="enableBoardingToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+<div class="boarding-options" id="boardingOptions">
+  <div class="boarding-options-inner">
+    <div class="form-field">
+      <label for="boardingTime">Boarding time</label>
+      <input id="boardingTime" type="time" />
+    </div>
+
+    <div class="form-field">
+      <label for="boardingDuration">Estimated boarding duration</label>
+      <input id="boardingDuration" type="text" placeholder="30m" />
+    </div>
+  </div>
+</div>
 
           <div class="form-field">
             <label for="flightNumber">Flight number</label>
