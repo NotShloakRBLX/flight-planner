@@ -5875,10 +5875,14 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
     const lockRef = doc(db, "cbpLock", "main");
     const arrivalRef = doc(collection(db, "cbpArrivals"));
 
-    batch.update(flightRef, {
-      cbpSubmitted: true,
-      cbpSubmittedAt: serverTimestamp()
-    });
+    batch.set(
+  flightRef,
+  {
+    cbpSubmitted: true,
+    cbpSubmittedAt: serverTimestamp()
+  },
+  { merge: true }
+);
 
     batch.set(
       lockRef,
