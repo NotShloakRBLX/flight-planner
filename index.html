@@ -789,6 +789,19 @@
       letter-spacing: -0.15px;
     }
 
+    .mid-flight-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.overnight-text {
+  color: #ffd43b;
+  font-weight: 760;
+}
+
     .mid-flight-icon {
       width: 20px;
       height: 20px;
@@ -1556,6 +1569,23 @@
           </div>
 
           <div class="form-field">
+  <label for="routeDistance">Route distance</label>
+  <input id="routeDistance" type="text" placeholder="2698 mi" />
+</div>
+
+<div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Overnight</div>
+    <div class="toggle-subtitle">Show overnight label beside duration</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="overnightToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+          <div class="form-field">
             <label for="timezoneDifference">Timezone difference</label>
             <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
           </div>
@@ -1671,9 +1701,9 @@
         </section>
 
         <div class="mid-flight-line">
-          <span class="mid-flight-icon"></span>
-          <span id="detailFlightDuration">--</span>
-        </div>
+  <span class="mid-flight-icon"></span>
+  <span class="mid-flight-info" id="detailFlightDuration">--</span>
+</div>
 
         <section class="airport-section">
           <div class="airport-row-title">
@@ -2056,8 +2086,10 @@ const ttActualBoarding = document.getElementById("ttActualBoarding");
     const flightDateInput = document.getElementById("flightDate");
     const scheduledDepartureInput = document.getElementById("scheduledDeparture");
     const scheduledArrivalInput = document.getElementById("scheduledArrival");
-    const flightTimeInput = document.getElementById("flightTime");
-    const timezoneDifferenceInput = document.getElementById("timezoneDifference");
+const flightTimeInput = document.getElementById("flightTime");
+const routeDistanceInput = document.getElementById("routeDistance");
+const overnightToggle = document.getElementById("overnightToggle");
+const timezoneDifferenceInput = document.getElementById("timezoneDifference");
 const edtArrivalToggle = document.getElementById("edtArrivalToggle");
 const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
@@ -2606,6 +2638,38 @@ if (hasBoarding) {
   }
 }
     
+    function formatRouteDistance(value) {
+  const text = String(value || "").trim();
+
+  if (!text) return "";
+
+  const numberOnly = Number(text.replace(/[^\d.]/g, ""));
+
+  if (!Number.isNaN(numberOnly) && numberOnly > 0) {
+    return `${Math.round(numberOnly).toLocaleString("en-US")} mi`;
+  }
+
+  return text;
+}
+
+function buildMidFlightInfo(flight) {
+  const duration = flight.flightTime || flight.airTime || "--";
+  const distance = formatRouteDistance(flight.routeDistance);
+  const isOvernight = flight.overnight === true;
+
+  let html = `<span>${escapeHTML(duration)}</span>`;
+
+  if (distance) {
+    html += `<span>•</span><span>${escapeHTML(distance)}</span>`;
+  }
+
+  if (isOvernight) {
+    html += `<span>•</span><span class="overnight-text">Overnight</span>`;
+  }
+
+  return html;
+}
+    
     function getFlightPhase(flight) {
       return flight.phase || "scheduled";
     }
@@ -2804,7 +2868,7 @@ setAirportRowText(
   `${flight.departureAirport || "DEP"} • ${departureAirportDisplayName}`
 );
 
-detailFlightDuration.textContent = flight.flightTime || flight.airTime || "--";
+detailFlightDuration.innerHTML = buildMidFlightInfo(flight);
 
 setAirportRowText(
   detailArrivalAirport,
@@ -2868,7 +2932,9 @@ cityArrival: cityArrivalInput.value.trim() || "Arrival",
         originalScheduledDeparture: scheduledDepartureInput.value || "",
         originalScheduledArrival: scheduledArrivalInput.value || "",
         flightTime: flightTimeInput.value.trim() || "",
-        timezoneDifference: timezoneDifferenceInput.value.trim() || "",
+routeDistance: routeDistanceInput.value.trim() || "",
+overnight: overnightToggle.checked,
+timezoneDifference: timezoneDifferenceInput.value.trim() || "",
 edtArrival: edtArrivalToggle.checked,
 enableBoarding: enableBoardingToggle.checked,
 boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
@@ -2939,6 +3005,14 @@ showNotification("Flight added!");
 
         if (flight.enableBoarding !== true) {
   flight.enableBoarding = false;
+}
+
+        if (flight.overnight !== true) {
+  flight.overnight = false;
+}
+
+if (!flight.routeDistance) {
+  flight.routeDistance = "";
 }
 
         allFlights.set(flight.id, flight);
