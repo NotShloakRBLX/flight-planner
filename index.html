@@ -1110,6 +1110,67 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       background: rgba(255, 255, 255, 0.17);
     }
 
+    .seat-card {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+    #12121a;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.seat-card.hidden {
+  display: none;
+}
+
+.seat-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  font-weight: 720;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.seat-value {
+  margin-top: 5px;
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+  line-height: 1;
+}
+
+.seat-cabin {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.premium-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd43b, #ff9f1c);
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 950;
+  box-shadow: 0 14px 34px rgba(255, 180, 40, 0.26);
+}
+
+.seat-card.premium .premium-badge {
+  display: flex;
+}
+    
     .timezone-card {
       margin-top: 24px;
       padding: 14px 16px;
@@ -1521,6 +1582,229 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       filter: brightness(1.06);
     }
 
+    .seat-flow-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 105;
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.34s ease;
+}
+
+.seat-flow-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.seat-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 110;
+  width: min(430px, calc(100% - 32px));
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(64, 156, 255, 0.14), transparent 45%),
+    rgba(13, 17, 32, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 40px) scale(0.96);
+  transition:
+    opacity 0.34s ease,
+    transform 0.46s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seat-popup.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.seat-popup-title {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+  color: white;
+}
+
+.seat-popup-subtitle {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.cabin-choice-grid {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.cabin-choice-button {
+  width: 100%;
+  min-height: 72px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.04);
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  padding: 16px;
+  transition: transform 0.25s ease, border-color 0.25s ease, filter 0.25s ease;
+}
+
+.cabin-choice-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.22);
+  filter: brightness(1.04);
+}
+
+.cabin-choice-button:active {
+  transform: scale(0.98);
+}
+
+.cabin-choice-title {
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.25px;
+}
+
+.cabin-choice-subtitle {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.payment-card {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.14), transparent 45%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.payment-small-label {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+}
+
+.payment-balance {
+  margin-top: 6px;
+  color: white;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+}
+
+.payment-seat {
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 15px;
+  font-weight: 720;
+}
+
+.payment-cost {
+  margin-top: 7px;
+  color: white;
+  font-size: 38px;
+  font-weight: 950;
+  letter-spacing: -1.3px;
+  line-height: 1;
+}
+
+.insufficient-text {
+  display: none;
+  margin-top: 16px;
+  color: #ff4b4b;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.insufficient-text.active {
+  display: block;
+}
+
+.seat-popup-actions {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.seat-pay-button,
+.seat-cancel-button {
+  height: 50px;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+}
+
+.seat-pay-button {
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  box-shadow: 0 18px 40px rgba(12, 190, 113, 0.2);
+}
+
+.seat-cancel-button {
+  background: linear-gradient(135deg, rgba(255, 75, 75, 0.94), rgba(155, 18, 18, 0.95));
+  box-shadow: 0 18px 40px rgba(255, 75, 75, 0.16);
+}
+
+.seat-pay-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  box-shadow: none;
+}
+
+.assigned-seat-display {
+  margin-top: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top, rgba(64, 156, 255, 0.14), transparent 50%),
+    rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  text-align: center;
+}
+
+.assigned-seat-big {
+  color: white;
+  font-size: 54px;
+  font-weight: 950;
+  letter-spacing: -1.7px;
+  line-height: 1;
+}
+
+.assigned-seat-cabin {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 15px;
+  font-weight: 720;
+}
+    
     .transaction-edit-overlay {
   position: fixed;
   inset: 0;
@@ -2066,7 +2350,30 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <input id="arrivalTaxiTime" type="text" placeholder="9m" />
 </div>
 
-<div class="form-section-heading">Extras</div>
+<div class="form-section-heading">Seats</div>
+<div class="form-section-subtitle">Cabin row counts and window seat letters for random seat assignment.</div>
+
+<div class="form-field">
+  <label for="premiumRows">First/Business Rows</label>
+  <input id="premiumRows" type="number" inputmode="numeric" min="0" placeholder="8" />
+</div>
+
+<div class="form-field">
+  <label for="premiumLetters">First/Business Window Letters</label>
+  <input id="premiumLetters" type="text" placeholder="A,D" />
+</div>
+
+<div class="form-field">
+  <label for="economyRows">Economy Rows</label>
+  <input id="economyRows" type="number" inputmode="numeric" min="0" placeholder="48" />
+</div>
+
+<div class="form-field">
+  <label for="economyLetters">Economy Window Letters</label>
+  <input id="economyLetters" type="text" placeholder="A,J" />
+</div>
+          
+          <div class="form-section-heading">Extras</div>
 <div class="form-section-subtitle">Optional display and timing features for this flight.</div>
 
 <div class="toggle-field">
@@ -2224,6 +2531,16 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </div>
         </section>
 
+        <section class="seat-card hidden" id="seatCard">
+  <div>
+    <div class="seat-label">Assigned Seat</div>
+    <div class="seat-value" id="seatValue">--</div>
+    <div class="seat-cabin" id="seatCabin">--</div>
+  </div>
+
+  <div class="premium-badge" aria-label="Premium seat">P</div>
+</section>
+        
         <section class="timezone-card" id="timezoneCard">
           <div class="timezone-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2469,6 +2786,55 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </div>
   </section>
 
+  <div class="seat-flow-overlay" id="seatFlowOverlay"></div>
+
+<section class="seat-popup" id="cabinSelectPopup">
+  <div class="seat-popup-title">Choose cabin</div>
+  <div class="seat-popup-subtitle">Select a cabin before adding this flight.</div>
+
+  <div class="cabin-choice-grid">
+    <button class="cabin-choice-button" id="chooseEconomyButton" type="button">
+      <div class="cabin-choice-title">Economy</div>
+      <div class="cabin-choice-subtitle">Free seat assignment</div>
+    </button>
+
+    <button class="cabin-choice-button" id="choosePremiumButton" type="button">
+      <div class="cabin-choice-title">First/Business</div>
+      <div class="cabin-choice-subtitle">Premium seat selection using miles</div>
+    </button>
+  </div>
+</section>
+
+<section class="seat-popup" id="premiumPaymentPopup">
+  <div class="seat-popup-title">Premium seat</div>
+  <div class="seat-popup-subtitle">Review your assigned seat and mileage cost.</div>
+
+  <div class="payment-card">
+    <div class="payment-small-label">Current balance</div>
+    <div class="payment-balance" id="premiumBalanceDisplay">0 mi</div>
+
+    <div class="payment-seat" id="premiumSeatDisplay">Seat --</div>
+
+    <div class="payment-small-label" style="margin-top: 16px;">Miles cost</div>
+    <div class="payment-cost" id="premiumCostDisplay">0 mi</div>
+
+    <div class="insufficient-text" id="insufficientBalanceText">Insufficient balance</div>
+  </div>
+
+  <div class="seat-popup-actions">
+    <button class="seat-cancel-button" id="premiumCancelButton" type="button">Cancel</button>
+    <button class="seat-pay-button" id="premiumPayButton" type="button">Pay now</button>
+  </div>
+</section>
+
+<section class="seat-popup" id="seatAssignedPopup">
+  <div class="seat-popup-title">Seat Assigned</div>
+  <div class="assigned-seat-display">
+    <div class="assigned-seat-big" id="assignedSeatBig">--</div>
+    <div class="assigned-seat-cabin" id="assignedSeatCabin">--</div>
+  </div>
+</section>
+  
   <div class="transaction-edit-overlay" id="transactionEditOverlay"></div>
 
 <section class="transaction-edit-popup" id="transactionEditPopup">
@@ -2533,6 +2899,20 @@ const transactionEditSubtitle = document.getElementById("transactionEditSubtitle
 const transactionMilesInput = document.getElementById("transactionMilesInput");
 const transactionSaveButton = document.getElementById("transactionSaveButton");
 const transactionDeleteButton = document.getElementById("transactionDeleteButton");
+  const seatFlowOverlay = document.getElementById("seatFlowOverlay");
+const cabinSelectPopup = document.getElementById("cabinSelectPopup");
+const chooseEconomyButton = document.getElementById("chooseEconomyButton");
+const choosePremiumButton = document.getElementById("choosePremiumButton");
+const premiumPaymentPopup = document.getElementById("premiumPaymentPopup");
+const premiumBalanceDisplay = document.getElementById("premiumBalanceDisplay");
+const premiumSeatDisplay = document.getElementById("premiumSeatDisplay");
+const premiumCostDisplay = document.getElementById("premiumCostDisplay");
+const insufficientBalanceText = document.getElementById("insufficientBalanceText");
+const premiumCancelButton = document.getElementById("premiumCancelButton");
+const premiumPayButton = document.getElementById("premiumPayButton");
+const seatAssignedPopup = document.getElementById("seatAssignedPopup");
+const assignedSeatBig = document.getElementById("assignedSeatBig");
+const assignedSeatCabin = document.getElementById("assignedSeatCabin");
 
 const editButton = document.getElementById("editButton");
 const backButton = document.getElementById("backButton");
@@ -2562,6 +2942,9 @@ const backButton = document.getElementById("backButton");
     const detailArrivalTime = document.getElementById("detailArrivalTime");
     const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
     const arrivalStatusLine = document.getElementById("arrivalStatusLine");
+    const seatCard = document.getElementById("seatCard");
+const seatValue = document.getElementById("seatValue");
+const seatCabin = document.getElementById("seatCabin");
     const timezoneTitle = document.getElementById("timezoneTitle");
     const timezoneSubtitle = document.getElementById("timezoneSubtitle");
     const openEditFlightButton = document.getElementById("openEditFlightButton");
@@ -2622,6 +3005,10 @@ const ttActualBoarding = document.getElementById("ttActualBoarding");
     const scheduledArrivalInput = document.getElementById("scheduledArrival");
 const flightTimeInput = document.getElementById("flightTime");
 const routeDistanceInput = document.getElementById("routeDistance");
+const premiumRowsInput = document.getElementById("premiumRows");
+const premiumLettersInput = document.getElementById("premiumLetters");
+const economyRowsInput = document.getElementById("economyRows");
+const economyLettersInput = document.getElementById("economyLetters");
 const overnightToggle = document.getElementById("overnightToggle");
 const timezoneDifferenceInput = document.getElementById("timezoneDifference");
 const edtArrivalToggle = document.getElementById("edtArrivalToggle");
@@ -2638,6 +3025,10 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let countdownTimer = null;
     let pendingMarkPhase = null;
     let activeTransaction = null;
+    let currentMilesBalance = 0;
+let pendingFlightToAdd = null;
+let pendingSeatAssignment = null;
+let pendingPremiumCost = 0;
 
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
@@ -3332,6 +3723,201 @@ function updateCompleteFlightButton(flight) {
   completeFlightButton.classList.toggle("disabled", !canComplete);
 }
     
+    function parseSeatLetters(value) {
+  return String(value || "")
+    .split(",")
+    .map(letter => letter.trim().toUpperCase())
+    .filter(letter => /^[A-Z]$/.test(letter));
+}
+
+function getRandomSeatFromCabin(startRow, rowCount, lettersText) {
+  const rows = Number(rowCount || 0);
+  const letters = parseSeatLetters(lettersText);
+
+  if (!rows || rows <= 0 || letters.length === 0) {
+    return "";
+  }
+
+  const row = startRow + Math.floor(Math.random() * rows);
+  const letter = letters[Math.floor(Math.random() * letters.length)];
+
+  return `${row}${letter}`;
+}
+
+function assignEconomySeatFromFlight(flight) {
+  const premiumRows = Number(flight.premiumRows || 0);
+  const economyStartRow = premiumRows + 1;
+
+  return getRandomSeatFromCabin(
+    economyStartRow,
+    flight.economyRows,
+    flight.economyLetters
+  );
+}
+
+function assignPremiumSeatFromFlight(flight) {
+  return getRandomSeatFromCabin(
+    1,
+    flight.premiumRows,
+    flight.premiumLetters
+  );
+}
+
+    function getRandomInteger(min, max) {
+  const low = Math.ceil(min);
+  const high = Math.floor(max);
+
+  return Math.floor(Math.random() * (high - low + 1)) + low;
+}
+
+function getPremiumSeatCost(routeDistance) {
+  const distance = Number(routeDistance || 0);
+
+  if (distance <= 500) {
+    return getRandomInteger(500, 1000);
+  }
+
+  if (distance <= 1000) {
+    return getRandomInteger(1000, 1500);
+  }
+
+  if (distance <= 3000) {
+    return getRandomInteger(2000, 4000);
+  }
+
+  if (distance <= 8000) {
+    return getRandomInteger(6000, 10000);
+  }
+
+  return getRandomInteger(10000, 15000);
+}
+
+function closeSeatPopups() {
+  seatFlowOverlay.classList.remove("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+}
+
+function showCabinSelectPopup() {
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.add("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+}
+
+function showSeatAssignedPopup(seat, cabin) {
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+
+  assignedSeatBig.textContent = seat || "--";
+  assignedSeatCabin.textContent = cabin;
+
+  seatAssignedPopup.classList.add("active");
+}
+
+function showPremiumPaymentPopup() {
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.add("active");
+
+  premiumBalanceDisplay.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
+  premiumSeatDisplay.textContent = `Seat ${pendingSeatAssignment?.seat || "--"}`;
+  premiumCostDisplay.textContent = `${pendingPremiumCost.toLocaleString("en-US")} mi`;
+
+  const hasEnoughMiles = currentMilesBalance >= pendingPremiumCost;
+
+  insufficientBalanceText.classList.toggle("active", !hasEnoughMiles);
+  premiumPayButton.disabled = !hasEnoughMiles;
+}
+
+async function saveFlightWithSeat({
+  cabin,
+  seat,
+  isPremium,
+  milesCost = 0
+}) {
+  if (!pendingFlightToAdd) return;
+
+  const flightToSave = {
+    ...pendingFlightToAdd,
+    assignedSeat: seat,
+    seatCabin: cabin,
+    premiumSeat: isPremium,
+    premiumSeatCost: milesCost
+  };
+
+  try {
+    if (isPremium && milesCost > 0) {
+      const batch = writeBatch(db);
+
+      const flightRef = doc(collection(db, "flights"));
+      const milesBalanceRef = doc(db, "miles", "balance");
+      const transactionRef = doc(collection(db, "mileTransactions"));
+
+      batch.set(flightRef, flightToSave);
+
+      batch.set(
+        milesBalanceRef,
+        {
+          balance: increment(-milesCost),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      batch.set(transactionRef, {
+        type: "spent",
+        title: "Premium Seat Selection",
+        amount: milesCost,
+        airline: flightToSave.airline || "",
+        flightNumber: flightToSave.flightNumber || "",
+        departureAirport: flightToSave.departureAirport || "",
+        arrivalAirport: flightToSave.arrivalAirport || "",
+        assignedSeat: seat,
+        cabin: cabin,
+        createdAt: serverTimestamp()
+      });
+
+      await batch.commit();
+    } else {
+      await addDoc(collection(db, "flights"), flightToSave);
+    }
+
+    flightForm.reset();
+    boardingOptions.classList.remove("active");
+
+    showSeatAssignedPopup(seat, cabin);
+
+    pendingFlightToAdd = null;
+    pendingSeatAssignment = null;
+    pendingPremiumCost = 0;
+  } catch (error) {
+    console.error("Error saving flight with seat:", error);
+    alert("Flight could not be added. Check your Firestore rules and Firebase setup.");
+    closeSeatPopups();
+  } finally {
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+  }
+}
+
+function updateSeatCard(flight) {
+  if (!flight.assignedSeat) {
+    seatCard.classList.add("hidden");
+    seatCard.classList.remove("premium");
+    seatValue.textContent = "--";
+    seatCabin.textContent = "--";
+    return;
+  }
+
+  seatCard.classList.remove("hidden");
+  seatCard.classList.toggle("premium", flight.premiumSeat === true);
+  seatValue.textContent = flight.assignedSeat;
+  seatCabin.textContent = flight.seatCabin || "Economy";
+}
+    
     function getFlightPhase(flight) {
       return flight.phase || "scheduled";
     }
@@ -3538,16 +4124,18 @@ setAirportRowText(
 );
 
       updateMainTimes(flight);
-      updateTimezoneBox(flight);
-      updateDetailCountdowns();
-      updateCompleteFlightButton(flight);
-
+updateSeatCard(flight);
+updateTimezoneBox(flight);
+updateDetailCountdowns();
+updateCompleteFlightButton(flight);
+      
       if (countdownTimer) clearInterval(countdownTimer);
       countdownTimer = setInterval(() => {
         if (activeFlight) {
           const latest = allFlights.get(activeFlight.id) || activeFlight;
           activeFlight = latest;
           updateMainTimes(latest);
+updateSeatCard(latest);
 updateTimezoneBox(latest);
 updateDetailCountdowns();
 updateCompleteFlightButton(latest);
@@ -3579,55 +4167,49 @@ updateCompleteFlightButton(latest);
       flightAddedPopup.classList.add("active");
     }
 
-    addFlightButton.addEventListener("click", async () => {
-      const flight = {
-        airline: airlineInput.value.trim().toUpperCase() || "AA",
-        flightNumber: flightNumberInput.value.trim() || "0000",
-       departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
-arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
-departureAirportName: departureAirportNameInput.value.trim() || "",
-arrivalAirportName: arrivalAirportNameInput.value.trim() || "",
-cityDeparture: cityDepartureInput.value.trim() || "Departure",
-cityArrival: cityArrivalInput.value.trim() || "Arrival",
-        flightDate: formatDisplayDate(flightDateInput.value),
-        flightDateRaw: flightDateInput.value || "",
-        scheduledDeparture: scheduledDepartureInput.value || "",
-        scheduledArrival: scheduledArrivalInput.value || "",
-        originalScheduledDeparture: scheduledDepartureInput.value || "",
-        originalScheduledArrival: scheduledArrivalInput.value || "",
-        flightTime: flightTimeInput.value.trim() || "",
-routeDistance: routeDistanceInput.value.trim() || "",
-overnight: overnightToggle.checked,
-timezoneDifference: timezoneDifferenceInput.value.trim() || "",
-edtArrival: edtArrivalToggle.checked,
-enableBoarding: enableBoardingToggle.checked,
-boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
-boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
-departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
-        arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
-        airTime: airTimeInput.value.trim() || "",
-        phase: "scheduled",
-        createdAt: serverTimestamp()
-      };
+    addFlightButton.addEventListener("click", () => {
+  const flight = {
+    airline: airlineInput.value.trim().toUpperCase() || "AA",
+    flightNumber: flightNumberInput.value.trim() || "0000",
+    departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
+    arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
+    departureAirportName: departureAirportNameInput.value.trim() || "",
+    arrivalAirportName: arrivalAirportNameInput.value.trim() || "",
+    cityDeparture: cityDepartureInput.value.trim() || "Departure",
+    cityArrival: cityArrivalInput.value.trim() || "Arrival",
+    flightDate: formatDisplayDate(flightDateInput.value),
+    flightDateRaw: flightDateInput.value || "",
+    scheduledDeparture: scheduledDepartureInput.value || "",
+    scheduledArrival: scheduledArrivalInput.value || "",
+    originalScheduledDeparture: scheduledDepartureInput.value || "",
+    originalScheduledArrival: scheduledArrivalInput.value || "",
+    flightTime: flightTimeInput.value.trim() || "",
+    airTime: airTimeInput.value.trim() || "",
+    routeDistance: routeDistanceInput.value.trim() || "",
+    premiumRows: premiumRowsInput.value.trim() || "",
+    premiumLetters: premiumLettersInput.value.trim().toUpperCase() || "",
+    economyRows: economyRowsInput.value.trim() || "",
+    economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
+    overnight: overnightToggle.checked,
+    timezoneDifference: timezoneDifferenceInput.value.trim() || "",
+    edtArrival: edtArrivalToggle.checked,
+    enableBoarding: enableBoardingToggle.checked,
+    boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
+    boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
+    departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
+    arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
+    phase: "scheduled",
+    createdAt: serverTimestamp()
+  };
 
-      addFlightButton.disabled = true;
-      addFlightButton.style.opacity = "0.72";
-      addFlightButton.style.cursor = "not-allowed";
+  pendingFlightToAdd = flight;
 
-      try {
-        await addDoc(collection(db, "flights"), flight);
-        flightForm.reset();
-boardingOptions.classList.remove("active");
-showNotification("Flight added!");
-      } catch (error) {
-        console.error("Error adding flight:", error);
-        alert("Flight could not be added. Check your Firestore rules and Firebase setup.");
-      } finally {
-        addFlightButton.disabled = false;
-        addFlightButton.style.opacity = "1";
-        addFlightButton.style.cursor = "pointer";
-      }
-    });
+  addFlightButton.disabled = true;
+  addFlightButton.style.opacity = "0.72";
+  addFlightButton.style.cursor = "not-allowed";
+
+  showCabinSelectPopup();
+});
 
     function refreshActiveFlight(updatedFlight) {
       if (activeFlight && updatedFlight.id === activeFlight.id) {
@@ -3647,11 +4229,11 @@ showNotification("Flight added!");
   const data = snapshot.exists() ? snapshot.data() : {};
   const balance = Number(data.balance || 0);
 
+  currentMilesBalance = balance;
   milesBalanceDisplay.textContent = balance.toLocaleString("en-US");
 }, (error) => {
   console.error("Error loading miles balance:", error);
 });
-
     const transactionsQuery = query(collection(db, "mileTransactions"), orderBy("createdAt", "desc"));
 
 onSnapshot(transactionsQuery, (snapshot) => {
@@ -3708,6 +4290,38 @@ onSnapshot(transactionsQuery, (snapshot) => {
 
 if (!flight.routeDistance) {
   flight.routeDistance = "";
+}
+
+        if (!flight.premiumRows) {
+  flight.premiumRows = "";
+}
+
+if (!flight.premiumLetters) {
+  flight.premiumLetters = "";
+}
+
+if (!flight.economyRows) {
+  flight.economyRows = "";
+}
+
+if (!flight.economyLetters) {
+  flight.economyLetters = "";
+}
+
+        if (!flight.assignedSeat) {
+  flight.assignedSeat = "";
+}
+
+if (!flight.seatCabin) {
+  flight.seatCabin = "";
+}
+
+if (flight.premiumSeat !== true) {
+  flight.premiumSeat = false;
+}
+
+if (!flight.premiumSeatCost) {
+  flight.premiumSeatCost = 0;
 }
 
         allFlights.set(flight.id, flight);
@@ -4151,6 +4765,97 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
     alert("Flight could not be completed. Check your Firestore rules.");
     updateCompleteFlightButton(activeFlight);
   }
+});
+    
+    seatFlowOverlay.addEventListener("click", () => {
+  if (seatAssignedPopup.classList.contains("active")) {
+    closeSeatPopups();
+    showNotification("Flight added!");
+    return;
+  }
+});
+
+seatAssignedPopup.addEventListener("click", () => {
+  closeSeatPopups();
+  showNotification("Flight added!");
+});
+
+chooseEconomyButton.addEventListener("click", async () => {
+  if (!pendingFlightToAdd) return;
+
+  const seat = assignEconomySeatFromFlight(pendingFlightToAdd);
+
+  if (!seat) {
+    alert("Economy seat could not be assigned. Check Economy Rows and Economy Window Letters.");
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+    closeSeatPopups();
+    return;
+  }
+
+  pendingSeatAssignment = {
+    seat,
+    cabin: "Economy",
+    premium: false
+  };
+
+  await saveFlightWithSeat({
+    cabin: "Economy",
+    seat,
+    isPremium: false,
+    milesCost: 0
+  });
+});
+
+choosePremiumButton.addEventListener("click", () => {
+  if (!pendingFlightToAdd) return;
+
+  const seat = assignPremiumSeatFromFlight(pendingFlightToAdd);
+
+  if (!seat) {
+    alert("Premium seat could not be assigned. Check First/Business Rows and First/Business Window Letters.");
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+    closeSeatPopups();
+    return;
+  }
+
+  pendingSeatAssignment = {
+    seat,
+    cabin: "First/Business",
+    premium: true
+  };
+
+  pendingPremiumCost = getPremiumSeatCost(getRouteDistanceMiles(pendingFlightToAdd));
+
+  showPremiumPaymentPopup();
+});
+
+premiumCancelButton.addEventListener("click", () => {
+  pendingSeatAssignment = null;
+  pendingPremiumCost = 0;
+  showCabinSelectPopup();
+});
+
+premiumPayButton.addEventListener("click", async () => {
+  if (!pendingFlightToAdd || !pendingSeatAssignment) return;
+
+  if (currentMilesBalance < pendingPremiumCost) {
+    return;
+  }
+
+  premiumPayButton.disabled = true;
+
+  await saveFlightWithSeat({
+    cabin: "First/Business",
+    seat: pendingSeatAssignment.seat,
+    isPremium: true,
+    milesCost: pendingPremiumCost
+  });
+
+  premiumPayButton.disabled = false;
 });
     
     transactionEditOverlay.addEventListener("click", closeTransactionEditor);
