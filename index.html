@@ -695,7 +695,18 @@
   align-items: center;
   gap: 12px;
   animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
+
+    .transaction-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .transaction-card:active {
+      transform: scale(0.985);
+      opacity: 0.82;
+    }
 
 .transaction-logo {
   width: 42px;
@@ -1484,6 +1495,145 @@
       filter: brightness(1.06);
     }
 
+    .transaction-edit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.34s ease;
+}
+
+.transaction-edit-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.transaction-edit-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+  width: min(430px, calc(100% - 32px));
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.14), transparent 45%),
+    radial-gradient(circle at top right, rgba(64, 156, 255, 0.12), transparent 40%),
+    rgba(13, 17, 32, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 40px) scale(0.96);
+  transition:
+    opacity 0.34s ease,
+    transform 0.46s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transaction-edit-popup.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.transaction-edit-title {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+  color: white;
+}
+
+.transaction-edit-subtitle {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.transaction-edit-label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 7px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0.15px;
+}
+
+.transaction-edit-popup input {
+  width: 100%;
+  height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 17px;
+  outline: none;
+  padding: 0 16px;
+  background: rgba(5, 10, 24, 0.7);
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.transaction-edit-popup input:focus {
+  border-color: rgba(255, 215, 80, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 80, 0.34),
+    0 0 0 5px rgba(255, 215, 80, 0.12);
+}
+
+.transaction-edit-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.transaction-save-button,
+.transaction-delete-button {
+  height: 50px;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+}
+
+.transaction-save-button {
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  box-shadow: 0 18px 40px rgba(12, 190, 113, 0.2);
+}
+
+.transaction-delete-button {
+  background: linear-gradient(135deg, rgba(255, 75, 75, 0.94), rgba(155, 18, 18, 0.95));
+  box-shadow: 0 18px 40px rgba(255, 75, 75, 0.16);
+}
+
+.transaction-save-button:hover,
+.transaction-delete-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.transaction-save-button:active,
+.transaction-delete-button:active {
+  transform: scale(0.97);
+}
+
+.transaction-save-button:disabled,
+.transaction-delete-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+    
     .notification-overlay {
       position: fixed;
       inset: 0;
@@ -2270,6 +2420,21 @@
     </div>
   </section>
 
+  <div class="transaction-edit-overlay" id="transactionEditOverlay"></div>
+
+<section class="transaction-edit-popup" id="transactionEditPopup">
+  <div class="transaction-edit-title">Edit transaction</div>
+  <div class="transaction-edit-subtitle" id="transactionEditSubtitle">Change miles amount or remove this transaction.</div>
+
+  <label class="transaction-edit-label" for="transactionMilesInput">Miles amount</label>
+  <input id="transactionMilesInput" type="number" inputmode="numeric" min="0" placeholder="3274" />
+
+  <div class="transaction-edit-actions">
+    <button class="transaction-delete-button" id="transactionDeleteButton" type="button">Delete</button>
+    <button class="transaction-save-button" id="transactionSaveButton" type="button">Save</button>
+  </div>
+</section>
+  
   <div class="notification-overlay" id="notificationOverlay"></div>
 
   <div class="flight-added-popup" id="flightAddedPopup" role="button" tabindex="0" aria-label="Dismiss flight added notification">
@@ -2313,6 +2478,12 @@ const milesPage = document.getElementById("milesPage");
 const milesBackButton = document.getElementById("milesBackButton");
 const milesBalanceDisplay = document.getElementById("milesBalanceDisplay");
 const transactionsList = document.getElementById("transactionsList");
+  const transactionEditOverlay = document.getElementById("transactionEditOverlay");
+const transactionEditPopup = document.getElementById("transactionEditPopup");
+const transactionEditSubtitle = document.getElementById("transactionEditSubtitle");
+const transactionMilesInput = document.getElementById("transactionMilesInput");
+const transactionSaveButton = document.getElementById("transactionSaveButton");
+const transactionDeleteButton = document.getElementById("transactionDeleteButton");
 
 const editButton = document.getElementById("editButton");
 const backButton = document.getElementById("backButton");
@@ -2417,6 +2588,7 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let activeFlight = null;
     let countdownTimer = null;
     let pendingMarkPhase = null;
+    let activeTransaction = null;
 
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
@@ -2471,7 +2643,35 @@ function formatTransactionDate(value) {
   });
 }
 
-function createTransactionCard(transaction) {
+function openTransactionEditor(transaction) {
+  activeTransaction = transaction;
+
+  const amount = Number(transaction.amount || 0);
+  const type = transaction.type || "earned";
+  const routeText = transaction.departureAirport && transaction.arrivalAirport
+    ? `${transaction.departureAirport} → ${transaction.arrivalAirport}`
+    : "Miles activity";
+
+  transactionEditSubtitle.textContent = `${transaction.title || "Miles Transaction"} • ${routeText} • ${type === "spent" ? "Spent" : "Earned"}`;
+  transactionMilesInput.value = Math.abs(amount);
+
+  transactionEditOverlay.classList.add("active");
+  transactionEditPopup.classList.add("active");
+
+  setTimeout(() => {
+    transactionMilesInput.focus();
+    transactionMilesInput.select();
+  }, 220);
+}
+
+function closeTransactionEditor() {
+  activeTransaction = null;
+  transactionEditOverlay.classList.remove("active");
+  transactionEditPopup.classList.remove("active");
+  transactionMilesInput.value = "";
+}
+    
+    function createTransactionCard(transaction) {
   const card = document.createElement("div");
   card.className = "transaction-card";
 
@@ -2504,7 +2704,10 @@ function createTransactionCard(transaction) {
     </div>
   `;
 
-  return card;
+  card.addEventListener("click", () => {
+    openTransactionEditor(transaction);
+  });
+      return card;
 }
 
     function getAirlineLogoPath(airlineCode) {
@@ -3898,6 +4101,112 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
     updateCompleteFlightButton(activeFlight);
+  }
+});
+    
+    transactionEditOverlay.addEventListener("click", closeTransactionEditor);
+
+transactionSaveButton.addEventListener("click", async () => {
+  if (!activeTransaction) return;
+
+  const oldAmount = Math.abs(Number(activeTransaction.amount || 0));
+  const newAmount = Math.round(Math.abs(Number(transactionMilesInput.value || 0)));
+
+  if (Number.isNaN(newAmount)) {
+    alert("Enter a valid miles amount.");
+    return;
+  }
+
+  const type = activeTransaction.type || "earned";
+
+  let balanceDifference = newAmount - oldAmount;
+
+  if (type === "spent") {
+    balanceDifference = balanceDifference * -1;
+  }
+
+  transactionSaveButton.disabled = true;
+  transactionDeleteButton.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    const transactionRef = doc(db, "mileTransactions", activeTransaction.id);
+    const milesBalanceRef = doc(db, "miles", "balance");
+
+    batch.update(transactionRef, {
+      amount: newAmount,
+      editedAt: serverTimestamp()
+    });
+
+    if (balanceDifference !== 0) {
+      batch.set(
+        milesBalanceRef,
+        {
+          balance: increment(balanceDifference),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
+
+    await batch.commit();
+
+    closeTransactionEditor();
+    showNotification("Transaction updated!");
+  } catch (error) {
+    console.error("Error updating transaction:", error);
+    alert("Transaction could not be updated. Check your Firestore rules.");
+  } finally {
+    transactionSaveButton.disabled = false;
+    transactionDeleteButton.disabled = false;
+  }
+});
+
+transactionDeleteButton.addEventListener("click", async () => {
+  if (!activeTransaction) return;
+
+  const shouldDelete = confirm("Delete this transaction and reverse the miles?");
+
+  if (!shouldDelete) return;
+
+  const amount = Math.abs(Number(activeTransaction.amount || 0));
+  const type = activeTransaction.type || "earned";
+
+  const balanceReverse = type === "spent" ? amount : -amount;
+
+  transactionSaveButton.disabled = true;
+  transactionDeleteButton.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    const transactionRef = doc(db, "mileTransactions", activeTransaction.id);
+    const milesBalanceRef = doc(db, "miles", "balance");
+
+    batch.delete(transactionRef);
+
+    if (amount > 0) {
+      batch.set(
+        milesBalanceRef,
+        {
+          balance: increment(balanceReverse),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
+
+    await batch.commit();
+
+    closeTransactionEditor();
+    showNotification("Transaction deleted!");
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    alert("Transaction could not be deleted. Check your Firestore rules.");
+  } finally {
+    transactionSaveButton.disabled = false;
+    transactionDeleteButton.disabled = false;
   }
 });
     
