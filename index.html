@@ -5864,14 +5864,76 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 });
     
     cbpSubmitButton.addEventListener("click", async () => {
-  if (!currentCBPLock || currentCBPLock.active !== true) return;
+  const lockData = currentCBPLock ? { ...currentCBPLock } : null;
+
+  if (!lockData || lockData.active !== true || !lockData.flightId) {
+    alert("CBP lock data is missing. Reload the page and try again.");
+    return;
+  }
 
   cbpSubmitButton.disabled = true;
 
   try {
     const batch = writeBatch(db);
 
-    const flightRef = getFlightRef(currentCBPLock.flightId);
+    const flightRef = getFlightRef(lockData.flightId);
+    const lockRef = doc(db, "cbpLock", "main");
+    const arrivalRef = doc(collection(db, "cbpArrivals"));
+
+    batch.set(
+      flightRef,
+      {
+        cbpSubmitted: true,
+        cbpSubmittedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(
+      lockRef,
+      {
+        active: false,
+        submittedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(arrivalRef, {
+      airline: lockData.airline || "",
+      flightNumber: lockData.flightNumber || "",
+      flightDate: lockData.flightDate || "",
+      flightDateRaw: lockData.flightDateRaw || "",
+      departureAirport: lockData.departureAirport || "",
+      arrivalAirport: lockData.arrivalAirport || "",
+      arrivalAirportName: lockData.arrivalAirportName || "",
+      passportName: lockData.passportName || "",
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    const returnedFlight = allFlights.get(lockData.flightId);
+
+    currentCBPLock = null;
+
+    closeCBPPage();
+    flightsPage.classList.remove("hidden");
+
+    if (returnedFlight) {
+      openFlightDetails({
+        ...returnedFlight,
+        cbpSubmitted: true
+      });
+    }
+
+    showNotification("CBP form submitted!");
+  } catch (error) {
+    console.error("Error submitting CBP form:", error);
+    alert("CBP form could not be submitted. Check console for the real error.");
+  } finally {
+    cbpSubmitButton.disabled = false;
+  }
+});
     const lockRef = doc(db, "cbpLock", "main");
     const arrivalRef = doc(collection(db, "cbpArrivals"));
 
