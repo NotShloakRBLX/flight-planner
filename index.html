@@ -4867,26 +4867,30 @@ function assignPremiumSeatFromFlight(flight) {
   return Math.floor(Math.random() * (high - low + 1)) + low;
 }
 
-function getPremiumSeatCost(routeDistance) {
+ function getPremiumSeatCost(routeDistance) {
   const distance = Number(routeDistance || 0);
 
   if (distance <= 500) {
-    return getRandomInteger(500, 1000);
+    return getRandomInteger(750, 1500);
   }
 
-  if (distance <= 1000) {
-    return getRandomInteger(1000, 1500);
+  if (distance <= 1500) {
+    return getRandomInteger(2000, 3500);
   }
 
   if (distance <= 3000) {
-    return getRandomInteger(2000, 4000);
+    return getRandomInteger(4000, 6500);
+  }
+
+  if (distance <= 5500) {
+    return getRandomInteger(6500, 9500);
   }
 
   if (distance <= 8000) {
-    return getRandomInteger(6000, 10000);
+    return getRandomInteger(11000, 17000);
   }
 
-  return getRandomInteger(10000, 15000);
+  return getRandomInteger(18000, 26000);
 }
 
 function closeSeatPopups() {
