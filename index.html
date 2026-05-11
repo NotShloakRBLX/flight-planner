@@ -6041,9 +6041,6 @@ cancelRenewPassportButton.addEventListener("click", closePassportPopups);
 passportCard.addEventListener("click", () => {
   if (!currentPassport) return;
 
-  passportCard.addEventListener("click", () => {
-  if (!currentPassport) return;
-
   if (isPassportActive()) {
     return;
   }
