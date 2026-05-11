@@ -896,8 +896,8 @@
 }
 
 .passport-card {
-  width: min(300px, 100%);
-  min-height: 430px;
+  width: min(320px, 100%);
+  min-height: 410px;
   border-radius: 34px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
@@ -907,13 +907,12 @@
   box-shadow:
     0 28px 90px rgba(0, 0, 0, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  padding: 22px;
+  padding: 18px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.28s ease, border-color 0.28s ease;
 }
-
 .passport-card:active {
   transform: scale(0.985);
 }
@@ -921,8 +920,8 @@
 .passport-card::after {
   content: "";
   position: absolute;
-  inset: 18px;
-  border-radius: 26px;
+  inset: 12px;
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
@@ -931,33 +930,40 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
   align-items: start;
 }
+
+    .passport-top-line > div {
+      min-width: 0;
+    }
 
 .passport-name-label,
 .passport-timer-label {
   color: rgba(255, 255, 255, 0.42);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.45px;
   text-transform: uppercase;
+  line-height: 1.1;
 }
 
 .passport-name {
   margin-top: 6px;
   color: white;
-  font-size: 22px;
+  font-size: clamp(18px, 5.8vw, 22px);
   font-weight: 900;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.5px;
   line-height: 1.05;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .passport-timer {
   margin-top: 6px;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 13px;
+  font-size: clamp(11px, 3.6vw, 13px);
   font-weight: 800;
   text-align: right;
   white-space: nowrap;
@@ -983,10 +989,10 @@
 .passport-emblem {
   position: absolute;
   left: 50%;
-  top: 52%;
+  top: 55%;
   transform: translate(-50%, -50%);
-  width: 126px;
-  height: 126px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
   background:
     radial-gradient(circle at center, rgba(255, 215, 80, 0.22), transparent 58%),
@@ -999,33 +1005,37 @@
 }
 
 .passport-emblem svg {
-  width: 74px;
-  height: 74px;
+  width: 64px;
+  height: 64px;
   fill: currentColor;
 }
 
 .passport-footer {
   position: absolute;
-  left: 22px;
-  right: 22px;
-  bottom: 24px;
+  left: 18px;
+  right: 18px;
+  bottom: 20px;
   z-index: 1;
 }
 
 .passport-footer-title {
   color: rgba(255, 255, 255, 0.48);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 850;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.55px;
   text-transform: uppercase;
+  line-height: 1.2;
 }
 
 .passport-footer-value {
   margin-top: 6px;
   color: rgba(255, 255, 255, 0.88);
-  font-size: 17px;
+  font-size: clamp(14px, 4.8vw, 17px);
   font-weight: 850;
-  letter-spacing: -0.25px;
+  letter-spacing: -0.2px;
+  line-height: 1.12;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .no-passport-card {
@@ -2695,6 +2705,57 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   grid-template-columns: 1fr;
 }
     }
+
+    @media (max-width: 430px) {
+  .passport-card {
+    width: 100%;
+    min-height: 390px;
+    padding: 16px;
+  }
+
+  .passport-card::after {
+    inset: 10px;
+  }
+
+  .passport-top-line {
+    gap: 8px;
+  }
+
+  .passport-name {
+    font-size: 16px;
+  }
+
+  .passport-timer {
+    font-size: 11px;
+  }
+
+  .passport-emblem {
+    width: 102px;
+    height: 102px;
+    top: 55%;
+  }
+
+  .passport-emblem svg {
+    width: 58px;
+    height: 58px;
+  }
+
+  .passport-footer {
+    left: 16px;
+    right: 16px;
+    bottom: 18px;
+  }
+
+  .passport-footer-title {
+    font-size: 9px;
+    letter-spacing: 0.45px;
+  }
+
+  .passport-footer-value {
+    font-size: 13px;
+    line-height: 1.15;
+  }
+}
 
     @media (max-width: 760px) {
       .add-flight-page,
