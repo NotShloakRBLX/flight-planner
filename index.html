@@ -104,6 +104,30 @@
   height: 18px;
   fill: currentColor;
 }
+
+    .passport-card.active-passport {
+  cursor: default;
+}
+
+.passport-card.active-passport:active {
+  transform: none;
+}
+
+.passport-card.active-passport::before {
+  content: "ACTIVE";
+  position: absolute;
+  right: 20px;
+  bottom: 72px;
+  z-index: 2;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(22, 225, 138, 0.95), rgba(15, 191, 117, 0.95));
+  color: white;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.7px;
+  box-shadow: 0 14px 28px rgba(12, 190, 113, 0.22);
+}
     
     .miles-button {
   position: absolute;
@@ -4009,7 +4033,10 @@ function updatePassportUI() {
 
   passportNameDisplay.textContent = currentPassport.fullName || "--";
   passportTimerDisplay.textContent = getPassportTimeRemainingText();
-  passportCard.classList.toggle("expired", !isPassportActive());
+  const active = isPassportActive();
+
+passportCard.classList.toggle("expired", !active);
+passportCard.classList.toggle("active-passport", active);
 }
 
 function openPassportPopup(popup) {
@@ -6014,9 +6041,14 @@ cancelRenewPassportButton.addEventListener("click", closePassportPopups);
 passportCard.addEventListener("click", () => {
   if (!currentPassport) return;
 
-  passportActionSubtitle.textContent = isPassportActive()
-    ? "Your passport is active. You can renew it for another week."
-    : "Your passport is expired. Renew it to add International US arrival flights.";
+  passportCard.addEventListener("click", () => {
+  if (!currentPassport) return;
+
+  if (isPassportActive()) {
+    return;
+  }
+
+  passportActionSubtitle.textContent = "Your passport is expired. Renew it to add International US arrival flights.";
 
   openPassportPopup(passportActionPopup);
 });
