@@ -4326,6 +4326,22 @@ function closeTransactionEditor() {
       return actual;
     }
 
+    function buildSequentialActualDateTime(flight, timeValue, previousDate) {
+  const actual = buildLocalDateTime(flight.flightDateRaw, timeValue);
+
+  if (!actual) return null;
+
+  if (!previousDate || Number.isNaN(previousDate.getTime())) {
+    return actual;
+  }
+
+  while (actual < previousDate) {
+    actual.setDate(actual.getDate() + 1);
+  }
+
+  return actual;
+}
+
     function getDepartureDateTime(flight) {
       return buildLocalDateTime(flight.flightDateRaw, flight.scheduledDeparture);
     }
@@ -5822,20 +5838,23 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
       }
 
       if (pendingMarkPhase === "land") {
-        const actualTakeoffDate = flight.actualTakeoff
-          ? buildActualDateTime(flight, flight.actualTakeoff, getScheduleTimes(flight).takeoff)
-          : null;
+  const actualTakeoffDate = flight.actualTakeoff
+    ? buildActualDateTime(flight, flight.actualTakeoff, getScheduleTimes(flight).takeoff)
+    : null;
 
-        const actualLandDate = buildActualDateTime(flight, time, actualTakeoffDate || getScheduleTimes(flight).land);
-        const airMinutes = actualTakeoffDate
-          ? Math.max(0, diffMinutes(actualLandDate, actualTakeoffDate))
-          : Math.max(0, Math.round((Date.now() - (flight.airStartMs || Date.now())) / 60000));
+  const actualLandDate = actualTakeoffDate
+    ? buildSequentialActualDateTime(flight, time, actualTakeoffDate)
+    : buildActualDateTime(flight, time, getScheduleTimes(flight).land);
 
-        updates.phase = "land";
-        updates.actualLand = time;
-        updates.actualAirTimeMinutes = airMinutes;
-        updates.arrivalTaxiStartMs = Date.now();
-      }
+  const airMinutes = actualTakeoffDate && actualLandDate
+    ? Math.max(0, diffMinutes(actualLandDate, actualTakeoffDate))
+    : Math.max(0, Math.round((Date.now() - (flight.airStartMs || Date.now())) / 60000));
+
+  updates.phase = "land";
+  updates.actualLand = time;
+  updates.actualAirTimeMinutes = airMinutes;
+  updates.arrivalTaxiStartMs = Date.now();
+}
 
       if (pendingMarkPhase === "gateArrival") {
         const actualGateDepartureDate = flight.actualGateDeparture
@@ -5846,8 +5865,9 @@ if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
           ? buildActualDateTime(flight, flight.actualLand, getScheduleTimes(flight).land)
           : null;
 
-        const actualGateArrivalDate = buildActualDateTime(flight, time, actualLandDate || getScheduleTimes(flight).gateArrival);
-
+const actualGateArrivalDate = actualLandDate
+  ? buildSequentialActualDateTime(flight, time, actualLandDate)
+  : buildActualDateTime(flight, time, getScheduleTimes(flight).gateArrival);
         const arrivalTaxiMinutes = actualLandDate
           ? Math.max(0, diffMinutes(actualGateArrivalDate, actualLandDate))
           : Math.max(0, Math.round((Date.now() - (flight.arrivalTaxiStartMs || Date.now())) / 60000));
