@@ -4859,13 +4859,25 @@ function getRandomSeatFromCabin(startRow, rowCount, lettersText) {
 
 function assignEconomySeatFromFlight(flight) {
   const premiumRows = Number(flight.premiumRows || 0);
+  const maxEconomyRow = Number(flight.economyRows || 0);
+  const letters = parseSeatLetters(flight.economyLetters);
+
   const economyStartRow = premiumRows + 1;
 
-  return getRandomSeatFromCabin(
-    economyStartRow,
-    flight.economyRows,
-    flight.economyLetters
-  );
+  if (
+    !Number.isFinite(premiumRows) ||
+    !Number.isFinite(maxEconomyRow) ||
+    maxEconomyRow <= 0 ||
+    economyStartRow > maxEconomyRow ||
+    letters.length === 0
+  ) {
+    return "";
+  }
+
+  const row = getRandomInteger(economyStartRow, maxEconomyRow);
+  const letter = letters[Math.floor(Math.random() * letters.length)];
+
+  return `${row}${letter}`;
 }
 
 function assignPremiumSeatFromFlight(flight) {
