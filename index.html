@@ -4631,7 +4631,8 @@ function formatBoardingPanel(flight) {
   const boardingDurationMinutes = parseDurationToMinutes(flight.boardingDuration);
   const departureTaxiMinutes = parseDurationToMinutes(flight.departureTaxiTime);
   const arrivalTaxiMinutes = parseDurationToMinutes(flight.arrivalTaxiTime);
-  const takeoff = addMinutes(gateDeparture, departureTaxiMinutes);
+  const takeoffChecklistBufferMinutes = 5;
+  const takeoff = addMinutes(gateDeparture, departureTaxiMinutes + takeoffChecklistBufferMinutes);
   const land = addMinutes(gateArrival, -arrivalTaxiMinutes);
 
   return {
