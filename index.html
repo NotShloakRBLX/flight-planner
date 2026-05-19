@@ -593,6 +593,32 @@
   display: none;
 }
 
+    .edt-offset-options {
+  grid-column: span 2;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition:
+    max-height 0.38s ease,
+    opacity 0.3s ease,
+    transform 0.38s ease;
+}
+
+.edt-offset-options.active {
+  max-height: 90px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (max-width: 1000px) {
+  .edt-offset-options {
+    grid-column: span 1;
+  }
+}
+
     .form-actions {
       margin-top: 22px;
       display: flex;
@@ -3255,6 +3281,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
 </div>
 
+          <div class="edt-offset-options" id="edtOffsetOptions">
+  <div class="form-field">
+    <label for="edtOffset">EDT offset</label>
+    <input id="edtOffset" type="text" placeholder="+14 or -5 / +14 30" />
+  </div>
+</div>
+
 <div class="toggle-field">
   <div class="toggle-text">
     <div class="toggle-title">Enable boarding</div>
@@ -3920,6 +3953,8 @@ const economyLettersInput = document.getElementById("economyLetters");
 const overnightToggle = document.getElementById("overnightToggle");
 const timezoneDifferenceInput = document.getElementById("timezoneDifference");
 const edtArrivalToggle = document.getElementById("edtArrivalToggle");
+const edtOffsetOptions = document.getElementById("edtOffsetOptions");
+const edtOffsetInput = document.getElementById("edtOffset");
 const intlUSArrivalToggle = document.getElementById("intlUSArrivalToggle");
 const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
@@ -3942,6 +3977,10 @@ let pendingPremiumCost = 0;
     let passportCountdownTimer = null;
     let currentCBPLock = null;
 
+    timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
+
+edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
+    
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
 
@@ -4540,6 +4579,19 @@ function formatBoardingPanel(flight) {
       return `${label} in ${remaining}m`;
     }
 
+    function updateEDTOffsetVisibility() {
+  const hasTimezoneChange = timezoneDifferenceInput.value.trim() !== "";
+  const usesEDTArrivalMode = edtArrivalToggle.checked;
+
+  const shouldShow = hasTimezoneChange && !usesEDTArrivalMode;
+
+  edtOffsetOptions.classList.toggle("active", shouldShow);
+
+  if (!shouldShow) {
+    edtOffsetInput.value = "";
+  }
+}
+    
     function parseTimezoneDifference(value) {
       const cleaned = String(value || "").trim();
 
@@ -4597,19 +4649,32 @@ function formatBoardingPanel(flight) {
     return;
   }
 
-  const convertedTime = new Date(arrivalDateTime);
+  timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
 
   if (flight.edtArrival) {
+    const convertedTime = new Date(arrivalDateTime);
     convertedTime.setMinutes(convertedTime.getMinutes() - timezoneInfo.totalMinutes);
 
-    timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
     timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityDeparture || "departure"} time`;
     return;
   }
 
+  const edtOffsetInfo = parseTimezoneDifference(flight.edtOffset);
+
+  if (edtOffsetInfo) {
+    const destinationTime = buildLocalDateTime(flight.flightDateRaw, flight.scheduledArrival);
+
+    if (destinationTime) {
+      destinationTime.setMinutes(destinationTime.getMinutes() + edtOffsetInfo.totalMinutes);
+
+      timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(destinationTime)} ${flight.cityArrival || "arrival"} time`;
+      return;
+    }
+  }
+
+  const convertedTime = new Date(arrivalDateTime);
   convertedTime.setMinutes(convertedTime.getMinutes() + timezoneInfo.totalMinutes);
 
-  timezoneTitle.textContent = formatTimezoneTitle(timezoneInfo);
   timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityArrival || "arrival"} time`;
 }
 
@@ -5017,6 +5082,9 @@ async function saveFlightWithSeat({
     flightForm.reset();
     boardingOptions.classList.remove("active");
 
+    edtOffsetOptions.classlist.remove("active");
+    edtOffsetInput.value = "";
+
     showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
@@ -5322,7 +5390,8 @@ updateCompleteFlightButton(latest);
     economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
     overnight: overnightToggle.checked,
     timezoneDifference: timezoneDifferenceInput.value.trim() || "",
-    edtArrival: edtArrivalToggle.checked,
+edtOffset: edtArrivalToggle.checked ? "" : edtOffsetInput.value.trim() || "",
+edtArrival: edtArrivalToggle.checked,
 internationalUSArrival: intlUSArrivalToggle.checked,
     cbpRequired: intlUSArrivalToggle.checked,
     cbpSubmitted: false,
@@ -5473,7 +5542,11 @@ onSnapshot(transactionsQuery, (snapshot) => {
   flight.overnight = false;
 }
 
-if (!flight.routeDistance) {
+if (!flight.edtOffset) {
+  flight.edtOffset = "";
+}
+        
+        if (!flight.routeDistance) {
   flight.routeDistance = "";
 }
 
