@@ -5080,12 +5080,20 @@ async function saveFlightWithSeat({
     }
 
     flightForm.reset();
-    boardingOptions.classList.remove("active");
 
-    edtOffsetOptions.classlist.remove("active");
-    edtOffsetInput.value = "";
+if (boardingOptions) {
+  boardingOptions.classList.remove("active");
+}
 
-    showSeatAssignedPopup(seat, cabin);
+if (edtOffsetOptions) {
+  edtOffsetOptions.classList.remove("active");
+}
+
+if (edtOffsetInput) {
+  edtOffsetInput.value = "";
+}
+
+showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
     pendingSeatAssignment = null;
