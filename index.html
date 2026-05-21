@@ -5266,13 +5266,17 @@ if (phase === "boardingComplete") {
       detailDepartureTime.classList.toggle("bad", departureBad);
       detailArrivalTime.classList.toggle("bad", arrivalBad);
 
-      const departureOld = flight.scheduledDeparture !== (flight.originalScheduledDeparture || flight.scheduledDeparture)
-        ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledDeparture)}</span>`
-        : "";
+      const departureOld = flight.actualGateDeparture && flight.actualGateDeparture !== flight.scheduledDeparture
+  ? ` <span class="old-time">${formatTime12Hour(flight.scheduledDeparture)}</span>`
+  : flight.scheduledDeparture !== (flight.originalScheduledDeparture || flight.scheduledDeparture)
+    ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledDeparture)}</span>`
+    : "";
 
-      const arrivalOld = flight.scheduledArrival !== (flight.originalScheduledArrival || flight.scheduledArrival)
-        ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledArrival)}</span>`
-        : "";
+const arrivalOld = flight.actualGateArrival && flight.actualGateArrival !== flight.scheduledArrival
+  ? ` <span class="old-time">${formatTime12Hour(flight.scheduledArrival)}</span>`
+  : flight.scheduledArrival !== (flight.originalScheduledArrival || flight.scheduledArrival)
+    ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledArrival)}</span>`
+    : "";
 
       detailDepartureTime.innerHTML = `${formatTime12Hour(displayedDepartureTime)}${departureOld}`;
       detailArrivalTime.innerHTML = `${formatTime12Hour(displayedArrivalTime)}${arrivalOld}`;
