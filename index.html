@@ -650,7 +650,6 @@
   height: 42px;
   padding: 0 16px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #2a7fff, #345dff);
   color: white;
   font-size: 15px;
   font-weight: 900;
@@ -658,32 +657,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 14px 34px rgba(52, 93, 255, 0.24);
 }
 
+/* ON TIME / early / good */
+.featured-status-flag.good,
+.featured-status-flag.on-time {
+  background: linear-gradient(135deg, #16e18a, #4fe08e, #0fbf75);
+  box-shadow: 0 14px 34px rgba(12, 190, 113, 0.24);
+}
+
+/* DELAYED / late */
+.featured-status-flag.bad,
+.featured-status-flag.delayed {
+  background: linear-gradient(135deg, #ffd43b, #ffe066, #f4c430);
+  box-shadow: 0 14px 34px rgba(255, 212, 59, 0.24);
+}
+
+/* ARRIVED good */
+.featured-status-flag.arrived.good {
+  background: linear-gradient(135deg, #16e18a, #4fe08e, #0fbf75);
+  box-shadow: 0 14px 34px rgba(12, 190, 113, 0.24);
+}
+
+/* ARRIVED late */
+.featured-status-flag.arrived.bad {
+  background: linear-gradient(135deg, #ffd43b, #ffe066, #f4c430);
+  box-shadow: 0 14px 34px rgba(255, 212, 59, 0.24);
+}
+
+/* INFLIGHT good */
 .featured-status-flag.inflight.good {
   background: linear-gradient(135deg, #16e18a, #4fe08e, #0fbf75);
   box-shadow: 0 14px 34px rgba(12, 190, 113, 0.24);
 }
 
+/* INFLIGHT late */
 .featured-status-flag.inflight.bad {
-  background: linear-gradient(135deg, #ffd43b, #ffb347, #ff8a1f);
-  box-shadow: 0 14px 34px rgba(255, 179, 71, 0.24);
-}
-
-.featured-status-flag.delayed {
-  background: linear-gradient(135deg, #ffb347, #ff8a1f);
-  box-shadow: 0 14px 34px rgba(255, 138, 31, 0.24);
-}
-
-.featured-status-flag.inflight {
-  background: linear-gradient(135deg, #4387ff, #345dff);
-  box-shadow: 0 14px 34px rgba(52, 93, 255, 0.24);
-}
-
-.featured-status-flag.arrived {
-  background: linear-gradient(135deg, #16e18a, #0fbf75);
-  box-shadow: 0 14px 34px rgba(12, 190, 113, 0.22);
+  background: linear-gradient(135deg, #ffd43b, #ffe066, #f4c430);
+  box-shadow: 0 14px 34px rgba(255, 212, 59, 0.24);
 }
 
 .featured-flight-number {
@@ -5405,9 +5416,11 @@ function getFeaturedStatusFlag(flight) {
   const actuals = getActualTimes(flight);
 
   if (phase === "gateArrival") {
+    const arrivedLate = actuals.actualGateArrival > schedule.gateArrival;
+
     return {
       text: "ARRIVED",
-      className: "arrived"
+      className: arrivedLate ? "arrived bad" : "arrived good"
     };
   }
 
@@ -5429,7 +5442,7 @@ function getFeaturedStatusFlag(flight) {
 
   return {
     text: "ON TIME",
-    className: ""
+    className: "on-time"
   };
 }
 
