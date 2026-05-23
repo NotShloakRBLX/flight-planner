@@ -756,6 +756,14 @@
   white-space: nowrap;
 }
 
+.featured-info-value.seat {
+  background: linear-gradient(135deg, #7fb6ff 0%, #5e93ff 45%, #345dff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 .featured-info-value.good {
   color: #4fe08e;
 }
@@ -5449,7 +5457,23 @@ function getFeaturedDepartValue(flight) {
   const schedule = getScheduleTimes(flight);
   const actuals = getActualTimes(flight);
 
-  if (phase === "gateDeparture" || phase === "taxi" || phase === "takeoff" || phase === "land" || phase === "gateArrival") {
+  if (phase === "gateArrival") {
+    return {
+      label: "Arrived",
+      value: formatTime12Hour(flight.actualGateArrival || flight.scheduledArrival),
+      className: ""
+    };
+  }
+
+  if (phase === "takeoff" || phase === "land") {
+    return {
+      label: "Arrives",
+      value: formatTime12Hour(flight.scheduledArrival),
+      className: ""
+    };
+  }
+
+  if (phase === "gateDeparture" || phase === "taxi") {
     const diff = describeDifference(actuals.actualGateDeparture, schedule.gateDeparture);
 
     return {
@@ -5480,25 +5504,11 @@ function getFeaturedGateValue(flight) {
   return flight.boardingGate || "--";
 }
 
-function getFeaturedArrivalValue(flight) {
-  const phase = getFlightPhase(flight);
-  const schedule = getScheduleTimes(flight);
-  const actuals = getActualTimes(flight);
-
-  if (phase === "gateArrival") {
-    const diff = describeDifference(actuals.actualGateArrival, schedule.gateArrival);
-
-    return {
-      label: "Arrived",
-      value: formatTime12Hour(flight.actualGateArrival),
-      className: diff.good ? "good" : "bad"
-    };
-  }
-
+function getFeaturedSeatValue(flight) {
   return {
-    label: "Arrives",
-    value: formatTime12Hour(flight.scheduledArrival),
-    className: ""
+    label: "Seat",
+    value: flight.assignedSeat || "—",
+    className: flight.assignedSeat ? "seat" : ""
   };
 }
 
@@ -5511,7 +5521,7 @@ function populateFeaturedFlightCard(card, flight) {
 
   const status = getFeaturedStatusFlag(flight);
   const departInfo = getFeaturedDepartValue(flight);
-  const arrivalInfo = getFeaturedArrivalValue(flight);
+  const seatInfo = getFeaturedSeatValue(flight);
 
   const flag = card.querySelector("[data-featured-flag]");
   flag.textContent = status.text;
@@ -5530,10 +5540,10 @@ function populateFeaturedFlightCard(card, flight) {
 
   card.querySelector("[data-featured-gate-value]").textContent = getFeaturedGateValue(flight);
 
-  card.querySelector("[data-featured-arrival-label]").textContent = arrivalInfo.label;
-  const arrivalValueEl = card.querySelector("[data-featured-arrival-value]");
-  arrivalValueEl.textContent = arrivalInfo.value;
-  arrivalValueEl.className = `featured-info-value ${arrivalInfo.className || ""}`;
+  card.querySelector("[data-featured-seat-label]").textContent = seatInfo.label;
+  const seatValueEl = card.querySelector("[data-featured-seat-value]");
+  seatValueEl.textContent = seatInfo.value;
+  seatValueEl.className = `featured-info-value ${seatInfo.className || ""}`;
 }
 
 function updateFeaturedCardLive() {
@@ -5607,8 +5617,8 @@ function startFeaturedCardLiveUpdates() {
       </div>
 
       <div class="featured-info-cell">
-        <div class="featured-info-label" data-featured-arrival-label></div>
-        <div class="featured-info-value" data-featured-arrival-value></div>
+        <div class="featured-info-label" data-featured-seat-label></div>
+        <div class="featured-info-value" data-featured-seat-value></div>
       </div>
     </div>
 
