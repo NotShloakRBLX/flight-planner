@@ -661,6 +661,16 @@
   box-shadow: 0 14px 34px rgba(52, 93, 255, 0.24);
 }
 
+.featured-status-flag.inflight.good {
+  background: linear-gradient(135deg, #16e18a, #4fe08e, #0fbf75);
+  box-shadow: 0 14px 34px rgba(12, 190, 113, 0.24);
+}
+
+.featured-status-flag.inflight.bad {
+  background: linear-gradient(135deg, #ffd43b, #ffb347, #ff8a1f);
+  box-shadow: 0 14px 34px rgba(255, 179, 71, 0.24);
+}
+
 .featured-status-flag.delayed {
   background: linear-gradient(135deg, #ffb347, #ff8a1f);
   box-shadow: 0 14px 34px rgba(255, 138, 31, 0.24);
@@ -5391,6 +5401,8 @@ function isFeaturedFlightDelayed(flight) {
 
 function getFeaturedStatusFlag(flight) {
   const phase = getFlightPhase(flight);
+  const schedule = getScheduleTimes(flight);
+  const actuals = getActualTimes(flight);
 
   if (phase === "gateArrival") {
     return {
@@ -5400,9 +5412,11 @@ function getFeaturedStatusFlag(flight) {
   }
 
   if (phase === "gateDeparture" || phase === "taxi" || phase === "takeoff" || phase === "land") {
+    const departedLate = actuals.actualGateDeparture > schedule.gateDeparture;
+
     return {
       text: "INFLIGHT",
-      className: "inflight"
+      className: departedLate ? "inflight bad" : "inflight good"
     };
   }
 
