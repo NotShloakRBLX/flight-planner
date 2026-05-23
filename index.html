@@ -613,6 +613,192 @@
   transform: translateY(0);
 }
 
+    .featured-flight-card {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background:
+    radial-gradient(circle at top left, rgba(64, 156, 255, 0.12), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(245, 247, 255, 0.9));
+  color: #111827;
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.featured-flight-top {
+  position: relative;
+  padding: 18px 18px 20px;
+  min-height: 142px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.featured-status-flag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 92px;
+  height: 42px;
+  padding: 0 14px;
+  border-bottom-left-radius: 22px;
+  background: linear-gradient(135deg, #079a38, #0bb84a);
+  color: white;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 30px rgba(7, 154, 56, 0.2);
+}
+
+.featured-status-flag.delayed {
+  background: linear-gradient(135deg, #ff9f1c, #f97316);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.22);
+}
+
+.featured-status-flag.inflight {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.22);
+}
+
+.featured-status-flag.arrived {
+  background: linear-gradient(135deg, #111827, #374151);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.18);
+}
+
+.featured-flight-number {
+  padding-right: 105px;
+  color: rgba(17, 24, 39, 0.72);
+  font-size: 19px;
+  font-weight: 760;
+  letter-spacing: 1.6px;
+}
+
+.featured-main-status {
+  margin-top: 8px;
+  color: #101827;
+  font-size: 39px;
+  font-weight: 460;
+  letter-spacing: -1.8px;
+  line-height: 1.02;
+}
+
+.featured-route-area {
+  padding: 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.featured-route-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #0f5fac;
+  font-size: 28px;
+  font-weight: 520;
+  letter-spacing: -0.75px;
+  line-height: 1;
+}
+
+.featured-route-arrow {
+  opacity: 0.65;
+}
+
+.featured-date-line {
+  margin-top: 10px;
+  color: rgba(17, 24, 39, 0.86);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+}
+
+.featured-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.featured-info-cell {
+  padding: 15px 14px 17px;
+}
+
+.featured-info-label {
+  color: rgba(17, 24, 39, 0.56);
+  font-size: 17px;
+  font-weight: 520;
+  letter-spacing: -0.25px;
+}
+
+.featured-info-value {
+  margin-top: 6px;
+  color: #111827;
+  font-size: 23px;
+  font-weight: 430;
+  letter-spacing: -0.65px;
+  white-space: nowrap;
+}
+
+.featured-info-value.good {
+  color: #0bb84a;
+  font-weight: 700;
+}
+
+.featured-info-value.bad {
+  color: #f97316;
+  font-weight: 700;
+}
+
+.featured-view-button {
+  width: 100%;
+  height: 56px;
+  border: none;
+  background: linear-gradient(135deg, #0f6fd8, #075fc1);
+  color: white;
+  font-size: 20px;
+  font-weight: 760;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  transition: filter 0.25s ease, transform 0.25s ease;
+}
+
+.featured-view-button:hover {
+  filter: brightness(1.05);
+}
+
+.featured-view-button:active {
+  transform: scale(0.985);
+}
+
+@media (max-width: 430px) {
+  .featured-flight-top {
+    min-height: 134px;
+    padding: 17px 16px 19px;
+  }
+
+  .featured-main-status {
+    font-size: 35px;
+  }
+
+  .featured-route-line {
+    font-size: 25px;
+  }
+
+  .featured-info-cell {
+    padding: 14px 12px 16px;
+  }
+
+  .featured-info-label {
+    font-size: 16px;
+  }
+
+  .featured-info-value {
+    font-size: 21px;
+  }
+}
+
 @media (max-width: 1000px) {
   .edt-offset-options {
     grid-column: span 1;
@@ -3976,6 +4162,8 @@ let pendingPremiumCost = 0;
     let currentPassport = null;
     let passportCountdownTimer = null;
     let currentCBPLock = null;
+    let latestFlightsCache = [];
+    let featuredRefreshTimer = null;
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -5128,6 +5316,239 @@ function updateSeatCard(flight) {
       return flight.phase || "scheduled";
     }
 
+    function getFlightSortTime(flight) {
+  const departure = getDepartureDateTime(flight);
+
+  if (!departure || Number.isNaN(departure.getTime())) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  return departure.getTime();
+}
+
+function getSortedFlightsForHome() {
+  return latestFlightsCache
+    .slice()
+    .sort((a, b) => getFlightSortTime(a) - getFlightSortTime(b));
+}
+
+function isFeaturedFlightDelayed(flight) {
+  const schedule = getScheduleTimes(flight);
+  const originalDeparture = getOriginalDepartureDateTime(flight);
+  const originalArrival = getOriginalArrivalDateTime(flight);
+  const actuals = getActualTimes(flight);
+
+  if (flight.actualGateDeparture) {
+    return actuals.actualGateDeparture > schedule.gateDeparture;
+  }
+
+  if (flight.actualGateArrival) {
+    return actuals.actualGateArrival > schedule.gateArrival;
+  }
+
+  return schedule.gateDeparture > originalDeparture || schedule.gateArrival > originalArrival;
+}
+
+function getFeaturedStatusFlag(flight) {
+  const phase = getFlightPhase(flight);
+
+  if (phase === "gateArrival") {
+    return {
+      text: "ARRIVED",
+      className: "arrived"
+    };
+  }
+
+  if (phase === "gateDeparture" || phase === "taxi" || phase === "takeoff" || phase === "land") {
+    return {
+      text: "INFLIGHT",
+      className: "inflight"
+    };
+  }
+
+  if (isFeaturedFlightDelayed(flight)) {
+    return {
+      text: "DELAYED",
+      className: "delayed"
+    };
+  }
+
+  return {
+    text: "ON TIME",
+    className: ""
+  };
+}
+
+function getFeaturedMainStatus(flight) {
+  const phase = getFlightPhase(flight);
+  const schedule = getScheduleTimes(flight);
+
+  if (phase === "boarding") {
+    return "Now boarding";
+  }
+
+  if (phase === "gateDeparture" || phase === "taxi") {
+    return "Departed Gate";
+  }
+
+  if (phase === "takeoff" || phase === "land") {
+    return formatCountdown(schedule.gateArrival, "Arrives");
+  }
+
+  if (phase === "gateArrival") {
+    return "Arrived at Gate";
+  }
+
+  if (flight.enableBoarding === true) {
+    const shouldShowBoardingTime = Math.floor(Date.now() / 6000) % 2 === 1;
+
+    if (shouldShowBoardingTime) {
+      return `Boards at ${formatTime12Hour(flight.boardingTime)}`;
+    }
+
+    return formatBoardingCountdown(schedule.boarding);
+  }
+
+  return formatCountdown(schedule.gateDeparture, "Departs");
+}
+
+function getFeaturedDepartValue(flight) {
+  const phase = getFlightPhase(flight);
+  const schedule = getScheduleTimes(flight);
+  const actuals = getActualTimes(flight);
+
+  if (phase === "gateDeparture" || phase === "taxi" || phase === "takeoff" || phase === "land" || phase === "gateArrival") {
+    const diff = describeDifference(actuals.actualGateDeparture, schedule.gateDeparture);
+
+    return {
+      label: "Departed",
+      value: formatTime12Hour(flight.actualGateDeparture),
+      className: diff.good ? "good" : "bad"
+    };
+  }
+
+  return {
+    label: "Depart",
+    value: formatTime12Hour(flight.scheduledDeparture),
+    className: ""
+  };
+}
+
+function getFeaturedGateValue(flight) {
+  const phase = getFlightPhase(flight);
+
+  if (phase === "takeoff" || phase === "land") {
+    return "—";
+  }
+
+  if (phase === "gateArrival") {
+    return flight.arrivalGate || "--";
+  }
+
+  return flight.boardingGate || "--";
+}
+
+function getFeaturedArrivalValue(flight) {
+  const phase = getFlightPhase(flight);
+  const schedule = getScheduleTimes(flight);
+  const actuals = getActualTimes(flight);
+
+  if (phase === "gateArrival") {
+    const diff = describeDifference(actuals.actualGateArrival, schedule.gateArrival);
+
+    return {
+      label: "Arrived",
+      value: formatTime12Hour(flight.actualGateArrival),
+      className: diff.good ? "good" : "bad"
+    };
+  }
+
+  return {
+    label: "Arrives",
+    value: formatTime12Hour(flight.scheduledArrival),
+    className: ""
+  };
+}
+
+function createFeaturedFlightCard(flight) {
+  const card = document.createElement("article");
+  card.className = "featured-flight-card";
+
+  const airline = escapeHTML(flight.airline || "AA");
+  const flightNumber = escapeHTML(flight.flightNumber || "0000");
+  const departureAirport = escapeHTML(flight.departureAirport || "DEP");
+  const arrivalAirport = escapeHTML(flight.arrivalAirport || "ARR");
+  const flightDate = escapeHTML(flight.flightDate || "");
+  const status = getFeaturedStatusFlag(flight);
+  const departInfo = getFeaturedDepartValue(flight);
+  const arrivalInfo = getFeaturedArrivalValue(flight);
+  const gateValue = escapeHTML(getFeaturedGateValue(flight));
+
+  card.innerHTML = `
+    <div class="featured-flight-top">
+      <div class="featured-status-flag ${status.className}">
+        ${escapeHTML(status.text)}
+      </div>
+
+      <div class="featured-flight-number">${airline} ${flightNumber}</div>
+      <div class="featured-main-status">${escapeHTML(getFeaturedMainStatus(flight))}</div>
+    </div>
+
+    <div class="featured-route-area">
+      <div class="featured-route-line">
+        <span>${departureAirport}</span>
+        <span class="featured-route-arrow">→</span>
+        <span>${arrivalAirport}</span>
+      </div>
+
+      <div class="featured-date-line">${flightDate}</div>
+    </div>
+
+    <div class="featured-info-grid">
+      <div class="featured-info-cell">
+        <div class="featured-info-label">${escapeHTML(departInfo.label)}</div>
+        <div class="featured-info-value ${departInfo.className}">${escapeHTML(departInfo.value)}</div>
+      </div>
+
+      <div class="featured-info-cell">
+        <div class="featured-info-label">Gate</div>
+        <div class="featured-info-value">${gateValue}</div>
+      </div>
+
+      <div class="featured-info-cell">
+        <div class="featured-info-label">${escapeHTML(arrivalInfo.label)}</div>
+        <div class="featured-info-value ${arrivalInfo.className}">${escapeHTML(arrivalInfo.value)}</div>
+      </div>
+    </div>
+
+    <button class="featured-view-button" type="button">View</button>
+  `;
+
+  card.querySelector(".featured-view-button").addEventListener("click", () => {
+    const selectedFlight = allFlights.get(flight.id);
+    if (selectedFlight) {
+      openFlightDetails(selectedFlight);
+    }
+  });
+
+  flightsList.appendChild(card);
+}
+
+function renderHomeFlights() {
+  flightsList.innerHTML = "";
+
+  const sortedFlights = getSortedFlightsForHome();
+
+  sortedFlights.forEach((flight, index) => {
+    if (index === 0) {
+      createFeaturedFlightCard(flight);
+      return;
+    }
+
+    createFlightCard(flight);
+  });
+}
+    
     function createFlightCard(flight) {
       const card = document.createElement("button");
       card.className = "flight-card";
@@ -5497,6 +5918,15 @@ onSnapshot(arrivalsQuery, (snapshot) => {
 
     recentArrivalsList.appendChild(createRecentArrivalCard(arrival));
   });
+  renderHomeFlights();
+
+if (featuredRefreshTimer) {
+  clearInterval(featuredRefreshTimer);
+}
+
+featuredRefreshTimer = setInterval(() => {
+  renderHomeFlights();
+}, 1000);
 }, (error) => {
   console.error("Error loading recent arrivals:", error);
 });
@@ -5526,7 +5956,8 @@ onSnapshot(transactionsQuery, (snapshot) => {
 
     onSnapshot(flightsQuery, (snapshot) => {
       flightsList.innerHTML = "";
-      allFlights.clear();
+allFlights.clear();
+latestFlightsCache = [];
 
       snapshot.forEach((snapshotDoc) => {
         const flight = {
@@ -5557,6 +5988,10 @@ onSnapshot(transactionsQuery, (snapshot) => {
 if (!flight.edtOffset) {
   flight.edtOffset = "";
 }
+
+        if (!flight.arrivalGate) {
+          flight.arrivalGate = "";
+        }
         
         if (!flight.routeDistance) {
   flight.routeDistance = "";
@@ -5607,8 +6042,8 @@ if (!flight.premiumSeatCost) {
 }
 
         allFlights.set(flight.id, flight);
-        createFlightCard(flight);
-        refreshActiveFlight(flight);
+latestFlightsCache.push(flight);
+refreshActiveFlight(flight);
       });
     }, (error) => {
       console.error("Error loading flights:", error);
@@ -5794,6 +6229,11 @@ markGateInput.value = "";
 if (phase === "boarding") {
   markTimeInput.style.display = "none";
   markGateInput.style.display = "block";
+  markGateInput.placeholder = "Gate C12";
+} else if (phase === "gateArrival") {
+  markTimeInput.style.display = "block";
+  markGateInput.style.display = "block";
+  markGateInput.placeholder = "Arrival gate C12";
 } else {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "none";
@@ -5907,6 +6347,8 @@ if (pendingMarkPhase === "boarding" && !markGateInput.value.trim()) return;
 
 if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 
+if (pendingMarkPhase === "gateArrival" && !markGateInput.value.trim()) return;
+
       const time = markTimeInput.value;
       const gate = markGateInput.value.trim();
       const updates = {};
@@ -5978,6 +6420,7 @@ const actualGateArrivalDate = actualLandDate
         updates.actualGateArrival = time;
         updates.actualArrivalTaxiMinutes = arrivalTaxiMinutes;
         updates.actualTotalTimeMinutes = totalMinutes;
+        updates.arrivalGate = gate;
       }
 
       confirmMarkButton.disabled = true;
