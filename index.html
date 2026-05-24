@@ -5414,11 +5414,11 @@ function isFeaturedFlightDelayed(flight) {
   const actuals = getActualTimes(flight);
 
   if (flight.actualGateDeparture) {
-    return actuals.actualGateDeparture > schedule.gateDeparture;
+    return actuals.actualGateDeparture > originalDeparture;
   }
 
   if (flight.actualGateArrival) {
-    return actuals.actualGateArrival > schedule.gateArrival;
+    return actuals.actualGateArrival > originalArrival;
   }
 
   return schedule.gateDeparture > originalDeparture || schedule.gateArrival > originalArrival;
@@ -5426,11 +5426,12 @@ function isFeaturedFlightDelayed(flight) {
 
 function getFeaturedStatusFlag(flight) {
   const phase = getFlightPhase(flight);
-  const schedule = getScheduleTimes(flight);
+  const originalDeparture = getOriginalDepartureDateTime(flight);
+  const originalArrival = getOriginalArrivalDateTime(flight);
   const actuals = getActualTimes(flight);
 
   if (phase === "gateArrival") {
-    const arrivedLate = actuals.actualGateArrival > schedule.gateArrival;
+    const arrivedLate = actuals.actualGateArrival > originalArrival;
 
     return {
       text: "ARRIVED",
@@ -5439,7 +5440,7 @@ function getFeaturedStatusFlag(flight) {
   }
 
   if (phase === "gateDeparture" || phase === "taxi" || phase === "takeoff" || phase === "land") {
-    const departedLate = actuals.actualGateDeparture > schedule.gateDeparture;
+    const departedLate = actuals.actualGateDeparture > originalDeparture;
 
     return {
       text: "INFLIGHT",
@@ -5519,8 +5520,8 @@ function getFeaturedMainStatus(flight) {
 
 function getFeaturedDepartValue(flight) {
   const phase = getFlightPhase(flight);
-  const schedule = getScheduleTimes(flight);
   const actuals = getActualTimes(flight);
+  const originalDeparture = getOriginalDepartureDateTime(flight);
 
   if (phase === "gateArrival") {
     return {
@@ -5539,7 +5540,7 @@ function getFeaturedDepartValue(flight) {
   }
 
   if (phase === "gateDeparture" || phase === "taxi") {
-    const diff = describeDifference(actuals.actualGateDeparture, schedule.gateDeparture);
+    const diff = describeDifference(actuals.actualGateDeparture, originalDeparture);
 
     return {
       label: "Departed",
@@ -5777,8 +5778,18 @@ function renderHomeFlights() {
       const schedule = getScheduleTimes(flight);
       const actuals = getActualTimes(flight);
 
-      const departureDiff = describeDifference(actuals.actualGateDeparture || schedule.gateDeparture, schedule.gateDeparture);
-      const arrivalDiff = describeDifference(actuals.actualGateArrival || schedule.gateArrival, schedule.gateArrival);
+      const originalDeparture = getOriginalDepartureDateTime(flight);
+const originalArrival = getOriginalArrivalDateTime(flight);
+
+const departureDiff = describeDifference(
+  actuals.actualGateDeparture || schedule.gateDeparture,
+  originalDeparture
+);
+
+const arrivalDiff = describeDifference(
+  actuals.actualGateArrival || schedule.gateArrival,
+  originalArrival
+);
 
       detailDepartureCountdown.textContent = flight.actualGateDeparture
         ? departureDiff.text
@@ -5807,7 +5818,7 @@ if (phase === "boardingComplete") {
 }
 
       if (phase === "gateDeparture") {
-        const isLate = actuals.actualGateDeparture > schedule.gateDeparture;
+        const isLate = actuals.actualGateDeparture > originalDeparture;
         setStatusPanel(isLate, "Departed Gate", departureDiff.text);
       }
 
