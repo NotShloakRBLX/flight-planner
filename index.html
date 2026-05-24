@@ -5464,8 +5464,26 @@ function getFeaturedMainStatus(flight) {
   const phase = getFlightPhase(flight);
   const schedule = getScheduleTimes(flight);
 
+  const shouldShowAtTime = Math.floor(Date.now() / 6000) % 2 === 1;
+
+  function formatInOrAt(targetDate, actionWord, timeValue) {
+    if (shouldShowAtTime && timeValue) {
+      return `${actionWord} at ${formatTime12Hour(timeValue)}`;
+    }
+
+    return formatCountdown(targetDate, actionWord);
+  }
+
   if (phase === "boarding") {
     return "Now boarding";
+  }
+
+  if (phase === "boardingComplete") {
+    return formatInOrAt(
+      schedule.gateDeparture,
+      "Departs",
+      flight.scheduledDeparture
+    );
   }
 
   if (phase === "gateDeparture" || phase === "taxi") {
@@ -5473,7 +5491,11 @@ function getFeaturedMainStatus(flight) {
   }
 
   if (phase === "takeoff" || phase === "land") {
-    return formatCountdown(schedule.gateArrival, "Arrives");
+    return formatInOrAt(
+      schedule.gateArrival,
+      "Arrives",
+      flight.scheduledArrival
+    );
   }
 
   if (phase === "gateArrival") {
@@ -5481,16 +5503,18 @@ function getFeaturedMainStatus(flight) {
   }
 
   if (flight.enableBoarding === true) {
-    const shouldShowBoardingTime = Math.floor(Date.now() / 6000) % 2 === 1;
-
-    if (shouldShowBoardingTime) {
+    if (shouldShowAtTime) {
       return `Boards at ${formatTime12Hour(flight.boardingTime)}`;
     }
 
     return formatBoardingCountdown(schedule.boarding);
   }
 
-  return formatCountdown(schedule.gateDeparture, "Departs");
+  return formatInOrAt(
+    schedule.gateDeparture,
+    "Departs",
+    flight.scheduledDeparture
+  );
 }
 
 function getFeaturedDepartValue(flight) {
