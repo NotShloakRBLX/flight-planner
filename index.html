@@ -5849,63 +5849,65 @@ if (phase === "boardingComplete") {
     }
 
     function updateMainTimes(flight) {
-      const schedule = getScheduleTimes(flight);
-      const actuals = getActualTimes(flight);
+  const schedule = getScheduleTimes(flight);
+  const actuals = getActualTimes(flight);
 
-      const originalDeparture = getOriginalDepartureDateTime(flight);
-      const originalArrival = getOriginalArrivalDateTime(flight);
+  const originalDeparture = getOriginalDepartureDateTime(flight);
+  const originalArrival = getOriginalArrivalDateTime(flight);
 
-      const displayedDepartureTime = flight.actualGateDeparture || flight.scheduledDeparture;
-      const displayedArrivalTime = flight.actualGateArrival || flight.scheduledArrival;
+  const displayedDepartureTime = flight.actualGateDeparture || flight.scheduledDeparture;
+  const displayedArrivalTime = flight.actualGateArrival || flight.scheduledArrival;
 
-      const departureBad = flight.actualGateDeparture
-        ? actuals.actualGateDeparture > schedule.gateDeparture
-        : schedule.gateDeparture > originalDeparture;
+  const displayedDepartureDate = flight.actualGateDeparture
+    ? actuals.actualGateDeparture
+    : schedule.gateDeparture;
 
-      const arrivalBad = flight.actualGateArrival
-        ? actuals.actualGateArrival > schedule.gateArrival
-        : schedule.gateArrival > originalArrival;
+  const displayedArrivalDate = flight.actualGateArrival
+    ? actuals.actualGateArrival
+    : schedule.gateArrival;
 
-      detailDepartureTime.classList.toggle("bad", departureBad);
-      detailArrivalTime.classList.toggle("bad", arrivalBad);
+  const departureDiff = describeDifference(
+    displayedDepartureDate,
+    originalDeparture
+  );
 
-      const departureOld = flight.actualGateDeparture && flight.actualGateDeparture !== flight.scheduledDeparture
-  ? ` <span class="old-time">${formatTime12Hour(flight.scheduledDeparture)}</span>`
-  : flight.scheduledDeparture !== (flight.originalScheduledDeparture || flight.scheduledDeparture)
-    ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledDeparture)}</span>`
+  const arrivalDiff = describeDifference(
+    displayedArrivalDate,
+    originalArrival
+  );
+
+  const departureBad = !departureDiff.good;
+  const arrivalBad = !arrivalDiff.good;
+
+  detailDepartureTime.classList.toggle("bad", departureBad);
+  detailArrivalTime.classList.toggle("bad", arrivalBad);
+
+  const originalDepartureTime = flight.originalScheduledDeparture || flight.scheduledDeparture;
+  const originalArrivalTime = flight.originalScheduledArrival || flight.scheduledArrival;
+
+  const departureOld = displayedDepartureTime !== originalDepartureTime
+    ? ` <span class="old-time">${formatTime12Hour(originalDepartureTime)}</span>`
     : "";
 
-const arrivalOld = flight.actualGateArrival && flight.actualGateArrival !== flight.scheduledArrival
-  ? ` <span class="old-time">${formatTime12Hour(flight.scheduledArrival)}</span>`
-  : flight.scheduledArrival !== (flight.originalScheduledArrival || flight.scheduledArrival)
-    ? ` <span class="old-time">${formatTime12Hour(flight.originalScheduledArrival)}</span>`
+  const arrivalOld = displayedArrivalTime !== originalArrivalTime
+    ? ` <span class="old-time">${formatTime12Hour(originalArrivalTime)}</span>`
     : "";
 
-      detailDepartureTime.innerHTML = `${formatTime12Hour(displayedDepartureTime)}${departureOld}`;
-      detailArrivalTime.innerHTML = `${formatTime12Hour(displayedArrivalTime)}${arrivalOld}`;
+  detailDepartureTime.innerHTML = `${formatTime12Hour(displayedDepartureTime)}${departureOld}`;
+  detailArrivalTime.innerHTML = `${formatTime12Hour(displayedArrivalTime)}${arrivalOld}`;
 
-      const departureDiff = describeDifference(
-        flight.actualGateDeparture ? actuals.actualGateDeparture : schedule.gateDeparture,
-        flight.actualGateDeparture ? schedule.gateDeparture : originalDeparture
-      );
+  departureStatusLine.innerHTML = `
+    <span class="${departureDiff.good ? "on-time" : "late-text"}">${departureDiff.text}</span>
+    <span> • </span>
+    <span id="detailDepartureCountdown">${flight.actualGateDeparture ? departureDiff.text : formatCountdown(schedule.gateDeparture, "Departs")}</span>
+  `;
 
-      const arrivalDiff = describeDifference(
-        flight.actualGateArrival ? actuals.actualGateArrival : schedule.gateArrival,
-        flight.actualGateArrival ? schedule.gateArrival : originalArrival
-      );
-
-      departureStatusLine.innerHTML = `
-        <span class="${departureDiff.good ? "on-time" : "late-text"}">${departureDiff.text}</span>
-        <span> • </span>
-        <span id="detailDepartureCountdown">${flight.actualGateDeparture ? departureDiff.text : formatCountdown(schedule.gateDeparture, "Departs")}</span>
-      `;
-
-      arrivalStatusLine.innerHTML = `
-        <span class="${arrivalDiff.good ? "on-time" : "late-text"}">${arrivalDiff.text}</span>
-        <span> • </span>
-        <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
-      `;
-    }
+  arrivalStatusLine.innerHTML = `
+    <span class="${arrivalDiff.good ? "on-time" : "late-text"}">${arrivalDiff.text}</span>
+    <span> • </span>
+    <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
+  `;
+}
 
     function openFlightDetails(flight) {
       activeFlight = flight;
@@ -6274,10 +6276,21 @@ refreshActiveFlight(flight);
 
   const updates = {
     scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
-    scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || "",
-    originalScheduledDeparture: activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || "",
-    originalScheduledArrival: activeFlight.originalScheduledArrival || activeFlight.scheduledArrival || ""
+    scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || ""
   };
+
+  /*
+    IMPORTANT:
+    Original scheduled times should only be created if they are missing.
+    They should NOT change every time you edit the schedule.
+  */
+  if (!activeFlight.originalScheduledDeparture) {
+    updates.originalScheduledDeparture = activeFlight.scheduledDeparture || "";
+  }
+
+  if (!activeFlight.originalScheduledArrival) {
+    updates.originalScheduledArrival = activeFlight.scheduledArrival || "";
+  }
 
   saveScheduleButton.disabled = true;
   saveScheduleButton.style.opacity = "0.72";
