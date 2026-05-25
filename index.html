@@ -488,6 +488,16 @@
         0 16px 38px rgba(0, 0, 0, 0.22);
       transform: translateY(-1px);
     }
+
+    .form-field input:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.45);
+  box-shadow: none;
+  transform: none;
+}
     .toggle-field {
   min-height: 50px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -3836,37 +3846,42 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <section class="edit-flight-page" id="editFlightPage">
     <div class="edit-flight-container">
       <header class="edit-flight-header">
-        <button class="back-button" id="editBackButton" aria-label="Back to flight details">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15.53 4.47a.75.75 0 0 1 0 1.06L9.06 12l6.47 6.47a.75.75 0 1 1-1.06 1.06l-7-7a.75.75 0 0 1 0-1.06l7-7a.75.75 0 0 1 1.06 0Z" />
-          </svg>
-        </button>
+  <button class="back-button" id="editBackButton" aria-label="Back to flight details">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15.53 4.47a.75.75 0 0 1 0 1.06L9.06 12l6.47 6.47a.75.75 0 1 1-1.06 1.06l-7-7a.75.75 0 0 1 0-1.06l7-7a.75.75 0 0 1 1.06 0Z" />
+    </svg>
+  </button>
 
-        <h1 class="edit-flight-title">Edit flight</h1>
-      </header>
+  <h1 class="edit-flight-title">Edit flight</h1>
+</header>
 
-      <section class="edit-form-card">
-        <div class="edit-form-grid">
-          <div class="form-field">
-            <label for="editScheduledDeparture">Scheduled departure time</label>
-            <input id="editScheduledDeparture" type="time" />
-          </div>
+<section class="edit-form-card">
+  <div class="edit-form-grid">
+    <div class="form-field">
+      <label for="editScheduledDeparture">Scheduled departure time</label>
+      <input id="editScheduledDeparture" type="time" />
+    </div>
 
-          <div class="form-field">
-            <label for="editScheduledArrival">Scheduled arrival time</label>
-            <input id="editScheduledArrival" type="time" />
-          </div>
-        </div>
+    <div class="form-field">
+      <label for="editScheduledArrival">Scheduled arrival time</label>
+      <input id="editScheduledArrival" type="time" />
+    </div>
 
-        <div class="form-actions">
-          <button class="save-button" id="saveScheduleButton" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9.55 17.55a1.25 1.25 0 0 1-1.77 0l-4.1-4.1a1.25 1.25 0 0 1 1.77-1.77l3.21 3.22 9.89-9.9a1.25 1.25 0 0 1 1.77 1.77l-10.77 10.78Z" />
-            </svg>
-            Save
-          </button>
-        </div>
-      </section>
+    <div class="form-field">
+      <label for="editBoardingTime">Boarding time</label>
+      <input id="editBoardingTime" type="time" disabled />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="save-button" id="saveScheduleButton" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9.55 17.55a1.25 1.25 0 0 1-1.77 0l-4.1-4.1a1.25 1.25 0 0 1 1.77-1.77l3.21 3.22 9.89-9.9a1.25 1.25 0 0 1 1.77 1.77l-10.77 10.78Z" />
+      </svg>
+      Save
+    </button>
+  </div>
+</section>
 
       <section class="phase-card">
         <div class="phase-title">Flight Phase</div>
@@ -4156,8 +4171,9 @@ const deleteFlightButton = document.getElementById("deleteFlightButton");
     const editFlightPage = document.getElementById("editFlightPage");
     const editBackButton = document.getElementById("editBackButton");
     const editScheduledDeparture = document.getElementById("editScheduledDeparture");
-    const editScheduledArrival = document.getElementById("editScheduledArrival");
-    const saveScheduleButton = document.getElementById("saveScheduleButton");
+const editScheduledArrival = document.getElementById("editScheduledArrival");
+const editBoardingTime = document.getElementById("editBoardingTime");
+const saveScheduleButton = document.getElementById("saveScheduleButton");
 
     const phaseBoarding = document.getElementById("phaseBoarding");
     const phaseGateDeparture = document.getElementById("phaseGateDeparture");
@@ -6222,6 +6238,9 @@ if (!flight.premiumSeatCost) {
 latestFlightsCache.push(flight);
 refreshActiveFlight(flight);
       });
+
+renderHomeFlights();
+startFeaturedCardLiveUpdates();
     }, (error) => {
       console.error("Error loading flights:", error);
     });
@@ -6249,7 +6268,12 @@ refreshActiveFlight(flight);
       if (!activeFlight) return;
 
       editScheduledDeparture.value = activeFlight.scheduledDeparture || "";
-      editScheduledArrival.value = activeFlight.scheduledArrival || "";
+editScheduledArrival.value = activeFlight.scheduledArrival || "";
+
+const canEditBoarding = activeFlight.enableBoarding === true;
+
+editBoardingTime.value = activeFlight.boardingTime || "";
+editBoardingTime.disabled = !canEditBoarding;
 
       renderPhaseButtons(activeFlight);
 
@@ -6275,9 +6299,15 @@ refreshActiveFlight(flight);
   if (!activeFlight) return;
 
   const updates = {
-    scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
-    scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || ""
-  };
+  scheduledDeparture: editScheduledDeparture.value || activeFlight.scheduledDeparture || "",
+  scheduledArrival: editScheduledArrival.value || activeFlight.scheduledArrival || "",
+  originalScheduledDeparture: activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || "",
+  originalScheduledArrival: activeFlight.originalScheduledArrival || activeFlight.scheduledArrival || ""
+};
+
+if (activeFlight.enableBoarding === true) {
+  updates.boardingTime = editBoardingTime.value || activeFlight.boardingTime || "";
+}
 
   /*
     IMPORTANT:
