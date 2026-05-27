@@ -6684,7 +6684,9 @@ const actualGateArrivalDate = actualLandDate
   }
 
   const completedFlight = activeFlight;
-  const earnedMiles = getEarnedMiles(completedFlight);
+
+  const usedPremiumSeat = completedFlight.premiumSeat === true;
+  const earnedMiles = usedPremiumSeat ? 0 : getEarnedMiles(completedFlight);
 
   completeFlightButton.disabled = true;
   completeFlightButton.classList.add("disabled");
@@ -6693,10 +6695,11 @@ const actualGateArrivalDate = actualLandDate
     const batch = writeBatch(db);
 
     const flightRef = getFlightRef(completedFlight.id);
-    const milesBalanceRef = doc(db, "miles", "balance");
-    const transactionRef = doc(collection(db, "mileTransactions"));
 
-    if (earnedMiles > 0) {
+    if (!usedPremiumSeat && earnedMiles > 0) {
+      const milesBalanceRef = doc(db, "miles", "balance");
+      const transactionRef = doc(collection(db, "mileTransactions"));
+
       batch.set(
         milesBalanceRef,
         {
@@ -6726,7 +6729,11 @@ const actualGateArrivalDate = actualLandDate
     closeFlightDetails();
     allFlights.delete(completedFlight.id);
 
-    showNotification(`Flight completed! +${earnedMiles.toLocaleString("en-US")} miles`);
+    if (usedPremiumSeat) {
+      showNotification("Flight completed!");
+    } else {
+      showNotification(`Flight completed! +${earnedMiles.toLocaleString("en-US")} miles`);
+    }
   } catch (error) {
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
