@@ -2193,6 +2193,130 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       color: rgba(255, 255, 255, 0.48);
     }
 
+    .cbp-info-card {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.17);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+    #12121a;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.cbp-info-card:active {
+  transform: scale(0.985);
+}
+
+.cbp-info-card.hidden {
+  display: none;
+}
+
+.cbp-info-logo {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cbp-info-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.cbp-info-title {
+  color: white;
+  font-size: 17px;
+  font-weight: 820;
+  letter-spacing: -0.25px;
+  line-height: 1.08;
+}
+
+.cbp-info-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.34s ease;
+}
+
+.cbp-info-popup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cbp-info-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 220;
+  width: min(410px, calc(100% - 32px));
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(64, 156, 255, 0.14), transparent 45%),
+    rgba(13, 17, 32, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 40px) scale(0.96);
+  transition:
+    opacity 0.34s ease,
+    transform 0.46s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+  cursor: pointer;
+}
+
+.cbp-info-popup.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.cbp-info-popup-logo {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 16px;
+}
+
+.cbp-info-popup-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cbp-info-popup-title {
+  color: white;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.08;
+}
+
+.cbp-info-popup-message {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
     .timetable-card {
       margin-top: 20px;
       border-radius: 22px;
@@ -3692,6 +3816,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </div>
         </section>
 
+        <section class="cbp-info-card hidden" id="cbpInfoCard">
+  <div class="cbp-info-logo">
+    <img src="./cbp.png" alt="CBP logo" />
+  </div>
+
+  <div class="cbp-info-title">US Customs &amp; Border Protection</div>
+</section>
+
         <section class="timetable-card">
           <div class="timetable-header">
             <div class="timetable-title">Detailed Timetable</div>
@@ -4038,6 +4170,19 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </div>
 </section>
   
+  <div class="cbp-info-popup-overlay" id="cbpInfoPopupOverlay"></div>
+
+<section class="cbp-info-popup" id="cbpInfoPopup">
+  <div class="cbp-info-popup-logo">
+    <img src="./cbp.png" alt="CBP logo" />
+  </div>
+
+  <div class="cbp-info-popup-title">US Customs &amp; Border Protection</div>
+  <div class="cbp-info-popup-message" id="cbpInfoPopupMessage">
+    You must do US Customs at --
+  </div>
+</section>
+  
   <div class="notification-overlay" id="notificationOverlay"></div>
 
   <div class="flight-added-popup" id="flightAddedPopup" role="button" tabindex="0" aria-label="Dismiss flight added notification">
@@ -4076,7 +4221,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-   const cbpPage = document.getElementById("cbpPage");
+   const cbpInfoCard = document.getElementById("cbpInfoCard");
+const cbpInfoPopupOverlay = document.getElementById("cbpInfoPopupOverlay");
+const cbpInfoPopup = document.getElementById("cbpInfoPopup");
+const cbpInfoPopupMessage = document.getElementById("cbpInfoPopupMessage");
+    const cbpPage = document.getElementById("cbpPage");
 const cbpArrivalAirport = document.getElementById("cbpArrivalAirport");
 const cbpPassportName = document.getElementById("cbpPassportName");
 const cbpSubmitButton = document.getElementById("cbpSubmitButton");
@@ -4957,6 +5106,34 @@ function formatBoardingPanel(flight) {
   timezoneSubtitle.textContent = `${formatTime12Hour(flight.scheduledArrival)} EDT arrival is ${formatDateTime12Hour(convertedTime)} ${flight.cityArrival || "arrival"} time`;
 }
 
+    function updateCBPInfoCard(flight) {
+  const shouldShow = flight && flight.internationalUSArrival === true;
+
+  cbpInfoCard.classList.toggle("hidden", !shouldShow);
+
+  if (!shouldShow) {
+    return;
+  }
+
+  const arrivalAirportName =
+    flight.arrivalAirportName ||
+    flight.cityArrival ||
+    flight.arrivalAirport ||
+    "your arrival airport";
+
+  cbpInfoPopupMessage.textContent = `You must do US Customs at ${arrivalAirportName}`;
+}
+
+function openCBPInfoPopup() {
+  cbpInfoPopupOverlay.classList.add("active");
+  cbpInfoPopup.classList.add("active");
+}
+
+function closeCBPInfoPopup() {
+  cbpInfoPopupOverlay.classList.remove("active");
+  cbpInfoPopup.classList.remove("active");
+}
+
     function setActualValue(element, value, isGood) {
       if (!value) {
         element.textContent = "--";
@@ -5770,6 +5947,10 @@ function renderHomeFlights() {
         <div class="flight-date-display">${flightDate}</div>
       `;
 
+cbpInfoCard.addEventListener("click", openCBPInfoPopup);
+cbpInfoPopupOverlay.addEventListener("click", closeCBPInfoPopup);
+cbpInfoPopup.addEventListener("click", closeCBPInfoPopup);
+      
       card.addEventListener("click", () => {
         const selectedFlight = allFlights.get(flight.id);
         if (selectedFlight) {
@@ -5957,6 +6138,7 @@ setAirportRowText(
       updateMainTimes(flight);
 updateSeatCard(flight);
 updateTimezoneBox(flight);
+updateCBPInfoCard(flight);
 updateDetailCountdowns();
 updateCompleteFlightButton(flight);
       
@@ -5968,6 +6150,7 @@ updateCompleteFlightButton(flight);
           updateMainTimes(latest);
 updateSeatCard(latest);
 updateTimezoneBox(latest);
+updateCBPInfoCard(latest);
 updateDetailCountdowns();
 updateCompleteFlightButton(latest);
         }
