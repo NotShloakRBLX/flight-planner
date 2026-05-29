@@ -5715,12 +5715,15 @@ function getFeaturedDepartValue(flight) {
   const phase = getFlightPhase(flight);
   const actuals = getActualTimes(flight);
   const originalDeparture = getOriginalDepartureDateTime(flight);
+  const originalArrival = getOriginalArrivalDateTime(flight);
 
   if (phase === "gateArrival") {
+    const diff = describeDifference(actuals.actualGateArrival, originalArrival);
+
     return {
       label: "Arrived",
       value: formatTime12Hour(flight.actualGateArrival || flight.scheduledArrival),
-      className: ""
+      className: diff.good ? "good" : "bad"
     };
   }
 
