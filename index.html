@@ -4368,7 +4368,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   writeBatch,
   increment,
   getDoc,
-  setDoc
+  setDoc,
+  where,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -4584,6 +4586,7 @@ let pendingPremiumCost = 0;
     let featuredRefreshTimer = null;
     let activeSeatSelectionSessionId = "";
 let activeSeatSelectionWindow = null;
+    let activeSeatSelectionUnsubscribe = null;
 
 const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
@@ -5744,7 +5747,64 @@ function showExternalSeatConfirmPopup() {
   externalSeatConfirmPopup.classList.add("active");
 }
 
-async function createSeatMapSessionAndRedirect() {
+function watchActiveSeatSelectionSession(sessionId) {
+  if (!sessionId) return;
+
+  if (activeSeatSelectionUnsubscribe) {
+    activeSeatSelectionUnsubscribe();
+    activeSeatSelectionUnsubscribe = null;
+  }
+
+  activeSeatSelectionUnsubscribe = onSnapshot(
+    doc(db, "seatSelectionSessions", sessionId),
+    (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const session = snapshot.data();
+
+      if (
+        session.status !== "redirecting" ||
+        !session.flightDraft ||
+        !session.selectedSeat ||
+        !session.paidMiles
+      ) {
+        return;
+      }
+
+      activeSeatSelectionSessionId = sessionId;
+
+      pendingFlightToAdd = {
+        ...session.flightDraft,
+        createdAt: serverTimestamp()
+      };
+
+      pendingSeatAssignment = {
+        seat: session.selectedSeat,
+        cabin: session.selectedCabin || "First/Business",
+        premium: true,
+        premiumEconomy: false
+      };
+
+      pendingPremiumCost = Number(session.paidMiles || 0);
+
+      addFlightButton.disabled = true;
+      addFlightButton.style.opacity = "0.72";
+      addFlightButton.style.cursor = "not-allowed";
+
+      showExternalSeatConfirmPopup();
+
+      if (activeSeatSelectionUnsubscribe) {
+        activeSeatSelectionUnsubscribe();
+        activeSeatSelectionUnsubscribe = null;
+      }
+    },
+    (error) => {
+      console.error("Error watching seat selection session:", error);
+    }
+  );
+}
+    
+    async function createSeatMapSessionAndRedirect() {
   if (!pendingFlightToAdd) return;
 
   const firstBusinessLastRow = Number(pendingFlightToAdd.premiumRows || 0);
@@ -5788,7 +5848,9 @@ async function createSeatMapSessionAndRedirect() {
   try {
     await setDoc(sessionRef, sessionData);
 
-    const seatMapUrl = `${SEAT_MAP_SITE_URL}?sessionId=${encodeURIComponent(sessionId)}`;
+watchActiveSeatSelectionSession(sessionId);
+
+const seatMapUrl = `${SEAT_MAP_SITE_URL}?sessionId=${encodeURIComponent(sessionId)}`;
 
     if (activeSeatSelectionWindow) {
       activeSeatSelectionWindow.location.href = seatMapUrl;
@@ -5995,7 +6057,12 @@ async function saveFlightWithSeat({
 
     activeSeatSelectionSessionId = "";
 
-    showSeatAssignedPopup(seat, cabin);
+    externalSeatConfirmPopup.classList.remove("active");
+seatRedirectPopup.classList.remove("active");
+premiumPaymentPopup.classList.remove("active");
+cabinSelectPopup.classList.remove("active");
+
+showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
     pendingSeatAssignment = null;
