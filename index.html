@@ -2145,6 +2145,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .seat-card.premium .premium-badge {
   display: flex;
 }
+
+.seat-card.premium-economy .premium-badge {
+  display: flex;
+  background: linear-gradient(135deg, #f4f7fb, #aeb7c4, #747d8c);
+  color: #111827;
+  box-shadow: 0 14px 34px rgba(190, 198, 210, 0.22);
+}
     
     .timezone-card {
       margin-top: 24px;
@@ -3613,7 +3620,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 <div class="form-section-subtitle">Cabin row counts and window seat letters for random seat assignment.</div>
 
 <div class="form-field">
-  <label for="premiumRows">First/Business Rows</label>
+  <label for="premiumRows">First/Business Last Row</label>
   <input id="premiumRows" type="number" inputmode="numeric" min="0" placeholder="8" />
 </div>
 
@@ -3622,11 +3629,37 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <input id="premiumLetters" type="text" placeholder="A,D" />
 </div>
 
-<div class="form-field">
-  <label for="economyRows">Economy Rows</label>
-  <input id="economyRows" type="number" inputmode="numeric" min="0" placeholder="48" />
+<div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Premium Economy selection</div>
+    <div class="toggle-subtitle">Enable paid Premium Economy cabin option</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="premiumEconomyToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
 </div>
 
+<div class="boarding-options" id="premiumEconomyOptions">
+  <div class="boarding-options-inner">
+    <div class="form-field">
+      <label for="premiumEconomyLastRow">Premium Economy Last Row</label>
+      <input id="premiumEconomyLastRow" type="number" inputmode="numeric" min="0" placeholder="14" />
+    </div>
+
+    <div class="form-field">
+      <label for="premiumEconomyLetters">Premium Economy Window Letters</label>
+      <input id="premiumEconomyLetters" type="text" placeholder="A,L" />
+    </div>
+  </div>
+</div>
+
+<div class="form-field">
+  <label for="economyRows">Economy Last Row</label>
+  <input id="economyRows" type="number" inputmode="numeric" min="0" placeholder="48" />
+</div>
+          
 <div class="form-field">
   <label for="economyLetters">Economy Window Letters</label>
   <input id="economyLetters" type="text" placeholder="A,J" />
@@ -4111,16 +4144,21 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <div class="seat-popup-title">Choose cabin</div>
   <div class="seat-popup-subtitle">Select a cabin before adding this flight.</div>
 
-  <div class="cabin-choice-grid">
-    <button class="cabin-choice-button" id="chooseEconomyButton" type="button">
-      <div class="cabin-choice-title">Economy</div>
-      <div class="cabin-choice-subtitle">Free seat assignment</div>
-    </button>
+  <button class="cabin-choice-button" id="chooseEconomyButton" type="button">
+  <div class="cabin-choice-title">Economy</div>
+  <div class="cabin-choice-subtitle">Free seat assignment</div>
+</button>
 
-    <button class="cabin-choice-button" id="choosePremiumButton" type="button">
-      <div class="cabin-choice-title">First/Business</div>
-      <div class="cabin-choice-subtitle">Premium seat selection using miles</div>
-    </button>
+<button class="cabin-choice-button" id="choosePremiumEconomyButton" type="button">
+  <div class="cabin-choice-title">Premium Economy</div>
+  <div class="cabin-choice-subtitle">Extra comfort seat selection using miles</div>
+</button>
+
+<button class="cabin-choice-button" id="choosePremiumButton" type="button">
+  <div class="cabin-choice-title">First/Business</div>
+  <div class="cabin-choice-subtitle">Premium seat selection using miles</div>
+</button>
+
   </div>
 </section>
 
@@ -4268,6 +4306,7 @@ const transactionDeleteButton = document.getElementById("transactionDeleteButton
   const seatFlowOverlay = document.getElementById("seatFlowOverlay");
 const cabinSelectPopup = document.getElementById("cabinSelectPopup");
 const chooseEconomyButton = document.getElementById("chooseEconomyButton");
+const choosePremiumEconomyButton = document.getElementById("choosePremiumEconomyButton");
 const choosePremiumButton = document.getElementById("choosePremiumButton");
 const premiumPaymentPopup = document.getElementById("premiumPaymentPopup");
 const premiumBalanceDisplay = document.getElementById("premiumBalanceDisplay");
@@ -4374,8 +4413,15 @@ const flightTimeInput = document.getElementById("flightTime");
 const routeDistanceInput = document.getElementById("routeDistance");
 const premiumRowsInput = document.getElementById("premiumRows");
 const premiumLettersInput = document.getElementById("premiumLetters");
+
+const premiumEconomyToggle = document.getElementById("premiumEconomyToggle");
+const premiumEconomyOptions = document.getElementById("premiumEconomyOptions");
+const premiumEconomyLastRowInput = document.getElementById("premiumEconomyLastRow");
+const premiumEconomyLettersInput = document.getElementById("premiumEconomyLetters");
+
 const economyRowsInput = document.getElementById("economyRows");
 const economyLettersInput = document.getElementById("economyLetters");
+
 const overnightToggle = document.getElementById("overnightToggle");
 const timezoneDifferenceInput = document.getElementById("timezoneDifference");
 const edtArrivalToggle = document.getElementById("edtArrivalToggle");
@@ -4415,6 +4461,15 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   if (!enableBoardingToggle.checked) {
     boardingTimeInput.value = "";
     boardingDurationInput.value = "";
+  }
+});
+
+    premiumEconomyToggle.addEventListener("change", () => {
+  premiumEconomyOptions.classList.toggle("active", premiumEconomyToggle.checked);
+
+  if (!premiumEconomyToggle.checked) {
+    premiumEconomyLastRowInput.value = "";
+    premiumEconomyLettersInput.value = "";
   }
 });
 
@@ -5380,23 +5435,53 @@ function getRandomSeatFromCabin(startRow, rowCount, lettersText) {
 }
 
 function assignEconomySeatFromFlight(flight) {
-  const premiumRows = Number(flight.premiumRows || 0);
-  const maxEconomyRow = Number(flight.economyRows || 0);
+  const firstBusinessLastRow = Number(flight.premiumRows || 0);
+  const premiumEconomyLastRow = Number(flight.premiumEconomyLastRow || 0);
+  const economyLastRow = Number(flight.economyRows || 0);
   const letters = parseSeatLetters(flight.economyLetters);
 
-  const economyStartRow = premiumRows + 1;
+  const economyStartRow = flight.premiumEconomyEnabled === true
+    ? premiumEconomyLastRow + 1
+    : firstBusinessLastRow + 1;
 
   if (
-    !Number.isFinite(premiumRows) ||
-    !Number.isFinite(maxEconomyRow) ||
-    maxEconomyRow <= 0 ||
-    economyStartRow > maxEconomyRow ||
+    !Number.isFinite(firstBusinessLastRow) ||
+    !Number.isFinite(economyLastRow) ||
+    economyLastRow <= 0 ||
+    economyStartRow > economyLastRow ||
     letters.length === 0
   ) {
     return "";
   }
 
-  const row = getRandomInteger(economyStartRow, maxEconomyRow);
+  const row = getRandomInteger(economyStartRow, economyLastRow);
+  const letter = letters[Math.floor(Math.random() * letters.length)];
+
+  return `${row}${letter}`;
+}
+
+    function assignPremiumEconomySeatFromFlight(flight) {
+  if (flight.premiumEconomyEnabled !== true) {
+    return "";
+  }
+
+  const firstBusinessLastRow = Number(flight.premiumRows || 0);
+  const premiumEconomyLastRow = Number(flight.premiumEconomyLastRow || 0);
+  const letters = parseSeatLetters(flight.premiumEconomyLetters);
+
+  const premiumEconomyStartRow = firstBusinessLastRow + 1;
+
+  if (
+    !Number.isFinite(firstBusinessLastRow) ||
+    !Number.isFinite(premiumEconomyLastRow) ||
+    premiumEconomyLastRow <= firstBusinessLastRow ||
+    premiumEconomyStartRow > premiumEconomyLastRow ||
+    letters.length === 0
+  ) {
+    return "";
+  }
+
+  const row = getRandomInteger(premiumEconomyStartRow, premiumEconomyLastRow);
   const letter = letters[Math.floor(Math.random() * letters.length)];
 
   return `${row}${letter}`;
@@ -5443,6 +5528,12 @@ function assignPremiumSeatFromFlight(flight) {
   return getRandomInteger(18000, 26000);
 }
 
+    function getPremiumEconomySeatCost(routeDistance) {
+  const premiumCost = getPremiumSeatCost(routeDistance);
+
+  return Math.round(premiumCost * 0.45);
+}
+
 function closeSeatPopups() {
   seatFlowOverlay.classList.remove("active");
   cabinSelectPopup.classList.remove("active");
@@ -5455,6 +5546,10 @@ function showCabinSelectPopup() {
   cabinSelectPopup.classList.add("active");
   premiumPaymentPopup.classList.remove("active");
   seatAssignedPopup.classList.remove("active");
+  
+  choosePremiumEconomyButton.style.display = pendingFlightToAdd?.premiumEconomyEnabled === true
+  ? "block"
+  : "none";
 }
 
 function showSeatAssignedPopup(seat, cabin) {
@@ -5486,6 +5581,7 @@ async function saveFlightWithSeat({
   cabin,
   seat,
   isPremium,
+  isPremiumEconomy = false,
   milesCost = 0
 }) {
   if (!pendingFlightToAdd) return;
@@ -5495,6 +5591,7 @@ async function saveFlightWithSeat({
     assignedSeat: seat,
     seatCabin: cabin,
     premiumSeat: isPremium,
+    premiumEconomySeat: isPremiumEconomy,
     premiumSeatCost: milesCost
   };
 
@@ -5519,7 +5616,7 @@ async function saveFlightWithSeat({
 
       batch.set(transactionRef, {
         type: "spent",
-        title: "Premium Seat Selection",
+        title: isPremiumEconomy ? "Premium Economy Seat Selection" : "Premium Seat Selection",
         amount: milesCost,
         airline: flightToSave.airline || "",
         flightNumber: flightToSave.flightNumber || "",
@@ -5568,14 +5665,16 @@ showSeatAssignedPopup(seat, cabin);
 function updateSeatCard(flight) {
   if (!flight.assignedSeat) {
     seatCard.classList.add("hidden");
-    seatCard.classList.remove("premium");
+    seatCard.classList.remove("premium", "premium-economy");
     seatValue.textContent = "--";
     seatCabin.textContent = "--";
     return;
   }
 
   seatCard.classList.remove("hidden");
-  seatCard.classList.toggle("premium", flight.premiumSeat === true);
+  seatCard.classList.toggle("premium", flight.premiumSeat === true && flight.premiumEconomySeat !== true);
+  seatCard.classList.toggle("premium-economy", flight.premiumEconomySeat === true);
+
   seatValue.textContent = flight.assignedSeat;
   seatCabin.textContent = flight.seatCabin || "Economy";
 }
@@ -6204,9 +6303,14 @@ updateCompleteFlightButton(latest);
     airTime: airTimeInput.value.trim() || "",
     routeDistance: routeDistanceInput.value.trim() || "",
     premiumRows: premiumRowsInput.value.trim() || "",
-    premiumLetters: premiumLettersInput.value.trim().toUpperCase() || "",
-    economyRows: economyRowsInput.value.trim() || "",
-    economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
+premiumLetters: premiumLettersInput.value.trim().toUpperCase() || "",
+
+premiumEconomyEnabled: premiumEconomyToggle.checked,
+premiumEconomyLastRow: premiumEconomyToggle.checked ? premiumEconomyLastRowInput.value.trim() || "" : "",
+premiumEconomyLetters: premiumEconomyToggle.checked ? premiumEconomyLettersInput.value.trim().toUpperCase() || "" : "",
+
+economyRows: economyRowsInput.value.trim() || "",
+economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
     overnight: overnightToggle.checked,
     timezoneDifference: timezoneDifferenceInput.value.trim() || "",
 edtOffset: edtArrivalToggle.checked ? "" : edtOffsetInput.value.trim() || "",
@@ -6344,6 +6448,22 @@ latestFlightsCache = [];
           ...snapshotDoc.data()
         };
 
+        if (flight.premiumEconomyEnabled !== true) {
+  flight.premiumEconomyEnabled = false;
+}
+
+if (!flight.premiumEconomyLastRow) {
+  flight.premiumEconomyLastRow = "";
+}
+
+if (!flight.premiumEconomyLetters) {
+  flight.premiumEconomyLetters = "";
+}
+
+if (flight.premiumEconomySeat !== true) {
+  flight.premiumEconomySeat = false;
+}
+        
         if (!flight.originalScheduledDeparture) {
           flight.originalScheduledDeparture = flight.scheduledDeparture;
         }
@@ -7120,6 +7240,32 @@ seatAssignedPopup.addEventListener("click", () => {
   showNotification("Flight added!");
 });
 
+choosePremiumEconomyButton.addEventListener("click", () => {
+  if (!pendingFlightToAdd) return;
+
+  const seat = assignPremiumEconomySeatFromFlight(pendingFlightToAdd);
+
+  if (!seat) {
+    alert("Premium Economy seat could not be assigned. Check Premium Economy Last Row and Premium Economy Window Letters.");
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+    closeSeatPopups();
+    return;
+  }
+
+  pendingSeatAssignment = {
+    seat,
+    cabin: "Premium Economy",
+    premium: true,
+    premiumEconomy: true
+  };
+
+  pendingPremiumCost = getPremiumEconomySeatCost(getRouteDistanceMiles(pendingFlightToAdd));
+
+  showPremiumPaymentPopup();
+});
+    
 chooseEconomyButton.addEventListener("click", async () => {
   if (!pendingFlightToAdd) return;
 
@@ -7189,10 +7335,11 @@ premiumPayButton.addEventListener("click", async () => {
   premiumPayButton.disabled = true;
 
   await saveFlightWithSeat({
-    cabin: "First/Business",
-    seat: pendingSeatAssignment.seat,
-    isPremium: true,
-    milesCost: pendingPremiumCost
+    cabin: pendingSeatAssignment.cabin,
+seat: pendingSeatAssignment.seat,
+isPremium: true,
+isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
+milesCost: pendingPremiumCost
   });
 
   premiumPayButton.disabled = false;
