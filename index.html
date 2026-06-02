@@ -3410,6 +3410,65 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   font-weight: 950;
 }
 
+.seat-redirect-loader {
+  margin-top: 20px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.14);
+  border-top-color: #16e18a;
+  animation: seatRedirectSpin 0.9s linear infinite;
+}
+
+@keyframes seatRedirectSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.external-seat-summary {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(64, 156, 255, 0.14), transparent 45%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.external-seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+}
+
+.external-seat-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.external-seat-label {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.25px;
+  text-transform: uppercase;
+}
+
+.external-seat-value {
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.45px;
+  text-align: right;
+}
+
+.external-seat-value.price {
+  color: #16e18a;
+}
+    
   </style>
 </head>
 
@@ -4220,6 +4279,41 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <div class="assigned-seat-cabin" id="assignedSeatCabin">--</div>
   </div>
 </section>
+
+  <section class="seat-popup" id="seatRedirectPopup">
+  <div class="seat-popup-title">Redirecting to seat map...</div>
+  <div class="seat-popup-subtitle">Your First/Business seat selection is opening in a new tab.</div>
+  <div class="seat-redirect-loader"></div>
+</section>
+
+<section class="seat-popup" id="externalSeatConfirmPopup">
+  <div class="seat-popup-title">Confirm Seat</div>
+  <div class="seat-popup-subtitle">Review your selected First/Business seat before adding this flight.</div>
+
+  <div class="external-seat-summary">
+    <div class="external-seat-row">
+      <div class="external-seat-label">Seat</div>
+      <div class="external-seat-value" id="externalSeatNumberDisplay">--</div>
+    </div>
+
+    <div class="external-seat-row">
+      <div class="external-seat-label">Cabin</div>
+      <div class="external-seat-value" id="externalSeatCabinDisplay">First/Business</div>
+    </div>
+
+    <div class="external-seat-row">
+      <div class="external-seat-label">Miles Paid</div>
+      <div class="external-seat-value price" id="externalSeatPriceDisplay">0 mi</div>
+    </div>
+  </div>
+
+  <div class="insufficient-text" id="externalSeatInsufficientText">Insufficient balance</div>
+
+  <div class="seat-popup-actions">
+    <button class="seat-cancel-button" id="cancelExternalSeatButton" type="button">Cancel</button>
+    <button class="seat-pay-button" id="confirmExternalSeatButton" type="button">Confirm</button>
+  </div>
+</section>
   
   <div class="transaction-edit-overlay" id="transactionEditOverlay"></div>
 
@@ -4272,7 +4366,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   deleteDoc,
   doc,
   writeBatch,
-  increment
+  increment,
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -4346,6 +4442,14 @@ const premiumPayButton = document.getElementById("premiumPayButton");
 const seatAssignedPopup = document.getElementById("seatAssignedPopup");
 const assignedSeatBig = document.getElementById("assignedSeatBig");
 const assignedSeatCabin = document.getElementById("assignedSeatCabin");
+const seatRedirectPopup = document.getElementById("seatRedirectPopup");
+const externalSeatConfirmPopup = document.getElementById("externalSeatConfirmPopup");
+const externalSeatNumberDisplay = document.getElementById("externalSeatNumberDisplay");
+const externalSeatCabinDisplay = document.getElementById("externalSeatCabinDisplay");
+const externalSeatPriceDisplay = document.getElementById("externalSeatPriceDisplay");
+const externalSeatInsufficientText = document.getElementById("externalSeatInsufficientText");
+const cancelExternalSeatButton = document.getElementById("cancelExternalSeatButton");
+const confirmExternalSeatButton = document.getElementById("confirmExternalSeatButton");
 
 const editButton = document.getElementById("editButton");
 const backButton = document.getElementById("backButton");
@@ -4478,6 +4582,11 @@ let pendingPremiumCost = 0;
     let currentCBPLock = null;
     let latestFlightsCache = [];
     let featuredRefreshTimer = null;
+    let activeSeatSelectionSessionId = "";
+let activeSeatSelectionWindow = null;
+
+const SEAT_MAP_SITE_URL = "https://shloakrlbx.github.io/msfs-seat-map/";
+const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -5567,6 +5676,8 @@ function closeSeatPopups() {
   cabinSelectPopup.classList.remove("active");
   premiumPaymentPopup.classList.remove("active");
   seatAssignedPopup.classList.remove("active");
+  seatRedirectPopup.classList.remove("active");
+  externalSeatConfirmPopup.classList.remove("active");
 }
 
 function showCabinSelectPopup() {
@@ -5605,12 +5716,189 @@ premiumCostDisplay.textContent = `${pendingPremiumCost.toLocaleString("en-US")} 
   premiumPayButton.disabled = !hasEnoughMiles;
 }
 
+    function showSeatRedirectPopup() {
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+  externalSeatConfirmPopup.classList.remove("active");
+  seatRedirectPopup.classList.add("active");
+}
+
+function showExternalSeatConfirmPopup() {
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+  seatRedirectPopup.classList.remove("active");
+
+  externalSeatNumberDisplay.textContent = pendingSeatAssignment?.seat || "--";
+  externalSeatCabinDisplay.textContent = pendingSeatAssignment?.cabin || "First/Business";
+  externalSeatPriceDisplay.textContent = `${Number(pendingPremiumCost || 0).toLocaleString("en-US")} mi`;
+
+  const hasEnoughMiles = currentMilesBalance >= pendingPremiumCost;
+
+  externalSeatInsufficientText.classList.toggle("active", !hasEnoughMiles);
+  confirmExternalSeatButton.disabled = !hasEnoughMiles;
+
+  externalSeatConfirmPopup.classList.add("active");
+}
+
+async function createSeatMapSessionAndRedirect() {
+  if (!pendingFlightToAdd) return;
+
+  const firstBusinessLastRow = Number(pendingFlightToAdd.premiumRows || 0);
+
+  if (!Number.isFinite(firstBusinessLastRow) || firstBusinessLastRow <= 0) {
+    alert("First/Business seat map could not be created. Check First/Business Last Row.");
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+    closeSeatPopups();
+    return;
+  }
+
+  showSeatRedirectPopup();
+
+  activeSeatSelectionWindow = window.open("about:blank", "_blank");
+
+  const sessionRef = doc(collection(db, "seatSelectionSessions"));
+  const sessionId = sessionRef.id;
+
+  const sessionData = {
+    status: "selecting",
+    flightDraft: pendingFlightToAdd,
+    airline: pendingFlightToAdd.airline || "",
+    flightNumber: pendingFlightToAdd.flightNumber || "",
+    departureAirport: pendingFlightToAdd.departureAirport || "",
+    arrivalAirport: pendingFlightToAdd.arrivalAirport || "",
+    flightDate: pendingFlightToAdd.flightDate || "",
+    flightDateRaw: pendingFlightToAdd.flightDateRaw || "",
+    routeDistanceMiles: getRouteDistanceMiles(pendingFlightToAdd),
+    firstBusinessLastRow,
+    returnUrl: MAIN_SITE_RETURN_URL,
+    selectedSeat: "",
+    selectedCabin: "",
+    paidMiles: 0,
+    aircraftType: "",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    await setDoc(sessionRef, sessionData);
+
+    const seatMapUrl = `${SEAT_MAP_SITE_URL}?sessionId=${encodeURIComponent(sessionId)}`;
+
+    if (activeSeatSelectionWindow) {
+      activeSeatSelectionWindow.location.href = seatMapUrl;
+    } else {
+      window.location.href = seatMapUrl;
+    }
+  } catch (error) {
+    console.error("Error creating seat map session:", error);
+    alert("Seat map session could not be created. Check Firestore rules.");
+
+    if (activeSeatSelectionWindow) {
+      activeSeatSelectionWindow.close();
+    }
+
+    addFlightButton.disabled = false;
+    addFlightButton.style.opacity = "1";
+    addFlightButton.style.cursor = "pointer";
+    closeSeatPopups();
+  }
+}
+
+async function processReturnedSeatSelection() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("seatSessionId");
+
+  if (!sessionId) return;
+
+  window.history.replaceState({}, document.title, MAIN_SITE_RETURN_URL);
+
+  try {
+    const sessionRef = doc(db, "seatSelectionSessions", sessionId);
+    const snapshot = await getDoc(sessionRef);
+
+    if (!snapshot.exists()) {
+      showNotification("Seat session not found!");
+      return;
+    }
+
+    const session = snapshot.data();
+
+    if (session.status === "completed") {
+      showNotification("Seat already confirmed!");
+      return;
+    }
+
+    if (!session.flightDraft || !session.selectedSeat || !session.paidMiles) {
+      showNotification("Seat selection incomplete!");
+      return;
+    }
+
+    activeSeatSelectionSessionId = sessionId;
+
+    pendingFlightToAdd = {
+      ...session.flightDraft,
+      createdAt: serverTimestamp()
+    };
+
+    pendingSeatAssignment = {
+      seat: session.selectedSeat,
+      cabin: session.selectedCabin || "First/Business",
+      premium: true,
+      premiumEconomy: false
+    };
+
+    pendingPremiumCost = Number(session.paidMiles || 0);
+
+    addFlightButton.disabled = true;
+    addFlightButton.style.opacity = "0.72";
+    addFlightButton.style.cursor = "not-allowed";
+
+    showExternalSeatConfirmPopup();
+  } catch (error) {
+    console.error("Error loading returned seat session:", error);
+    showNotification("Seat session could not be loaded!");
+  }
+}
+
+async function cancelExternalSeatSelection() {
+  const sessionId = activeSeatSelectionSessionId;
+
+  closeSeatPopups();
+
+  pendingSeatAssignment = null;
+  pendingPremiumCost = 0;
+  pendingFlightToAdd = null;
+  activeSeatSelectionSessionId = "";
+
+  addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1";
+  addFlightButton.style.cursor = "pointer";
+
+  if (!sessionId) return;
+
+  try {
+    await updateDoc(doc(db, "seatSelectionSessions", sessionId), {
+      status: "canceled",
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Error canceling seat selection:", error);
+  }
+}
+
 async function saveFlightWithSeat({
   cabin,
   seat,
   isPremium,
   isPremiumEconomy = false,
-  milesCost = 0
+  milesCost = 0,
+  seatSelectionSessionId = ""
 }) {
   if (!pendingFlightToAdd) return;
 
@@ -5624,12 +5912,16 @@ async function saveFlightWithSeat({
   };
 
   try {
+    let savedFlightId = "";
+
     if (isPremium && milesCost > 0) {
       const batch = writeBatch(db);
 
       const flightRef = doc(collection(db, "flights"));
       const milesBalanceRef = doc(db, "miles", "balance");
       const transactionRef = doc(collection(db, "mileTransactions"));
+
+      savedFlightId = flightRef.id;
 
       batch.set(flightRef, flightToSave);
 
@@ -5655,26 +5947,55 @@ async function saveFlightWithSeat({
         createdAt: serverTimestamp()
       });
 
+      if (seatSelectionSessionId) {
+        batch.set(
+          doc(db, "seatSelectionSessions", seatSelectionSessionId),
+          {
+            status: "completed",
+            finalizedFlightId: savedFlightId,
+            finalizedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      }
+
       await batch.commit();
     } else {
-      await addDoc(collection(db, "flights"), flightToSave);
+      const createdFlight = await addDoc(collection(db, "flights"), flightToSave);
+      savedFlightId = createdFlight.id;
+
+      if (seatSelectionSessionId) {
+        await updateDoc(doc(db, "seatSelectionSessions", seatSelectionSessionId), {
+          status: "completed",
+          finalizedFlightId: savedFlightId,
+          finalizedAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }
     }
 
     flightForm.reset();
 
-if (boardingOptions) {
-  boardingOptions.classList.remove("active");
-}
+    if (boardingOptions) {
+      boardingOptions.classList.remove("active");
+    }
 
-if (edtOffsetOptions) {
-  edtOffsetOptions.classList.remove("active");
-}
+    if (premiumEconomyOptions) {
+      premiumEconomyOptions.classList.remove("active");
+    }
 
-if (edtOffsetInput) {
-  edtOffsetInput.value = "";
-}
+    if (edtOffsetOptions) {
+      edtOffsetOptions.classList.remove("active");
+    }
 
-showSeatAssignedPopup(seat, cabin);
+    if (edtOffsetInput) {
+      edtOffsetInput.value = "";
+    }
+
+    activeSeatSelectionSessionId = "";
+
+    showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
     pendingSeatAssignment = null;
@@ -7322,29 +7643,10 @@ chooseEconomyButton.addEventListener("click", async () => {
   });
 });
 
-choosePremiumButton.addEventListener("click", () => {
+choosePremiumButton.addEventListener("click", async () => {
   if (!pendingFlightToAdd) return;
 
-  const seat = assignPremiumSeatFromFlight(pendingFlightToAdd);
-
-  if (!seat) {
-    alert("Premium seat could not be assigned. Check First/Business Rows and First/Business Window Letters.");
-    addFlightButton.disabled = false;
-    addFlightButton.style.opacity = "1";
-    addFlightButton.style.cursor = "pointer";
-    closeSeatPopups();
-    return;
-  }
-
-  pendingSeatAssignment = {
-    seat,
-    cabin: "First/Business",
-    premium: true
-  };
-
-  pendingPremiumCost = getPremiumSeatCost(getRouteDistanceMiles(pendingFlightToAdd));
-
-  showPremiumPaymentPopup();
+  await createSeatMapSessionAndRedirect();
 });
 
 premiumCancelButton.addEventListener("click", () => {
@@ -7371,6 +7673,35 @@ milesCost: pendingPremiumCost
   });
 
   premiumPayButton.disabled = false;
+});
+
+    cancelExternalSeatButton.addEventListener("click", cancelExternalSeatSelection);
+
+confirmExternalSeatButton.addEventListener("click", async () => {
+  if (!pendingFlightToAdd || !pendingSeatAssignment || !activeSeatSelectionSessionId) {
+    return;
+  }
+
+  if (currentMilesBalance < pendingPremiumCost) {
+    externalSeatInsufficientText.classList.add("active");
+    confirmExternalSeatButton.disabled = true;
+    return;
+  }
+
+  confirmExternalSeatButton.disabled = true;
+  confirmExternalSeatButton.style.opacity = "0.72";
+
+  await saveFlightWithSeat({
+    cabin: pendingSeatAssignment.cabin,
+    seat: pendingSeatAssignment.seat,
+    isPremium: true,
+    isPremiumEconomy: false,
+    milesCost: pendingPremiumCost,
+    seatSelectionSessionId: activeSeatSelectionSessionId
+  });
+
+  confirmExternalSeatButton.disabled = false;
+  confirmExternalSeatButton.style.opacity = "1";
 });
     
     transactionEditOverlay.addEventListener("click", closeTransactionEditor);
@@ -7478,6 +7809,8 @@ transactionDeleteButton.addEventListener("click", async () => {
     transactionDeleteButton.disabled = false;
   }
 });
+    
+    processReturnedSeatSelection();
     
     deleteFlightButton.addEventListener("click", async () => {
       if (!activeFlight) return;
