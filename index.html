@@ -2749,48 +2749,49 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   line-height: 1.25;
 }
 
-.cabin-choice-grid {
-  margin-top: 20px;
-  display: grid;
-  gap: 12px;
+.cabin-select-popup {
+  width: min(92vw, 540px);
+  padding: 28px 28px 24px;
+  border-radius: 30px;
+}
+
+.cabin-select-popup .popup-title {
+  margin-bottom: 8px;
+}
+
+.cabin-select-popup .popup-subtitle {
+  margin-bottom: 20px;
+}
+
+.cabin-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .cabin-choice-button {
   width: 100%;
-  min-height: 72px;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
-    rgba(255, 255, 255, 0.04);
-  color: white;
-  cursor: pointer;
+  min-height: 108px;
+  padding: 22px 24px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   text-align: left;
-  padding: 16px;
-  transition: transform 0.25s ease, border-color 0.25s ease, filter 0.25s ease;
-}
-
-.cabin-choice-button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.22);
-  filter: brightness(1.04);
-}
-
-.cabin-choice-button:active {
-  transform: scale(0.98);
 }
 
 .cabin-choice-title {
-  font-size: 18px;
-  font-weight: 850;
-  letter-spacing: -0.25px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 8px;
 }
 
 .cabin-choice-subtitle {
-  margin-top: 5px;
-  color: rgba(255, 255, 255, 0.48);
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  opacity: 0.92;
 }
 
 .payment-card {
