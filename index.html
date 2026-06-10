@@ -3742,12 +3742,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
 .world-cup-info-card {
-  margin-top: 14px;
+  margin-top: 24px;
   padding: 14px 16px;
   border-radius: 22px;
-  border: 2px solid rgba(255, 215, 80, 0.26);
+  border: 2px solid rgba(255, 255, 255, 0.17);
   background:
-    radial-gradient(circle at top left, rgba(255, 215, 80, 0.10), transparent 44%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
     #12121a;
   display: grid;
@@ -3756,7 +3755,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   gap: 12px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
   cursor: pointer;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
 }
 
 .world-cup-info-card:active {
@@ -3768,17 +3767,16 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
 .world-cup-info-logo {
-  width: 64px;
-  height: 64px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(4px);
 }
 
 .world-cup-info-logo img {
-  width: 68px;
-  height: 68px;
+  width: 42px;
+  height: 42px;
   object-fit: contain;
   display: block;
 }
@@ -3786,7 +3784,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .world-cup-info-title {
   color: white;
   font-size: 17px;
-  font-weight: 850;
+  font-weight: 820;
   letter-spacing: -0.25px;
   line-height: 1.08;
 }
