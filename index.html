@@ -3262,7 +3262,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     line-height: 1.15;
   }
 }
-
+    
     @media (max-width: 760px) {
       .add-flight-page,
       .edit-flight-page {
@@ -3882,6 +3882,16 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .world-cup-insufficient.active {
   display: block;
 }
+
+    #worldCupPopupOverlay {
+  z-index: 230;
+}
+
+    #worldCupPaymentPopup,
+    #worldCupDetailsPopup,
+    #worldCupWinnerPopup {
+      z-index: 240;
+    }
 
 @media (max-width: 760px) {
   .world-cup-options-inner {
