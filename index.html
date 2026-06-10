@@ -24,7 +24,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font-family: inherit;
     }
 
@@ -450,6 +451,45 @@
       letter-spacing: 0.15px;
     }
 
+    .form-field select {
+  width: 100%;
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  outline: none;
+  padding: 0 14px;
+  background: rgba(5, 10, 24, 0.58);
+  color: white;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.1px;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.form-field select option {
+  background: #070b18;
+  color: white;
+}
+
+.form-field select:hover {
+  background: rgba(8, 15, 34, 0.72);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-field select:focus {
+  border-color: rgba(255, 215, 80, 0.95);
+  background: rgba(8, 15, 34, 0.86);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 80, 0.34),
+    0 0 0 5px rgba(255, 215, 80, 0.12),
+    0 16px 38px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+    
     .form-field input {
       width: 100%;
       height: 50px;
@@ -3468,6 +3508,386 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .external-seat-value.price {
   color: #16e18a;
 }
+
+    .world-cup-options {
+  grid-column: 1 / -1;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition:
+    max-height 0.42s ease,
+    opacity 0.34s ease,
+    transform 0.42s ease;
+}
+
+.world-cup-options.active {
+  max-height: 260px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.world-cup-options-inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  padding-top: 4px;
+}
+
+.world-cup-page {
+  position: fixed;
+  inset: 0;
+  z-index: 205;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.16), transparent 32%),
+    radial-gradient(circle at top right, rgba(0, 115, 255, 0.16), transparent 34%),
+    radial-gradient(circle at bottom, rgba(22, 225, 138, 0.10), transparent 36%),
+    #060a15;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(28px);
+  transition:
+    opacity 0.38s ease,
+    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.world-cup-page.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.world-cup-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 34px 20px 42px;
+}
+
+.world-cup-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.world-cup-brand img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.32));
+}
+
+.world-cup-title {
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -0.85px;
+}
+
+.world-cup-line {
+  width: 100%;
+  height: 1px;
+  margin-top: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 215, 80, 0.72),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+
+.world-cup-form-box {
+  margin-top: 28px;
+  padding: 22px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.12), transparent 44%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.035)),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.world-cup-match-title {
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: -0.7px;
+  text-align: center;
+}
+
+.world-cup-match-subtitle {
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.world-cup-field {
+  margin-top: 18px;
+}
+
+.world-cup-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15px;
+}
+
+.world-cup-field input,
+.world-cup-field select {
+  width: 100%;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 17px;
+  outline: none;
+  padding: 0 15px;
+  background: rgba(5, 10, 24, 0.68);
+  color: white;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.world-cup-field select option {
+  background: #070b18;
+}
+
+.world-cup-balance-text {
+  margin-top: 9px;
+  color: rgba(255, 215, 80, 0.82);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.world-cup-prediction-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.world-cup-choice {
+  min-height: 54px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.04);
+  color: white;
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.world-cup-choice.active {
+  border-color: rgba(255, 215, 80, 0.62);
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.22), transparent 44%),
+    rgba(255, 255, 255, 0.07);
+}
+
+.world-cup-choice:active {
+  transform: scale(0.97);
+}
+
+.world-cup-submit {
+  width: 100%;
+  height: 56px;
+  margin-top: 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #16e18a, #0fbf75, #069b61);
+  color: white;
+  font-size: 16px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow:
+    0 18px 42px rgba(12, 190, 113, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.world-cup-submit svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+.world-cup-submit:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.world-cup-info-card {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 215, 80, 0.26);
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.10), transparent 44%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+    #12121a;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.world-cup-info-card:active {
+  transform: scale(0.985);
+}
+
+.world-cup-info-card.hidden {
+  display: none;
+}
+
+.world-cup-info-logo {
+  width: 34px;
+  height: 34px;
+}
+
+.world-cup-info-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.world-cup-info-title {
+  color: white;
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -0.25px;
+  line-height: 1.08;
+}
+
+.world-cup-info-subtitle {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.world-cup-featured-card {
+  border-color: rgba(255, 215, 80, 0.20);
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.20), transparent 34%),
+    radial-gradient(circle at top right, rgba(0, 115, 255, 0.18), transparent 34%),
+    radial-gradient(circle at bottom, rgba(22, 225, 138, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(15, 19, 38, 0.98), rgba(5, 9, 22, 0.98));
+}
+
+.world-cup-featured-card .featured-status-flag {
+  background: linear-gradient(135deg, #ffd43b, #ffe066, #f4c430);
+  box-shadow: 0 14px 34px rgba(255, 212, 59, 0.24);
+}
+
+.world-cup-stadium-name {
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.9px;
+  line-height: 1.03;
+}
+
+.world-cup-location-line {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  font-weight: 760;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.world-cup-button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.world-cup-button-row .featured-view-button:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.world-cup-payment-card,
+.world-cup-details-card {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.14), transparent 45%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.world-cup-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+}
+
+.world-cup-detail-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.world-cup-detail-label {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.world-cup-detail-value {
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.world-cup-detail-value.gold {
+  color: #ffd43b;
+}
+
+.world-cup-detail-value.green {
+  color: #16e18a;
+}
+
+.world-cup-insufficient {
+  display: none;
+  margin-top: 14px;
+  color: #ff4b4b;
+  font-size: 14px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.world-cup-insufficient.active {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .world-cup-options-inner {
+    grid-template-columns: 1fr;
+  }
+}
     
   </style>
 </head>
@@ -3523,6 +3943,68 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <button class="cbp-submit-button" id="cbpSubmitButton" type="button">
       Submit Form
     </button>
+  </div>
+</section>
+
+  <section class="world-cup-page" id="worldCupPage">
+  <div class="world-cup-shell">
+    <div class="world-cup-brand">
+      <img src="./fifa.png" alt="FIFA World Cup logo" />
+      <div class="world-cup-title">FIFA World Cup</div>
+    </div>
+
+    <div class="world-cup-line"></div>
+
+    <section class="world-cup-form-box">
+      <div class="world-cup-match-title" id="worldCupSetupMatchTitle">Team 1 vs Team 2</div>
+      <div class="world-cup-match-subtitle">Set your stadium details and lock in your match prediction.</div>
+
+      <div class="world-cup-field">
+        <label for="worldCupStadiumInput">Stadium</label>
+        <input id="worldCupStadiumInput" type="text" placeholder="MetLife Stadium" />
+      </div>
+
+      <div class="world-cup-field">
+        <label for="worldCupLocationInput">Location</label>
+        <input id="worldCupLocationInput" type="text" placeholder="East Rutherford, NJ" />
+      </div>
+
+      <div class="world-cup-field">
+        <label for="worldCupDateInput">Match date</label>
+        <input id="worldCupDateInput" type="date" />
+      </div>
+
+      <div class="world-cup-field">
+        <label for="worldCupWagerSelect">Miles Wager</label>
+        <select id="worldCupWagerSelect">
+          <option value="500">500 mi</option>
+          <option value="1000">1,000 mi</option>
+          <option value="1500">1,500 mi</option>
+          <option value="2500">2,500 mi</option>
+          <option value="5000">5,000 mi</option>
+        </select>
+
+        <div class="world-cup-balance-text" id="worldCupCurrentBalanceText">Current balance: 0 mi</div>
+      </div>
+
+      <div class="world-cup-field">
+        <label>Prediction</label>
+
+        <div class="world-cup-prediction-grid">
+          <button class="world-cup-choice" id="worldCupPredictionTeam1" type="button">Team 1</button>
+          <button class="world-cup-choice" id="worldCupPredictionTeam2" type="button">Team 2</button>
+        </div>
+      </div>
+
+      <div class="world-cup-insufficient" id="worldCupInsufficientText">Insufficient balance</div>
+
+      <button class="world-cup-submit" id="worldCupSubmitButton" type="button" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 10V8a5 5 0 0 1 10 0v2h.5A2.5 2.5 0 0 1 20 12.5v6A2.5 2.5 0 0 1 17.5 21h-11A2.5 2.5 0 0 1 4 18.5v-6A2.5 2.5 0 0 1 6.5 10H7Zm2 0h6V8a3 3 0 0 0-6 0v2Z" />
+        </svg>
+        Submit
+      </button>
+    </section>
   </div>
 </section>
   
@@ -3791,6 +4273,37 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </label>
 </div>
 
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">World Cup Match Flight</div>
+    <div class="toggle-subtitle">Adds FIFA World Cup match details to this flight</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="worldCupToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
+<div class="world-cup-options" id="worldCupOptions">
+  <div class="world-cup-options-inner">
+    <div class="form-field">
+      <label for="worldCupLink">Google match link</label>
+      <input id="worldCupLink" type="url" placeholder="https://google.com/search?..." />
+    </div>
+
+    <div class="form-field">
+      <label for="worldCupTeam1">Team 1</label>
+      <input id="worldCupTeam1" type="text" placeholder="Brazil" />
+    </div>
+
+    <div class="form-field">
+      <label for="worldCupTeam2">Team 2</label>
+      <input id="worldCupTeam2" type="text" placeholder="Morocco" />
+    </div>
+  </div>
+</div>
+
 <div class="form-field">
   <label for="timezoneDifference">Timezone difference</label>
   <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
@@ -3936,6 +4449,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </div>
         </section>
 
+        <section class="world-cup-info-card hidden" id="worldCupInfoCard">
+  <div class="world-cup-info-logo">
+    <img src="./fifa.png" alt="FIFA World Cup logo" />
+  </div>
+
+  <div>
+    <div class="world-cup-info-title" id="worldCupInfoTitle">Team 1 vs Team 2</div>
+    <div class="world-cup-info-subtitle">Tap to view match</div>
+  </div>
+</section>
+        
         <section class="cbp-info-card hidden" id="cbpInfoCard">
   <div class="cbp-info-logo">
     <img src="./cbp.png" alt="CBP logo" />
@@ -4315,6 +4839,87 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </div>
 </section>
   
+  <div class="passport-popup-overlay" id="worldCupPopupOverlay"></div>
+
+<section class="passport-popup" id="worldCupPaymentPopup">
+  <div class="passport-popup-title">Miles Wager</div>
+  <div class="passport-popup-subtitle">Confirm your wager. Your miles will be deducted now.</div>
+
+  <div class="world-cup-payment-card">
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Current Balance</div>
+      <div class="world-cup-detail-value" id="worldCupPaymentBalance">0 mi</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Miles Wager</div>
+      <div class="world-cup-detail-value gold" id="worldCupPaymentWager">0 mi</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">If Correct</div>
+      <div class="world-cup-detail-value green" id="worldCupPaymentPayout">0 mi</div>
+    </div>
+  </div>
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="worldCupCancelPaymentButton" type="button">Cancel</button>
+    <button class="passport-green-button" id="worldCupPayNowButton" type="button">Pay now</button>
+  </div>
+</section>
+
+<section class="passport-popup" id="worldCupDetailsPopup">
+  <div class="passport-popup-title" id="worldCupDetailsTitle">Team 1 vs Team 2</div>
+  <div class="passport-popup-subtitle">World Cup match details and wager information.</div>
+
+  <div class="world-cup-details-card">
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Stadium</div>
+      <div class="world-cup-detail-value" id="worldCupDetailsStadium">--</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Location</div>
+      <div class="world-cup-detail-value" id="worldCupDetailsLocation">--</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Date</div>
+      <div class="world-cup-detail-value" id="worldCupDetailsDate">--</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Prediction</div>
+      <div class="world-cup-detail-value gold" id="worldCupDetailsPrediction">--</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Wager</div>
+      <div class="world-cup-detail-value" id="worldCupDetailsWager">--</div>
+    </div>
+
+    <div class="world-cup-detail-row">
+      <div class="world-cup-detail-label">Potential Payout</div>
+      <div class="world-cup-detail-value green" id="worldCupDetailsPayout">--</div>
+    </div>
+  </div>
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="worldCupCloseDetailsButton" type="button">Close</button>
+    <button class="passport-green-button" id="worldCupCompleteMatchButton" type="button">Complete Match</button>
+  </div>
+</section>
+
+<section class="passport-popup" id="worldCupWinnerPopup">
+  <div class="passport-popup-title">Who won?</div>
+  <div class="passport-popup-subtitle">Select the team that officially won the match.</div>
+
+  <div class="world-cup-prediction-grid" style="margin-top: 20px;">
+    <button class="world-cup-choice" id="worldCupWinnerTeam1Button" type="button">Team 1</button>
+    <button class="world-cup-choice" id="worldCupWinnerTeam2Button" type="button">Team 2</button>
+  </div>
+</section>
+  
   <div class="transaction-edit-overlay" id="transactionEditOverlay"></div>
 
 <section class="transaction-edit-popup" id="transactionEditPopup">
@@ -4389,6 +4994,44 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 const cbpInfoPopupOverlay = document.getElementById("cbpInfoPopupOverlay");
 const cbpInfoPopup = document.getElementById("cbpInfoPopup");
 const cbpInfoPopupMessage = document.getElementById("cbpInfoPopupMessage");
+    const worldCupPage = document.getElementById("worldCupPage");
+const worldCupSetupMatchTitle = document.getElementById("worldCupSetupMatchTitle");
+const worldCupStadiumInput = document.getElementById("worldCupStadiumInput");
+const worldCupLocationInput = document.getElementById("worldCupLocationInput");
+const worldCupDateInput = document.getElementById("worldCupDateInput");
+const worldCupWagerSelect = document.getElementById("worldCupWagerSelect");
+const worldCupCurrentBalanceText = document.getElementById("worldCupCurrentBalanceText");
+const worldCupPredictionTeam1 = document.getElementById("worldCupPredictionTeam1");
+const worldCupPredictionTeam2 = document.getElementById("worldCupPredictionTeam2");
+const worldCupInsufficientText = document.getElementById("worldCupInsufficientText");
+const worldCupSubmitButton = document.getElementById("worldCupSubmitButton");
+
+const worldCupInfoCard = document.getElementById("worldCupInfoCard");
+const worldCupInfoTitle = document.getElementById("worldCupInfoTitle");
+
+const worldCupPopupOverlay = document.getElementById("worldCupPopupOverlay");
+const worldCupPaymentPopup = document.getElementById("worldCupPaymentPopup");
+const worldCupPaymentBalance = document.getElementById("worldCupPaymentBalance");
+const worldCupPaymentWager = document.getElementById("worldCupPaymentWager");
+const worldCupPaymentPayout = document.getElementById("worldCupPaymentPayout");
+const worldCupCancelPaymentButton = document.getElementById("worldCupCancelPaymentButton");
+const worldCupPayNowButton = document.getElementById("worldCupPayNowButton");
+
+const worldCupDetailsPopup = document.getElementById("worldCupDetailsPopup");
+const worldCupDetailsTitle = document.getElementById("worldCupDetailsTitle");
+const worldCupDetailsStadium = document.getElementById("worldCupDetailsStadium");
+const worldCupDetailsLocation = document.getElementById("worldCupDetailsLocation");
+const worldCupDetailsDate = document.getElementById("worldCupDetailsDate");
+const worldCupDetailsPrediction = document.getElementById("worldCupDetailsPrediction");
+const worldCupDetailsWager = document.getElementById("worldCupDetailsWager");
+const worldCupDetailsPayout = document.getElementById("worldCupDetailsPayout");
+const worldCupCloseDetailsButton = document.getElementById("worldCupCloseDetailsButton");
+const worldCupCompleteMatchButton = document.getElementById("worldCupCompleteMatchButton");
+
+const worldCupWinnerPopup = document.getElementById("worldCupWinnerPopup");
+const worldCupWinnerTeam1Button = document.getElementById("worldCupWinnerTeam1Button");
+const worldCupWinnerTeam2Button = document.getElementById("worldCupWinnerTeam2Button");
+    
     const cbpPage = document.getElementById("cbpPage");
 const cbpArrivalAirport = document.getElementById("cbpArrivalAirport");
 const cbpPassportName = document.getElementById("cbpPassportName");
@@ -4562,6 +5205,11 @@ const edtArrivalToggle = document.getElementById("edtArrivalToggle");
 const edtOffsetOptions = document.getElementById("edtOffsetOptions");
 const edtOffsetInput = document.getElementById("edtOffset");
 const intlUSArrivalToggle = document.getElementById("intlUSArrivalToggle");
+const worldCupToggle = document.getElementById("worldCupToggle");
+const worldCupOptions = document.getElementById("worldCupOptions");
+const worldCupLinkInput = document.getElementById("worldCupLink");
+const worldCupTeam1Input = document.getElementById("worldCupTeam1");
+const worldCupTeam2Input = document.getElementById("worldCupTeam2");
 const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
 const boardingTimeInput = document.getElementById("boardingTime");
@@ -4587,6 +5235,9 @@ let pendingPremiumCost = 0;
     let activeSeatSelectionSessionId = "";
 let activeSeatSelectionWindow = null;
     let activeSeatSelectionUnsubscribe = null;
+    let currentWorldCupLock = null;
+    let activeWorldCupMatch = null;
+    let selectedWorldCupPrediction = "";
 
 const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
@@ -4610,6 +5261,16 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   if (!premiumEconomyToggle.checked) {
     premiumEconomyLastRowInput.value = "";
     premiumEconomyLettersInput.value = "";
+  }
+});
+
+    worldCupToggle.addEventListener("change", () => {
+  worldCupOptions.classList.toggle("active", worldCupToggle.checked);
+
+  if (!worldCupToggle.checked) {
+    worldCupLinkInput.value = "";
+    worldCupTeam1Input.value = "";
+    worldCupTeam2Input.value = "";
   }
 });
 
@@ -4748,6 +5409,395 @@ function closeCBPPage() {
   cbpPage.classList.remove("active");
   document.body.style.overflow = "";
 }
+
+    function getWorldCupMatchTitle(data) {
+  const team1 = data?.worldCupTeam1 || data?.team1 || "Team 1";
+  const team2 = data?.worldCupTeam2 || data?.team2 || "Team 2";
+
+  return `${team1} vs ${team2}`;
+}
+
+function openWorldCupPage(lockData) {
+  currentWorldCupLock = lockData;
+  selectedWorldCupPrediction = "";
+
+  const team1 = lockData.worldCupTeam1 || "Team 1";
+  const team2 = lockData.worldCupTeam2 || "Team 2";
+
+  worldCupSetupMatchTitle.textContent = `${team1} vs ${team2}`;
+  worldCupPredictionTeam1.textContent = team1;
+  worldCupPredictionTeam2.textContent = team2;
+
+  worldCupStadiumInput.value = "";
+  worldCupLocationInput.value = "";
+  worldCupDateInput.value = "";
+  worldCupWagerSelect.value = "500";
+
+  updateWorldCupSetupState();
+
+  flightsPage.classList.add("hidden");
+  addFlightPage.classList.remove("active");
+  editFlightPage.classList.remove("active");
+  detailPage.classList.remove("active");
+  milesPage.classList.remove("active");
+  passportPage.classList.remove("active");
+  cbpPage.classList.remove("active");
+
+  worldCupPage.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeWorldCupPage() {
+  worldCupPage.classList.remove("active");
+  flightsPage.classList.remove("hidden");
+  document.body.style.overflow = "";
+}
+
+function updateWorldCupSetupState() {
+  const wager = Number(worldCupWagerSelect.value || 0);
+  const hasEnough = currentMilesBalance >= wager;
+
+  worldCupCurrentBalanceText.textContent = `Current balance: ${currentMilesBalance.toLocaleString("en-US")} mi`;
+
+  worldCupPredictionTeam1.classList.toggle(
+    "active",
+    selectedWorldCupPrediction === (currentWorldCupLock?.worldCupTeam1 || "")
+  );
+
+  worldCupPredictionTeam2.classList.toggle(
+    "active",
+    selectedWorldCupPrediction === (currentWorldCupLock?.worldCupTeam2 || "")
+  );
+
+  const ready =
+    !!worldCupStadiumInput.value.trim() &&
+    !!worldCupLocationInput.value.trim() &&
+    !!worldCupDateInput.value &&
+    !!selectedWorldCupPrediction &&
+    hasEnough;
+
+  worldCupInsufficientText.classList.toggle("active", !hasEnough);
+  worldCupSubmitButton.disabled = !ready;
+}
+
+function openWorldCupPaymentPopup() {
+  const wager = Number(worldCupWagerSelect.value || 0);
+  const payout = wager * 2;
+
+  worldCupPaymentBalance.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
+  worldCupPaymentWager.textContent = `${wager.toLocaleString("en-US")} mi`;
+  worldCupPaymentPayout.textContent = `+${payout.toLocaleString("en-US")} mi`;
+
+  worldCupPopupOverlay.classList.add("active");
+  worldCupPaymentPopup.classList.add("active");
+}
+
+function closeWorldCupPopups() {
+  worldCupPopupOverlay.classList.remove("active");
+  worldCupPaymentPopup.classList.remove("active");
+  worldCupDetailsPopup.classList.remove("active");
+  worldCupWinnerPopup.classList.remove("active");
+}
+
+function formatWorldCupDate(value) {
+  if (!value) return "--";
+
+  const date = new Date(value + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) return "--";
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+async function submitWorldCupWager() {
+  if (!currentWorldCupLock) return;
+
+  const wager = Number(worldCupWagerSelect.value || 0);
+
+  if (currentMilesBalance < wager) {
+    updateWorldCupSetupState();
+    return;
+  }
+
+  worldCupPayNowButton.disabled = true;
+
+  const matchData = {
+    active: true,
+    resolved: false,
+    team1: currentWorldCupLock.worldCupTeam1 || "Team 1",
+    team2: currentWorldCupLock.worldCupTeam2 || "Team 2",
+    matchLink: currentWorldCupLock.worldCupLink || "",
+    stadium: worldCupStadiumInput.value.trim(),
+    location: worldCupLocationInput.value.trim(),
+    matchDate: worldCupDateInput.value,
+    prediction: selectedWorldCupPrediction,
+    wager,
+    potentialPayout: wager * 2,
+
+    airline: currentWorldCupLock.airline || "",
+    flightNumber: currentWorldCupLock.flightNumber || "",
+    departureAirport: currentWorldCupLock.departureAirport || "",
+    arrivalAirport: currentWorldCupLock.arrivalAirport || "",
+    originalFlightId: currentWorldCupLock.flightId || "",
+
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    const batch = writeBatch(db);
+
+    batch.set(
+      doc(db, "activeWorldCupMatch", "main"),
+      matchData,
+      { merge: true }
+    );
+
+    batch.set(
+      doc(db, "miles", "balance"),
+      {
+        balance: increment(-wager),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(doc(collection(db, "mileTransactions")), {
+      type: "spent",
+      title: "Miles Wager",
+      amount: wager,
+      airline: "fifa",
+      createdAt: serverTimestamp()
+    });
+
+    batch.set(
+      doc(db, "worldCupLock", "main"),
+      {
+        active: false,
+        submittedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    await batch.commit();
+
+    currentWorldCupLock = null;
+    closeWorldCupPopups();
+    closeWorldCupPage();
+    showNotification("Miles wager locked!");
+  } catch (error) {
+    console.error("Error submitting World Cup wager:", error);
+    alert("World Cup wager could not be submitted. Check Firestore rules.");
+  } finally {
+    worldCupPayNowButton.disabled = false;
+  }
+}
+
+function updateWorldCupInfoCard(flight) {
+  const shouldShow = flight && flight.worldCupMatch === true;
+
+  worldCupInfoCard.classList.toggle("hidden", !shouldShow);
+
+  if (!shouldShow) return;
+
+  worldCupInfoTitle.textContent = getWorldCupMatchTitle(flight);
+}
+
+function openWorldCupFlightLink(flight) {
+  const link = flight?.worldCupLink || "";
+
+  if (!link) return;
+
+  window.open(link, "_blank");
+}
+
+function createWorldCupFeaturedCard(match) {
+  const card = document.createElement("article");
+  card.className = "featured-flight-card world-cup-featured-card";
+
+  const team1 = escapeHTML(match.team1 || "Team 1");
+  const team2 = escapeHTML(match.team2 || "Team 2");
+  const stadium = escapeHTML(match.stadium || "Stadium");
+  const location = escapeHTML(match.location || "Location");
+  const prediction = escapeHTML(match.prediction || "--");
+  const wager = Number(match.wager || 0);
+  const payout = Number(match.potentialPayout || wager * 2);
+
+  card.innerHTML = `
+    <div class="featured-flight-top">
+      <div class="featured-status-flag">MATCHDAY</div>
+      <div class="featured-flight-number">FIFA WORLD CUP</div>
+      <div class="featured-main-status">${team1} vs ${team2}</div>
+    </div>
+
+    <div class="featured-route-area">
+      <div class="world-cup-stadium-name">${stadium}</div>
+      <div class="world-cup-location-line">${location} • ${escapeHTML(formatWorldCupDate(match.matchDate))}</div>
+    </div>
+
+    <div class="featured-info-grid">
+      <div class="featured-info-cell">
+        <div class="featured-info-label">Prediction</div>
+        <div class="featured-info-value">${prediction}</div>
+      </div>
+
+      <div class="featured-info-cell">
+        <div class="featured-info-label">Wager</div>
+        <div class="featured-info-value">${wager.toLocaleString("en-US")}</div>
+      </div>
+
+      <div class="featured-info-cell">
+        <div class="featured-info-label">Payout</div>
+        <div class="featured-info-value good">${payout.toLocaleString("en-US")}</div>
+      </div>
+    </div>
+
+    <div class="world-cup-button-row">
+      <button class="featured-view-button" type="button" data-world-cup-view>View</button>
+      <button class="featured-view-button" type="button" data-world-cup-details>Details</button>
+    </div>
+  `;
+
+  card.querySelector("[data-world-cup-view]").addEventListener("click", () => {
+    if (match.matchLink) {
+      window.open(match.matchLink, "_blank");
+    }
+  });
+
+  card.querySelector("[data-world-cup-details]").addEventListener("click", () => {
+    openWorldCupMatchDetails(match);
+  });
+
+  flightsList.appendChild(card);
+}
+
+function openWorldCupMatchDetails(match) {
+  activeWorldCupMatch = match;
+
+  const title = `${match.team1 || "Team 1"} vs ${match.team2 || "Team 2"}`;
+
+  worldCupDetailsTitle.textContent = title;
+  worldCupDetailsStadium.textContent = match.stadium || "--";
+  worldCupDetailsLocation.textContent = match.location || "--";
+  worldCupDetailsDate.textContent = formatWorldCupDate(match.matchDate);
+  worldCupDetailsPrediction.textContent = match.prediction || "--";
+  worldCupDetailsWager.textContent = `${Number(match.wager || 0).toLocaleString("en-US")} mi`;
+  worldCupDetailsPayout.textContent = `+${Number(match.potentialPayout || 0).toLocaleString("en-US")} mi`;
+
+  worldCupWinnerTeam1Button.textContent = match.team1 || "Team 1";
+  worldCupWinnerTeam2Button.textContent = match.team2 || "Team 2";
+
+  worldCupPopupOverlay.classList.add("active");
+  worldCupDetailsPopup.classList.add("active");
+}
+
+async function resolveWorldCupMatch(winner) {
+  if (!activeWorldCupMatch || !winner) return;
+
+  const match = activeWorldCupMatch;
+  const predictedCorrect = winner === match.prediction;
+  const reward = predictedCorrect ? Number(match.wager || 0) * 2 : 0;
+
+  worldCupWinnerTeam1Button.disabled = true;
+  worldCupWinnerTeam2Button.disabled = true;
+
+  try {
+    const batch = writeBatch(db);
+
+    batch.set(
+      doc(db, "activeWorldCupMatch", "main"),
+      {
+        active: false,
+        resolved: true,
+        actualWinner: winner,
+        predictionWon: predictedCorrect,
+        completedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    if (predictedCorrect && reward > 0) {
+      batch.set(
+        doc(db, "miles", "balance"),
+        {
+          balance: increment(reward),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      batch.set(doc(collection(db, "mileTransactions")), {
+        type: "earned",
+        title: `${match.team1 || "Team 1"} vs ${match.team2 || "Team 2"}`,
+        amount: reward,
+        airline: "fifa",
+        createdAt: serverTimestamp()
+      });
+    }
+
+    await batch.commit();
+
+    closeWorldCupPopups();
+
+    if (predictedCorrect) {
+      showNotification(`Prediction won! +${reward.toLocaleString("en-US")} miles`);
+    } else {
+      showNotification("Prediction lost!");
+    }
+  } catch (error) {
+    console.error("Error resolving World Cup match:", error);
+    alert("Match could not be completed. Check Firestore rules.");
+  } finally {
+    worldCupWinnerTeam1Button.disabled = false;
+    worldCupWinnerTeam2Button.disabled = false;
+  }
+}
+
+    worldCupStadiumInput.addEventListener("input", updateWorldCupSetupState);
+worldCupLocationInput.addEventListener("input", updateWorldCupSetupState);
+worldCupDateInput.addEventListener("change", updateWorldCupSetupState);
+worldCupWagerSelect.addEventListener("change", updateWorldCupSetupState);
+
+worldCupPredictionTeam1.addEventListener("click", () => {
+  selectedWorldCupPrediction = currentWorldCupLock?.worldCupTeam1 || "";
+  updateWorldCupSetupState();
+});
+
+worldCupPredictionTeam2.addEventListener("click", () => {
+  selectedWorldCupPrediction = currentWorldCupLock?.worldCupTeam2 || "";
+  updateWorldCupSetupState();
+});
+
+worldCupSubmitButton.addEventListener("click", openWorldCupPaymentPopup);
+worldCupCancelPaymentButton.addEventListener("click", closeWorldCupPopups);
+worldCupPayNowButton.addEventListener("click", submitWorldCupWager);
+worldCupPopupOverlay.addEventListener("click", closeWorldCupPopups);
+
+worldCupInfoCard.addEventListener("click", () => {
+  if (activeFlight) {
+    openWorldCupFlightLink(activeFlight);
+  }
+});
+
+worldCupCloseDetailsButton.addEventListener("click", closeWorldCupPopups);
+
+worldCupCompleteMatchButton.addEventListener("click", () => {
+  worldCupDetailsPopup.classList.remove("active");
+  worldCupWinnerPopup.classList.add("active");
+});
+
+worldCupWinnerTeam1Button.addEventListener("click", () => {
+  resolveWorldCupMatch(activeWorldCupMatch?.team1 || "");
+});
+
+worldCupWinnerTeam2Button.addEventListener("click", () => {
+  resolveWorldCupMatch(activeWorldCupMatch?.team2 || "");
+});
 
 async function createCBPLockForFlight(flight) {
   const lockData = {
@@ -6047,6 +7097,10 @@ async function saveFlightWithSeat({
       premiumEconomyOptions.classList.remove("active");
     }
 
+if (worldCupOptions) {
+  worldCupOptions.classList.remove("active");
+}
+    
     if (edtOffsetOptions) {
       edtOffsetOptions.classList.remove("active");
     }
@@ -6324,6 +7378,15 @@ function populateFeaturedFlightCard(card, flight) {
 }
 
 function updateFeaturedCardLive() {
+   if (activeWorldCupMatch && activeWorldCupMatch.active === true) {
+    const card = flightsList.querySelector(".world-cup-featured-card");
+
+    if (!card) {
+      renderHomeFlights();
+    }
+
+    return;
+  }
   const sortedFlights = getSortedFlightsForHome();
   const featuredFlight = sortedFlights[0];
   const card = flightsList.querySelector(".featured-flight-card");
@@ -6418,6 +7481,16 @@ function renderHomeFlights() {
   flightsList.innerHTML = "";
 
   const sortedFlights = getSortedFlightsForHome();
+
+  if (activeWorldCupMatch && activeWorldCupMatch.active === true) {
+    createWorldCupFeaturedCard(activeWorldCupMatch);
+
+    sortedFlights.forEach((flight) => {
+      createFlightCard(flight);
+    });
+
+    return;
+  }
 
   if (!sortedFlights.length) {
     return;
@@ -6657,6 +7730,7 @@ setAirportRowText(
 updateSeatCard(flight);
 updateTimezoneBox(flight);
 updateCBPInfoCard(flight);
+updateWorldCupInfoCard(flight);
 updateDetailCountdowns();
 updateCompleteFlightButton(flight);
       
@@ -6669,6 +7743,7 @@ updateCompleteFlightButton(flight);
 updateSeatCard(latest);
 updateTimezoneBox(latest);
 updateCBPInfoCard(latest);
+updateWorldCupInfoCard(latest);
 updateDetailCountdowns();
 updateCompleteFlightButton(latest);
         }
@@ -6732,8 +7807,13 @@ economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
 edtOffset: edtArrivalToggle.checked ? "" : edtOffsetInput.value.trim() || "",
 edtArrival: edtArrivalToggle.checked,
 internationalUSArrival: intlUSArrivalToggle.checked,
-    cbpRequired: intlUSArrivalToggle.checked,
-    cbpSubmitted: false,
+cbpRequired: intlUSArrivalToggle.checked,
+cbpSubmitted: false,
+
+worldCupMatch: worldCupToggle.checked,
+worldCupLink: worldCupToggle.checked ? worldCupLinkInput.value.trim() || "" : "",
+worldCupTeam1: worldCupToggle.checked ? worldCupTeam1Input.value.trim() || "Team 1" : "",
+worldCupTeam2: worldCupToggle.checked ? worldCupTeam2Input.value.trim() || "Team 2" : "",
 enableBoarding: enableBoardingToggle.checked,
     boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
     boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
@@ -6778,6 +7858,32 @@ enableBoarding: enableBoardingToggle.checked,
     openCBPPage(data);
     return;
   }
+
+      onSnapshot(doc(db, "worldCupLock", "main"), (snapshot) => {
+  const data = snapshot.exists() ? snapshot.data() : null;
+
+  if (data && data.active === true) {
+    openWorldCupPage(data);
+    return;
+  }
+
+  currentWorldCupLock = null;
+}, (error) => {
+  console.error("Error loading World Cup lock:", error);
+});
+
+onSnapshot(doc(db, "activeWorldCupMatch", "main"), (snapshot) => {
+  const data = snapshot.exists() ? snapshot.data() : null;
+
+  activeWorldCupMatch = data && data.active === true
+    ? data
+    : null;
+
+  renderHomeFlights();
+  startFeaturedCardLiveUpdates();
+}, (error) => {
+  console.error("Error loading active World Cup match:", error);
+});
 
   currentCBPLock = null;
 }, (error) => {
@@ -6950,6 +8056,22 @@ if (flight.internationalUSArrival !== true) {
 
 if (flight.cbpSubmitted !== true) {
   flight.cbpSubmitted = false;
+}
+
+        if (flight.worldCupMatch !== true) {
+  flight.worldCupMatch = false;
+}
+
+if (!flight.worldCupLink) {
+  flight.worldCupLink = "";
+}
+
+if (!flight.worldCupTeam1) {
+  flight.worldCupTeam1 = "";
+}
+
+if (!flight.worldCupTeam2) {
+  flight.worldCupTeam2 = "";
 }
 
 if (!flight.premiumSeatCost) {
@@ -7442,6 +8564,43 @@ const actualGateArrivalDate = actualLandDate
         routeDistance: getRouteDistanceMiles(completedFlight),
         createdAt: serverTimestamp()
       });
+    }
+
+    if (completedFlight.worldCupMatch === true) {
+      const worldCupLockData = {
+        active: true,
+        flightId: completedFlight.id,
+        airline: completedFlight.airline || "",
+        flightNumber: completedFlight.flightNumber || "",
+        departureAirport: completedFlight.departureAirport || "",
+        arrivalAirport: completedFlight.arrivalAirport || "",
+        flightDate: completedFlight.flightDate || "",
+        flightDateRaw: completedFlight.flightDateRaw || "",
+        worldCupTeam1: completedFlight.worldCupTeam1 || "Team 1",
+        worldCupTeam2: completedFlight.worldCupTeam2 || "Team 2",
+        worldCupLink: completedFlight.worldCupLink || "",
+        createdAt: serverTimestamp()
+      };
+
+      batch.set(
+        doc(db, "worldCupLock", "main"),
+        worldCupLockData,
+        { merge: true }
+      );
+
+      batch.delete(flightRef);
+
+      await batch.commit();
+
+      closeFlightDetails();
+      allFlights.delete(completedFlight.id);
+
+      openWorldCupPage({
+        ...worldCupLockData,
+        createdAt: null
+      });
+
+      return;
     }
 
     batch.delete(flightRef);
