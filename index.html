@@ -5749,6 +5749,9 @@ async function resolveWorldCupMatch(winner) {
   worldCupWinnerTeam1Button.disabled = true;
   worldCupWinnerTeam2Button.disabled = true;
 
+  // Close the popup immediately so it does not feel delayed
+  closeWorldCupPopups();
+
   try {
     const batch = writeBatch(db);
 
@@ -5785,8 +5788,6 @@ async function resolveWorldCupMatch(winner) {
     }
 
     await batch.commit();
-
-    closeWorldCupPopups();
 
     if (predictedCorrect) {
       showNotification(`Prediction won! +${reward.toLocaleString("en-US")} miles`);
