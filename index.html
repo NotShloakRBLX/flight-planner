@@ -5278,8 +5278,9 @@ let pendingPremiumCost = 0;
 let activeSeatSelectionWindow = null;
     let activeSeatSelectionUnsubscribe = null;
     let currentWorldCupLock = null;
-    let activeWorldCupMatch = null;
-    let selectedWorldCupPrediction = "";
+let activeWorldCupMatch = null;
+let selectedWorldCupPrediction = "";
+let pendingWorldCupFormData = null;
 
 const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
@@ -5523,8 +5524,43 @@ function updateWorldCupSetupState() {
 }
 
 function openWorldCupPaymentPopup() {
+  if (!currentWorldCupLock) return;
+
   const wager = Number(worldCupWagerSelect.value || 0);
   const payout = wager * 2;
+
+  const stadium = worldCupStadiumInput.value.trim();
+  const location = worldCupLocationInput.value.trim();
+  const matchDate = worldCupDateInput.value;
+
+  if (!stadium || !location || !matchDate || !selectedWorldCupPrediction) {
+    updateWorldCupSetupState();
+    return;
+  }
+
+  if (currentMilesBalance < wager) {
+    updateWorldCupSetupState();
+    return;
+  }
+
+  pendingWorldCupFormData = {
+    stadium,
+    location,
+    matchDate,
+    prediction: selectedWorldCupPrediction,
+    wager,
+    potentialPayout: payout,
+
+    team1: currentWorldCupLock.worldCupTeam1 || "Team 1",
+    team2: currentWorldCupLock.worldCupTeam2 || "Team 2",
+    matchLink: currentWorldCupLock.worldCupLink || "",
+
+    airline: currentWorldCupLock.airline || "",
+    flightNumber: currentWorldCupLock.flightNumber || "",
+    departureAirport: currentWorldCupLock.departureAirport || "",
+    arrivalAirport: currentWorldCupLock.arrivalAirport || "",
+    originalFlightId: currentWorldCupLock.flightId || ""
+  };
 
   worldCupPaymentBalance.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
   worldCupPaymentWager.textContent = `${wager.toLocaleString("en-US")} mi`;
@@ -5556,9 +5592,10 @@ function formatWorldCupDate(value) {
 }
 
 async function submitWorldCupWager() {
-  if (!currentWorldCupLock) return;
+  if (!currentWorldCupLock || !pendingWorldCupFormData) return;
 
-  const wager = Number(worldCupWagerSelect.value || 0);
+  const formData = { ...pendingWorldCupFormData };
+  const wager = Number(formData.wager || 0);
 
   if (currentMilesBalance < wager) {
     updateWorldCupSetupState();
@@ -5570,21 +5607,23 @@ async function submitWorldCupWager() {
   const matchData = {
     active: true,
     resolved: false,
-    team1: currentWorldCupLock.worldCupTeam1 || "Team 1",
-    team2: currentWorldCupLock.worldCupTeam2 || "Team 2",
-    matchLink: currentWorldCupLock.worldCupLink || "",
-    stadium: worldCupStadiumInput.value.trim(),
-    location: worldCupLocationInput.value.trim(),
-    matchDate: worldCupDateInput.value,
-    prediction: selectedWorldCupPrediction,
-    wager,
-    potentialPayout: wager * 2,
 
-    airline: currentWorldCupLock.airline || "",
-    flightNumber: currentWorldCupLock.flightNumber || "",
-    departureAirport: currentWorldCupLock.departureAirport || "",
-    arrivalAirport: currentWorldCupLock.arrivalAirport || "",
-    originalFlightId: currentWorldCupLock.flightId || "",
+    team1: formData.team1,
+    team2: formData.team2,
+    matchLink: formData.matchLink,
+
+    stadium: formData.stadium,
+    location: formData.location,
+    matchDate: formData.matchDate,
+    prediction: formData.prediction,
+    wager: formData.wager,
+    potentialPayout: formData.potentialPayout,
+
+    airline: formData.airline,
+    flightNumber: formData.flightNumber,
+    departureAirport: formData.departureAirport,
+    arrivalAirport: formData.arrivalAirport,
+    originalFlightId: formData.originalFlightId,
 
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -5628,6 +5667,8 @@ async function submitWorldCupWager() {
     await batch.commit();
 
     currentWorldCupLock = null;
+    pendingWorldCupFormData = null;
+
     closeWorldCupPopups();
     closeWorldCupPage();
     showNotification("Miles wager locked!");
