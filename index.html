@@ -1033,6 +1033,37 @@
   );
 }
 
+    .cbp-operation-box {
+  width: 100%;
+  margin-top: 18px;
+  display: grid;
+  gap: 9px;
+  justify-items: center;
+}
+
+.cbp-operation-box.hidden {
+  display: none;
+}
+
+.cbp-operation-line {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 215, 80, 0.72),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+
+.cbp-operation-text {
+  color: rgba(255, 215, 80, 0.92);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 1.6px;
+  text-align: center;
+}
+
 .cbp-form-box {
   width: 100%;
   margin-top: 30px;
@@ -3968,11 +3999,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <img class="cbp-logo" src="./cbp.png" alt="CBP logo" />
 
     <div class="cbp-title">US Customs &amp; Border Protection</div>
-    <div class="cbp-title-line"></div>
+<div class="cbp-title-line"></div>
+
+<div class="cbp-operation-box hidden" id="cbpOperationBox">
+  <div class="cbp-operation-line"></div>
+  <div class="cbp-operation-text">PRECLEARANCE OPERATIONS</div>
+  <div class="cbp-operation-line"></div>
+</div>
 
     <section class="cbp-form-box">
       <div class="cbp-field">
-        <div class="cbp-label">Arrival Airport</div>
+        <div class="cbp-label" id="cbpAirportLabel">Arrival Airport</div>
         <div class="cbp-value" id="cbpArrivalAirport">--</div>
       </div>
 
@@ -5078,6 +5115,8 @@ const worldCupWinnerTeam2Button = document.getElementById("worldCupWinnerTeam2Bu
 const cbpArrivalAirport = document.getElementById("cbpArrivalAirport");
 const cbpPassportName = document.getElementById("cbpPassportName");
 const cbpSubmitButton = document.getElementById("cbpSubmitButton");
+const cbpAirportLabel = document.getElementById("cbpAirportLabel");
+const cbpOperationBox = document.getElementById("cbpOperationBox");
     const passportButton = document.getElementById("passportButton");
 const passportPage = document.getElementById("passportPage");
 const passportBackButton = document.getElementById("passportBackButton");
@@ -5272,8 +5311,9 @@ let pendingPremiumCost = 0;
     let currentPassport = null;
     let passportCountdownTimer = null;
     let currentCBPLock = null;
-    let latestFlightsCache = [];
-    let featuredRefreshTimer = null;
+let latestFlightsCache = [];
+let featuredRefreshTimer = null;
+let preclearanceCheckTimer = null;
     let activeSeatSelectionSessionId = "";
 let activeSeatSelectionWindow = null;
     let activeSeatSelectionUnsubscribe = null;
@@ -5427,6 +5467,22 @@ function showRenewPassportPopup() {
   passportInsufficientText.classList.toggle("active", !hasEnough);
   confirmRenewPassportButton.disabled = !hasEnough;
 }
+    function isUSPreclearanceAirport(code) {
+  const airport = String(code || "").trim().toUpperCase();
+  return airport === "DUB" || airport === "AUH";
+}
+
+function flightUsesUSPreclearance(flight) {
+  return (
+    flight?.internationalUSArrival === true &&
+    isUSPreclearanceAirport(flight?.departureAirport)
+  );
+}
+
+function getDepartureAirportDisplayName(flight) {
+  return flight.departureAirportName || flight.cityDeparture || flight.departureAirport || "Departure";
+}
+    
     function getArrivalAirportDisplayName(flight) {
   return flight.arrivalAirportName || flight.cityArrival || flight.arrivalAirport || "Arrival";
 }
@@ -5434,8 +5490,15 @@ function showRenewPassportPopup() {
 function openCBPPage(lockData) {
   currentCBPLock = lockData;
 
-  cbpArrivalAirport.textContent = lockData.arrivalAirportName || "--";
+  const isPreclearance = lockData.preclearance === true;
+
+  cbpAirportLabel.textContent = isPreclearance ? "Departure Airport" : "Arrival Airport";
+  cbpArrivalAirport.textContent = isPreclearance
+    ? lockData.departureAirportName || "--"
+    : lockData.arrivalAirportName || "--";
+
   cbpPassportName.textContent = lockData.passportName || "--";
+  cbpOperationBox.classList.toggle("hidden", !isPreclearance);
 
   flightsPage.classList.add("hidden");
   addFlightPage.classList.remove("active");
@@ -5443,6 +5506,7 @@ function openCBPPage(lockData) {
   detailPage.classList.remove("active");
   milesPage.classList.remove("active");
   passportPage.classList.remove("active");
+  worldCupPage.classList.remove("active");
 
   cbpPage.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -5886,6 +5950,8 @@ worldCupWinnerTeam2Button.addEventListener("click", () => {
 });
 
 async function createCBPLockForFlight(flight) {
+  const isPreclearance = flightUsesUSPreclearance(flight);
+
   const lockData = {
     active: true,
     flightId: flight.id,
@@ -5895,14 +5961,18 @@ async function createCBPLockForFlight(flight) {
     flightDateRaw: flight.flightDateRaw || "",
     departureAirport: flight.departureAirport || "",
     arrivalAirport: flight.arrivalAirport || "",
+    departureAirportName: getDepartureAirportDisplayName(flight),
     arrivalAirportName: getArrivalAirportDisplayName(flight),
     passportName: currentPassport?.fullName || "",
+    preclearance: isPreclearance,
+    operationType: isPreclearance ? "preclearance" : "arrival",
     createdAt: serverTimestamp()
   };
 
   await updateDoc(getFlightRef(flight.id), {
     cbpRequired: true,
-    cbpSubmitted: false
+    cbpSubmitted: false,
+    usPreclearance: isPreclearance
   });
 
   const batch = writeBatch(db);
@@ -5917,6 +5987,7 @@ async function createCBPLockForFlight(flight) {
 
   openCBPPage(lockData);
 }
+
 
 function formatArrivalDate(value) {
   if (!value) return "";
@@ -6446,13 +6517,33 @@ function formatBoardingPanel(flight) {
     return;
   }
 
+  const isPreclearance = flightUsesUSPreclearance(flight) || flight.usPreclearance === true;
+
+  if (isPreclearance && flight.cbpSubmitted === true) {
+    cbpInfoPopupMessage.textContent = "You have completed US Preclearance";
+    return;
+  }
+
+  if (isPreclearance) {
+    const departureAirportName =
+      flight.departureAirportName ||
+      flight.cityDeparture ||
+      flight.departureAirport ||
+      "your departure airport";
+
+    cbpInfoPopupMessage.textContent = `You must do US Preclearance at ${departureAirportName}`;
+    return;
+  }
+
   const arrivalAirportName =
     flight.arrivalAirportName ||
     flight.cityArrival ||
     flight.arrivalAirport ||
     "your arrival airport";
 
-  cbpInfoPopupMessage.textContent = `You must do US Customs at ${arrivalAirportName}`;
+  cbpInfoPopupMessage.textContent = flight.cbpSubmitted === true
+    ? "You have completed US Customs"
+    : `You must do US Customs at ${arrivalAirportName}`;
 }
 
 function openCBPInfoPopup() {
@@ -6463,6 +6554,47 @@ function openCBPInfoPopup() {
 function closeCBPInfoPopup() {
   cbpInfoPopupOverlay.classList.remove("active");
   cbpInfoPopup.classList.remove("active");
+}
+
+    async function checkPreclearanceLocks() {
+  if (currentCBPLock?.active === true) return;
+  if (cbpPage.classList.contains("active")) return;
+
+  const now = Date.now();
+
+  const flight = latestFlightsCache.find((item) => {
+    if (!item) return false;
+    if (item.internationalUSArrival !== true) return false;
+    if (item.cbpSubmitted === true) return false;
+    if (!flightUsesUSPreclearance(item) && item.usPreclearance !== true) return false;
+    if (item.enableBoarding === true) return false;
+    if (getFlightPhase(item) !== "scheduled") return false;
+
+    const departure = getDepartureDateTime(item);
+    if (!departure || Number.isNaN(departure.getTime())) return false;
+
+    const minutesUntilDeparture = Math.round((departure.getTime() - now) / 60000);
+
+    return minutesUntilDeparture <= 10 && minutesUntilDeparture >= -2;
+  });
+
+  if (!flight) return;
+
+  try {
+    await createCBPLockForFlight(flight);
+  } catch (error) {
+    console.error("Error creating preclearance lock:", error);
+  }
+}
+
+function startPreclearanceLockWatcher() {
+  if (preclearanceCheckTimer) {
+    clearInterval(preclearanceCheckTimer);
+  }
+
+  preclearanceCheckTimer = setInterval(() => {
+    checkPreclearanceLocks();
+  }, 15000);
 }
 
     function setActualValue(element, value, isGood) {
@@ -7893,6 +8025,7 @@ economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
 edtOffset: edtArrivalToggle.checked ? "" : edtOffsetInput.value.trim() || "",
 edtArrival: edtArrivalToggle.checked,
 internationalUSArrival: intlUSArrivalToggle.checked,
+usPreclearance: intlUSArrivalToggle.checked && isUSPreclearanceAirport(departureAirportInput.value),
 cbpRequired: intlUSArrivalToggle.checked,
 cbpSubmitted: false,
 
@@ -7967,6 +8100,8 @@ onSnapshot(doc(db, "activeWorldCupMatch", "main"), (snapshot) => {
 
   renderHomeFlights();
   startFeaturedCardLiveUpdates();
+  startPreclearanceLockWatcher();
+  checkPreclearanceLocks();
 }, (error) => {
   console.error("Error loading active World Cup match:", error);
 });
@@ -8135,6 +8270,10 @@ if (flight.premiumSeat !== true) {
 if (flight.internationalUSArrival !== true) {
   flight.internationalUSArrival = false;
 }
+
+        if (flight.usPreclearance !== true) {
+          flight.usPreclearance = flightUsesUSPreclearance(flight);
+        }
 
         if (flight.cbpRequired !== true) {
   flight.cbpRequired = false;
@@ -8589,14 +8728,27 @@ const actualGateArrivalDate = actualLandDate
   editFlightPage.classList.remove("active");
 
   if (
-    markedPhase === "gateArrival" &&
-    completedPhaseFlight.internationalUSArrival === true &&
-    completedPhaseFlight.cbpSubmitted !== true
-  ) {
-    detailPage.classList.remove("active");
-    await createCBPLockForFlight(completedPhaseFlight);
-    return;
-  }
+  markedPhase === "boarding" &&
+  completedPhaseFlight.internationalUSArrival === true &&
+  completedPhaseFlight.cbpSubmitted !== true &&
+  (flightUsesUSPreclearance(completedPhaseFlight) || completedPhaseFlight.usPreclearance === true)
+) {
+  detailPage.classList.remove("active");
+  await createCBPLockForFlight(completedPhaseFlight);
+  return;
+}
+
+if (
+  markedPhase === "gateArrival" &&
+  completedPhaseFlight.internationalUSArrival === true &&
+  completedPhaseFlight.cbpSubmitted !== true &&
+  !flightUsesUSPreclearance(completedPhaseFlight) &&
+  completedPhaseFlight.usPreclearance !== true
+) {
+  detailPage.classList.remove("active");
+  await createCBPLockForFlight(completedPhaseFlight);
+  return;
+}
 
   detailPage.classList.add("active");
 } catch (error) {
@@ -8744,17 +8896,20 @@ const actualGateArrivalDate = actualLandDate
     );
 
     batch.set(arrivalRef, {
-      airline: lockData.airline || "",
-      flightNumber: lockData.flightNumber || "",
-      flightDate: lockData.flightDate || "",
-      flightDateRaw: lockData.flightDateRaw || "",
-      departureAirport: lockData.departureAirport || "",
-      arrivalAirport: lockData.arrivalAirport || "",
-      arrivalAirportName: lockData.arrivalAirportName || "",
-      passportName: lockData.passportName || "",
-      createdAt: serverTimestamp()
-    });
-
+  airline: lockData.airline || "",
+  flightNumber: lockData.flightNumber || "",
+  flightDate: lockData.flightDate || "",
+  flightDateRaw: lockData.flightDateRaw || "",
+  departureAirport: lockData.departureAirport || "",
+  arrivalAirport: lockData.arrivalAirport || "",
+  departureAirportName: lockData.departureAirportName || "",
+  arrivalAirportName: lockData.arrivalAirportName || "",
+  passportName: lockData.passportName || "",
+  preclearance: lockData.preclearance === true,
+  operationType: lockData.preclearance === true ? "preclearance" : "arrival",
+  createdAt: serverTimestamp()
+});
+    
     await batch.commit();
 
     const returnedFlight = allFlights.get(lockData.flightId);
