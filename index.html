@@ -5934,6 +5934,26 @@ worldCupInfoCard.addEventListener("click", () => {
   }
 });
 
+    cbpInfoCard.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!activeFlight || activeFlight.internationalUSArrival !== true) {
+    return;
+  }
+
+  updateCBPInfoCard(activeFlight);
+  openCBPInfoPopup();
+});
+
+cbpInfoPopupOverlay.addEventListener("click", closeCBPInfoPopup);
+
+cbpInfoPopup.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  closeCBPInfoPopup();
+});
+
 worldCupCloseDetailsButton.addEventListener("click", closeWorldCupPopups);
 
 worldCupCompleteMatchButton.addEventListener("click", () => {
@@ -7755,10 +7775,6 @@ function renderHomeFlights() {
 
         <div class="flight-date-display">${flightDate}</div>
       `;
-
-cbpInfoCard.addEventListener("click", openCBPInfoPopup);
-cbpInfoPopupOverlay.addEventListener("click", closeCBPInfoPopup);
-cbpInfoPopup.addEventListener("click", closeCBPInfoPopup);
       
       card.addEventListener("click", () => {
         const selectedFlight = allFlights.get(flight.id);
