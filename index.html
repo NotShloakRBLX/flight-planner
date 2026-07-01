@@ -643,6 +643,18 @@
   display: none;
 }
 
+    .phase-button.boarding-blocked {
+  background: linear-gradient(135deg, rgba(255, 75, 75, 0.95), rgba(155, 18, 18, 0.95)) !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  box-shadow: 0 0 0 2px rgba(255, 75, 75, 0.28);
+}
+
+.phase-button.boarding-blocked .phase-button-inner {
+  background: rgba(20, 5, 8, 0.96);
+  color: rgba(255, 255, 255, 0.72);
+}
+
     .edt-offset-options {
   grid-column: span 2;
   max-height: 0;
@@ -5634,6 +5646,19 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </div>
   </section>
 
+  <div class="mark-popup-overlay" id="boardingBlockedOverlay"></div>
+
+<section class="mark-popup" id="boardingBlockedPopup">
+  <div class="mark-popup-title">Boarding Not Complete</div>
+  <div class="mark-popup-subtitle">
+    Enter the boarding code on the boarding site before departing the gate.
+  </div>
+
+  <div class="mark-popup-actions">
+    <button class="mark-button" id="boardingBlockedCloseButton" type="button">OK</button>
+  </div>
+</section>
+  
   <div class="mark-popup-overlay" id="markPopupOverlay"></div>
 
   <section class="mark-popup" id="markPopup">
@@ -6013,6 +6038,10 @@ const boardingArrivalTime = document.getElementById("boardingArrivalTime");
 const boardingArrivalAirport = document.getElementById("boardingArrivalAirport");
 const boardingTripDuration = document.getElementById("boardingTripDuration");
 const boardingTripDetailsButton = document.getElementById("boardingTripDetailsButton");
+
+const boardingBlockedOverlay = document.getElementById("boardingBlockedOverlay");
+const boardingBlockedPopup = document.getElementById("boardingBlockedPopup");
+const boardingBlockedCloseButton = document.getElementById("boardingBlockedCloseButton");
 
 const passportPopupOverlay = document.getElementById("passportPopupOverlay");
 const createPassportPopup = document.getElementById("createPassportPopup");
@@ -6477,6 +6506,16 @@ function updateWorldCupSetupState() {
   worldCupSubmitButton.disabled = !ready;
 }
 
+    function openBoardingBlockedPopup() {
+  boardingBlockedOverlay.classList.add("active");
+  boardingBlockedPopup.classList.add("active");
+}
+
+function closeBoardingBlockedPopup() {
+  boardingBlockedOverlay.classList.remove("active");
+  boardingBlockedPopup.classList.remove("active");
+}
+
 function openWorldCupPaymentPopup() {
   if (!currentWorldCupLock) return;
 
@@ -6710,6 +6749,9 @@ function createWorldCupFeaturedCard(match) {
   card.querySelector("[data-world-cup-details]").addEventListener("click", () => {
     openWorldCupMatchDetails(match);
   });
+
+  boardingBlockedOverlay.addEventListener("click", closeBoardingBlockedPopup);
+boardingBlockedCloseButton.addEventListener("click", closeBoardingBlockedPopup);
 
   flightsList.appendChild(card);
 }
@@ -9599,9 +9641,20 @@ const phaseOrder = hasBoarding
         }
 
         if (itemIndex === currentIndex + 1) {
-          item.button.classList.add("active");
-          return;
-        }
+  const boardingBlocksGateDeparture =
+    item.key === "gateDeparture" &&
+    flight.enableBoarding === true &&
+    flight.boardingVerified !== true;
+
+  if (boardingBlocksGateDeparture) {
+    item.button.classList.add("boarding-blocked");
+    item.button.disabled = false;
+    return;
+  }
+
+  item.button.classList.add("active");
+  return;
+}
 
         item.button.classList.add("locked");
         item.button.disabled = true;
@@ -9797,6 +9850,14 @@ if (activeFlight.boardingSessionId || activeFlight.id) {
   if (!activeFlight) return;
 
   const phase = getFlightPhase(activeFlight);
+
+  if (
+    activeFlight.enableBoarding === true &&
+    activeFlight.boardingVerified !== true
+  ) {
+    openBoardingBlockedPopup();
+    return;
+  }
 
   if (activeFlight.enableBoarding === true) {
     if (phase !== "boardingComplete") return;
