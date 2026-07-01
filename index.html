@@ -4867,6 +4867,92 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   transform: scale(1.45);
   transform-origin: center;
 }
+
+    .travel-card-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.travel-card-grid.hidden {
+  display: none;
+}
+
+.travel-info-card {
+  min-height: 142px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.17);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+    #12121a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.travel-card-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.travel-card-icon img {
+  display: block;
+  object-fit: contain;
+}
+
+.pnr-icon img {
+  width: 42px;
+  height: 42px;
+}
+
+.seat-icon img {
+  width: 42px;
+  height: 34px;
+}
+
+.travel-card-value {
+  margin-top: 24px;
+  color: white;
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.travel-card-label {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+}
+
+@media (max-width: 430px) {
+  .travel-info-card {
+    min-height: 132px;
+    padding: 16px;
+  }
+
+  .travel-card-value {
+    margin-top: 20px;
+    font-size: 22px;
+  }
+
+  .travel-card-label {
+    font-size: 15px;
+  }
+
+  .seat-icon img {
+    width: 40px;
+    height: 31px;
+  }
+}
     
   </style>
 </head>
@@ -5515,14 +5601,24 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </div>
         </section>
 
-        <section class="seat-card hidden" id="seatCard">
-  <div>
-    <div class="seat-label">Assigned Seat</div>
-    <div class="seat-value" id="seatValue">--</div>
-    <div class="seat-cabin" id="seatCabin">--</div>
-  </div>
+        <section class="travel-card-grid hidden" id="travelCards">
+  <article class="travel-info-card pnr-card" id="pnrCard">
+    <div class="travel-card-icon pnr-icon">
+      <img src="./pnr.png" alt="Booking code" />
+    </div>
 
-  <div class="premium-badge" aria-label="Premium seat">P</div>
+    <div class="travel-card-value" id="pnrValue">------</div>
+    <div class="travel-card-label">Booking Code</div>
+  </article>
+
+  <article class="travel-info-card seat-card" id="seatCard">
+    <div class="travel-card-icon seat-icon">
+      <img src="./seat.png" alt="Seat" />
+    </div>
+
+    <div class="travel-card-value" id="seatValue">--</div>
+    <div class="travel-card-label" id="seatCabin">--</div>
+  </article>
 </section>
         
         <section class="timezone-card" id="timezoneCard">
@@ -6254,7 +6350,9 @@ const backButton = document.getElementById("backButton");
     const detailArrivalTime = document.getElementById("detailArrivalTime");
     const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
     const arrivalStatusLine = document.getElementById("arrivalStatusLine");
-    const seatCard = document.getElementById("seatCard");
+    const travelCards = document.getElementById("travelCards");
+const pnrValue = document.getElementById("pnrValue");
+const seatCard = document.getElementById("seatCard");
 const seatValue = document.getElementById("seatValue");
 const seatCabin = document.getElementById("seatCabin");
     const timezoneTitle = document.getElementById("timezoneTitle");
@@ -8451,19 +8549,21 @@ showSeatAssignedPopup(seat, cabin);
 }
 
 function updateSeatCard(flight) {
+  pnrValue.textContent = getReservationCode(flight);
+
   if (!flight.assignedSeat) {
-    seatCard.classList.add("hidden");
+    travelCards.classList.add("hidden");
     seatCard.classList.remove("premium", "premium-economy");
     seatValue.textContent = "--";
     seatCabin.textContent = "--";
     return;
   }
 
-  seatCard.classList.remove("hidden");
+  travelCards.classList.remove("hidden");
   seatCard.classList.toggle("premium", flight.premiumSeat === true && flight.premiumEconomySeat !== true);
   seatCard.classList.toggle("premium-economy", flight.premiumEconomySeat === true);
 
-  seatValue.textContent = flight.assignedSeat;
+  seatValue.textContent = `Seat ${flight.assignedSeat}`;
   seatCabin.textContent = flight.seatCabin || "Economy";
 }
     
