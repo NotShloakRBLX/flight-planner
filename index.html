@@ -8650,10 +8650,11 @@ function openBoardingPassPage(flight) {
 
   boardingConfirmation.textContent = `CONFIRMATION # | ${getReservationCode(flight)}`;
   boardingPassengerName.textContent = currentPassport?.fullName || "Passenger";
-  boardingAirlineLogo.src = getAirlineLogoPath(airline);
-  boardingAirlineLogo.onerror = function () {
-    this.style.display = "none";
-  };
+  boardingAirlineLogo.style.display = "block";
+boardingAirlineLogo.src = getAirlineLogoPath(airline);
+boardingAirlineLogo.onerror = function () {
+  this.style.display = "none";
+};
 
   boardingFlightNumber.textContent = `${airline}${flightNumber}`;
   boardingCode.textContent = getBoardingCode(flight);
@@ -9643,39 +9644,44 @@ markPopupOverlay.classList.add("active");
   const phase = getFlightPhase(activeFlight);
 
   if (phase === "scheduled") {
+    const updates = {
+      phase: "boarding",
+      boardingStartMs: Date.now()
+    };
+
+    let completedPhaseFlight = {
+      ...activeFlight,
+      ...updates,
+      id: activeFlight.id
+    };
+
     try {
-      const updates = {
-        phase: "boarding",
-        boardingStartMs: Date.now()
-      };
-
       await updateDoc(getFlightRef(activeFlight.id), updates);
-
-      const completedPhaseFlight = {
-        ...activeFlight,
-        ...updates,
-        id: activeFlight.id
-      };
-
-      editFlightPage.classList.remove("active");
-
-      if (
-        completedPhaseFlight.internationalUSArrival === true &&
-        completedPhaseFlight.cbpSubmitted !== true &&
-        (flightUsesUSPreclearance(completedPhaseFlight) || completedPhaseFlight.usPreclearance === true)
-      ) {
-        detailPage.classList.remove("active");
-        await createCBPLockForFlight(completedPhaseFlight);
-        return;
-      }
-
-      detailPage.classList.remove("active");
-      openBoardingPassPage(completedPhaseFlight);
     } catch (error) {
       console.error("Error starting boarding:", error);
       alert("Boarding could not be started.");
+      return;
     }
 
+    editFlightPage.classList.remove("active");
+    detailPage.classList.remove("active");
+
+    if (
+      completedPhaseFlight.internationalUSArrival === true &&
+      completedPhaseFlight.cbpSubmitted !== true &&
+      (flightUsesUSPreclearance(completedPhaseFlight) || completedPhaseFlight.usPreclearance === true)
+    ) {
+      try {
+        await createCBPLockForFlight(completedPhaseFlight);
+      } catch (error) {
+        console.error("Error opening preclearance after boarding:", error);
+        openBoardingPassPage(completedPhaseFlight);
+      }
+
+      return;
+    }
+
+    openBoardingPassPage(completedPhaseFlight);
     return;
   }
 
