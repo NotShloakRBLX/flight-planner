@@ -9020,16 +9020,20 @@ updateCompleteFlightButton(latest);
     }
 
     function closeFlightDetails() {
-      detailPage.classList.remove("active");
-      activeFlight = null;
+  detailPage.classList.remove("active");
+  boardingPassPage.classList.remove("active");
+  flightsPage.classList.remove("hidden");
 
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-      }
+  activeFlight = null;
+  activeBoardingPassFlight = null;
 
-      document.body.style.overflow = "";
-    }
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+
+  document.body.style.overflow = "";
+}
 
     detailCloseButton.addEventListener("click", closeFlightDetails);
 
@@ -9045,8 +9049,12 @@ updateCompleteFlightButton(latest);
 boardingTripDetailsButton.addEventListener("click", () => {
   if (!activeBoardingPassFlight) return;
 
+  const selectedFlight = allFlights.get(activeBoardingPassFlight.id) || activeBoardingPassFlight;
+
   boardingPassPage.classList.remove("active");
-  openFlightDetails(activeBoardingPassFlight);
+  flightsPage.classList.add("hidden");
+
+  openFlightDetails(selectedFlight);
 });
 
     addFlightButton.addEventListener("click", () => {
