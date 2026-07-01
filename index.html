@@ -6511,6 +6511,18 @@ function updateWorldCupSetupState() {
   boardingBlockedPopup.classList.add("active");
 }
 
+    boardingBlockedOverlay.addEventListener("click", closeBoardingBlockedPopup);
+
+boardingBlockedPopup.addEventListener("click", (event) => {
+  event.stopPropagation();
+});
+
+boardingBlockedCloseButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  closeBoardingBlockedPopup();
+});
+
 function closeBoardingBlockedPopup() {
   boardingBlockedOverlay.classList.remove("active");
   boardingBlockedPopup.classList.remove("active");
@@ -6749,9 +6761,6 @@ function createWorldCupFeaturedCard(match) {
   card.querySelector("[data-world-cup-details]").addEventListener("click", () => {
     openWorldCupMatchDetails(match);
   });
-
-  boardingBlockedOverlay.addEventListener("click", closeBoardingBlockedPopup);
-boardingBlockedCloseButton.addEventListener("click", closeBoardingBlockedPopup);
 
   flightsList.appendChild(card);
 }
