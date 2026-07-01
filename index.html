@@ -8475,6 +8475,17 @@ function getFeaturedPassengerName() {
   return currentPassport?.fullName || "Passenger";
 }
 
+    function generateBoardingCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+
+  for (let index = 0; index < 6; index += 1) {
+    code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+
+  return code;
+}
+
 function getReservationCode(flight) {
   if (flight.reservationCode) {
     return String(flight.reservationCode).trim().toUpperCase();
@@ -9115,10 +9126,13 @@ worldCupLink: worldCupToggle.checked ? worldCupLinkInput.value.trim() || "" : ""
 worldCupTeam1: worldCupToggle.checked ? worldCupTeam1Input.value.trim() || "Team 1" : "",
 worldCupTeam2: worldCupToggle.checked ? worldCupTeam2Input.value.trim() || "Team 2" : "",
 enableBoarding: enableBoardingToggle.checked,
-   boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
+boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
 boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
 boardingGate: enableBoardingToggle.checked ? boardingGateInput.value.trim().toUpperCase() || "" : "",
 boardingTerminal: enableBoardingToggle.checked ? boardingTerminalInput.value.trim() || "" : "",
+boardingCode: generateBoardingCode(),
+boardingVerified: false,
+boardingSessionId: "",
     departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
     phase: "scheduled",
@@ -9324,6 +9338,18 @@ if (!flight.edtOffset) {
 
 if (!flight.boardingTerminal) {
   flight.boardingTerminal = "";
+}
+
+        if (!flight.boardingCode) {
+  flight.boardingCode = getReservationCode(flight);
+}
+
+if (flight.boardingVerified !== true) {
+  flight.boardingVerified = false;
+}
+
+if (!flight.boardingSessionId) {
+  flight.boardingSessionId = "";
 }
         
         if (!flight.routeDistance) {
@@ -9638,15 +9664,55 @@ markPopupOverlay.classList.add("active");
     cancelMarkButton.addEventListener("click", closeMarkPopup);
     markPopupOverlay.addEventListener("click", closeMarkPopup);
 
+    async function createBoardingSessionForFlight(flight) {
+  if (!flight || !flight.id) return "";
+
+  const sessionId = flight.id;
+  const sessionRef = doc(db, "boardingSessions", sessionId);
+
+  await setDoc(
+    sessionRef,
+    {
+      active: true,
+      verified: false,
+      flightId: flight.id,
+      airline: flight.airline || "",
+      flightNumber: flight.flightNumber || "",
+      flightDate: flight.flightDate || "",
+      flightDateRaw: flight.flightDateRaw || "",
+      departureAirport: flight.departureAirport || "",
+      arrivalAirport: flight.arrivalAirport || "",
+      cityDeparture: flight.cityDeparture || "",
+      cityArrival: flight.cityArrival || "",
+      boardingCode: flight.boardingCode || getReservationCode(flight),
+      boardingGate: flight.boardingGate || "",
+      boardingTerminal: flight.boardingTerminal || "",
+      assignedSeat: flight.assignedSeat || "",
+      seatCabin: flight.seatCabin || "Economy",
+      startedAtMs: Date.now(),
+      startedAt: serverTimestamp(),
+      verifiedAt: null,
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+
+  return sessionId;
+}
+    
     phaseBoarding.addEventListener("click", async () => {
   if (!activeFlight || activeFlight.enableBoarding !== true) return;
 
   const phase = getFlightPhase(activeFlight);
 
   if (phase === "scheduled") {
+    const sessionId = activeFlight.id;
+    
     const updates = {
       phase: "boarding",
-      boardingStartMs: Date.now()
+      boardingStartMs: Date.now(),
+      boardingVerified: false,
+      boardingSessionId: sessionId
     };
 
     let completedPhaseFlight = {
@@ -9656,12 +9722,18 @@ markPopupOverlay.classList.add("active");
     };
 
     try {
-      await updateDoc(getFlightRef(activeFlight.id), updates);
-    } catch (error) {
-      console.error("Error starting boarding:", error);
-      alert("Boarding could not be started.");
-      return;
-    }
+  await updateDoc(getFlightRef(activeFlight.id), updates);
+
+  await createBoardingSessionForFlight({
+    ...activeFlight,
+    ...updates,
+    id: activeFlight.id
+  });
+} catch (error) {
+  console.error("Error starting boarding:", error);
+  alert("Boarding could not be started.");
+  return;
+}
 
     editFlightPage.classList.remove("active");
     detailPage.classList.remove("active");
@@ -9696,9 +9768,21 @@ markPopupOverlay.classList.add("active");
 
     try {
       await updateDoc(getFlightRef(activeFlight.id), {
-        phase: "boardingComplete",
-        actualBoardingMinutes
-      });
+  phase: "boardingComplete",
+  actualBoardingMinutes
+});
+
+if (activeFlight.boardingSessionId || activeFlight.id) {
+  await setDoc(
+    doc(db, "boardingSessions", activeFlight.boardingSessionId || activeFlight.id),
+    {
+      active: false,
+      endedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
 
       editFlightPage.classList.remove("active");
       detailPage.classList.add("active");
