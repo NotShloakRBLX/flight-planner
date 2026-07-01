@@ -625,7 +625,7 @@
 }
 
 .boarding-options.active {
-  max-height: 130px;
+  max-height: 230px;
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -5186,6 +5186,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       <label for="boardingDuration">Estimated boarding duration</label>
       <input id="boardingDuration" type="text" placeholder="30m" />
     </div>
+
+    <div class="form-field">
+  <label for="boardingGate">Gate</label>
+  <input id="boardingGate" type="text" placeholder="C18" />
+</div>
+
+<div class="form-field">
+  <label for="boardingTerminal">Terminal</label>
+  <input id="boardingTerminal" type="text" placeholder="Main" />
+</div>
+    
   </div>
 </div>
 </div>
@@ -6170,6 +6181,8 @@ const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
 const boardingTimeInput = document.getElementById("boardingTime");
 const boardingDurationInput = document.getElementById("boardingDuration");
+const boardingGateInput = document.getElementById("boardingGate");
+const boardingTerminalInput = document.getElementById("boardingTerminal");
 const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
     const airTimeInput = document.getElementById("airTime");
@@ -6208,9 +6221,11 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
 
   if (!enableBoardingToggle.checked) {
-    boardingTimeInput.value = "";
-    boardingDurationInput.value = "";
-  }
+  boardingTimeInput.value = "";
+  boardingDurationInput.value = "";
+  boardingGateInput.value = "";
+  boardingTerminalInput.value = "";
+}
 });
 
     premiumEconomyToggle.addEventListener("change", () => {
@@ -9099,8 +9114,10 @@ worldCupLink: worldCupToggle.checked ? worldCupLinkInput.value.trim() || "" : ""
 worldCupTeam1: worldCupToggle.checked ? worldCupTeam1Input.value.trim() || "Team 1" : "",
 worldCupTeam2: worldCupToggle.checked ? worldCupTeam2Input.value.trim() || "Team 2" : "",
 enableBoarding: enableBoardingToggle.checked,
-    boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
-    boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
+   boardingTime: enableBoardingToggle.checked ? boardingTimeInput.value || "" : "",
+boardingDuration: enableBoardingToggle.checked ? boardingDurationInput.value.trim() || "" : "",
+boardingGate: enableBoardingToggle.checked ? boardingGateInput.value.trim().toUpperCase() || "" : "",
+boardingTerminal: enableBoardingToggle.checked ? boardingTerminalInput.value.trim() || "" : "",
     departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
     phase: "scheduled",
@@ -9299,6 +9316,14 @@ if (!flight.edtOffset) {
         if (!flight.arrivalGate) {
           flight.arrivalGate = "";
         }
+
+        if (!flight.boardingGate) {
+  flight.boardingGate = "";
+}
+
+if (!flight.boardingTerminal) {
+  flight.boardingTerminal = "";
+}
         
         if (!flight.routeDistance) {
   flight.routeDistance = "";
@@ -9618,7 +9643,39 @@ markPopupOverlay.classList.add("active");
   const phase = getFlightPhase(activeFlight);
 
   if (phase === "scheduled") {
-    openMarkPopup("boarding");
+    try {
+      const updates = {
+        phase: "boarding",
+        boardingStartMs: Date.now()
+      };
+
+      await updateDoc(getFlightRef(activeFlight.id), updates);
+
+      const completedPhaseFlight = {
+        ...activeFlight,
+        ...updates,
+        id: activeFlight.id
+      };
+
+      editFlightPage.classList.remove("active");
+
+      if (
+        completedPhaseFlight.internationalUSArrival === true &&
+        completedPhaseFlight.cbpSubmitted !== true &&
+        (flightUsesUSPreclearance(completedPhaseFlight) || completedPhaseFlight.usPreclearance === true)
+      ) {
+        detailPage.classList.remove("active");
+        await createCBPLockForFlight(completedPhaseFlight);
+        return;
+      }
+
+      detailPage.classList.remove("active");
+      openBoardingPassPage(completedPhaseFlight);
+    } catch (error) {
+      console.error("Error starting boarding:", error);
+      alert("Boarding could not be started.");
+    }
+
     return;
   }
 
