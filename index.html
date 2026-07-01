@@ -9473,6 +9473,15 @@ if (!flight.premiumSeatCost) {
 
         allFlights.set(flight.id, flight);
 latestFlightsCache.push(flight);
+
+if (
+  flight.enableBoarding === true &&
+  getFlightPhase(flight) === "boardingComplete" &&
+  flight.boardingVerified !== true
+) {
+  watchBoardingSessionForFlight(flight);
+}
+
 refreshActiveFlight(flight);
       });
 
@@ -9760,6 +9769,39 @@ markPopupOverlay.classList.add("active");
   );
 
   return sessionId;
+}
+
+    function watchBoardingSessionForFlight(flight) {
+  if (!flight || !flight.id || flight.enableBoarding !== true) return;
+
+  const sessionId = flight.boardingSessionId || flight.id;
+
+  onSnapshot(
+    doc(db, "boardingSessions", sessionId),
+    async (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const session = snapshot.data();
+
+      if (session.verified !== true) return;
+
+      const latestFlight = allFlights.get(flight.id) || activeFlight;
+
+      if (!latestFlight || latestFlight.boardingVerified === true) return;
+
+      try {
+        await updateDoc(getFlightRef(flight.id), {
+          boardingVerified: true,
+          boardingVerifiedAt: serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Error unlocking gate departure:", error);
+      }
+    },
+    (error) => {
+      console.error("Error watching boarding session:", error);
+    }
+  );
 }
     
     phaseBoarding.addEventListener("click", async () => {
