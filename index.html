@@ -3961,6 +3961,252 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     grid-template-columns: 1fr;
   }
 }
+
+    .featured-flight-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(110, 130, 150, 0.18);
+  background: #202934;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.38);
+  animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.featured-flight-top {
+  position: relative;
+  min-height: 140px;
+  padding: 22px 18px 24px;
+  border-bottom: 1px solid rgba(160, 180, 200, 0.26);
+  display: block;
+  text-align: left;
+}
+
+.featured-flight-number {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 26px;
+  font-weight: 520;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: left;
+}
+
+.featured-status-flag {
+  position: absolute;
+  top: 19px;
+  right: 18px;
+  min-width: 92px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 7px;
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: none !important;
+}
+
+.featured-status-flag.good,
+.featured-status-flag.on-time,
+.featured-status-flag.arrived.good,
+.featured-status-flag.inflight.good {
+  background: linear-gradient(180deg, #10c96e, #06a85a);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.featured-status-flag.bad,
+.featured-status-flag.delayed,
+.featured-status-flag.arrived.bad,
+.featured-status-flag.inflight.bad {
+  background: linear-gradient(180deg, #ffd43b, #d6a900);
+  color: #1d1d1f !important;
+  -webkit-text-fill-color: #1d1d1f !important;
+}
+
+.featured-main-status {
+  margin-top: 34px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: -1.7px;
+  line-height: 1;
+  text-align: left;
+}
+
+.featured-route-area {
+  position: relative;
+  padding: 20px 48px 20px 18px;
+  border-bottom: 1px solid rgba(160, 180, 200, 0.26);
+  text-align: left;
+  cursor: pointer;
+}
+
+.featured-route-area:active {
+  opacity: 0.78;
+}
+
+.featured-passenger-name {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 21px;
+  font-weight: 420;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.featured-route-line {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  color: #2f9bff;
+  font-size: 32px;
+  font-weight: 430;
+  letter-spacing: -0.7px;
+  line-height: 1;
+}
+
+.featured-route-arrow {
+  opacity: 0.9;
+  font-size: 28px;
+}
+
+.featured-route-chevron {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #2f9bff;
+  font-size: 44px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.featured-date-line {
+  margin-top: 17px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 20px;
+  font-weight: 420;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.featured-info-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 1fr 0.9fr;
+  border-bottom: 1px solid rgba(160, 180, 200, 0.26);
+  background: transparent;
+}
+
+.featured-info-cell {
+  padding: 17px 10px 18px;
+  text-align: left;
+}
+
+.featured-info-cell:first-child {
+  padding-left: 18px;
+}
+
+.featured-info-cell:last-child {
+  padding-right: 18px;
+  text-align: right;
+}
+
+.featured-info-label {
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 20px;
+  font-weight: 360;
+  letter-spacing: -0.6px;
+}
+
+.featured-info-value {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 22px;
+  font-weight: 390;
+  letter-spacing: -0.4px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.featured-info-value.seat {
+  background: none;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.74);
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.featured-info-value.good {
+  color: #4fe08e;
+}
+
+.featured-info-value.bad {
+  color: #ffce45;
+}
+
+.featured-view-button {
+  width: calc(100% - 36px);
+  height: 60px;
+  margin: 24px 18px 24px;
+  border: none;
+  border-radius: 999px;
+  background: #3da8f5;
+  color: #17202a;
+  font-size: 24px;
+  font-weight: 760;
+  letter-spacing: -0.55px;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.featured-view-button:active {
+  transform: scale(0.985);
+}
+
+@media (max-width: 430px) {
+  .featured-flight-card {
+    border-radius: 28px;
+  }
+
+  .featured-flight-top {
+    min-height: 132px;
+    padding: 20px 18px 22px;
+  }
+
+  .featured-flight-number {
+    font-size: 25px;
+  }
+
+  .featured-main-status {
+    font-size: 40px;
+  }
+
+  .featured-passenger-name {
+    font-size: 20px;
+  }
+
+  .featured-route-line {
+    font-size: 31px;
+  }
+
+  .featured-date-line {
+    font-size: 19px;
+  }
+
+  .featured-info-label {
+    font-size: 19px;
+  }
+
+  .featured-info-value {
+    font-size: 21px;
+  }
+}
     
   </style>
 </head>
@@ -7581,7 +7827,81 @@ function getFeaturedSeatValue(flight) {
   };
 }
 
-function populateFeaturedFlightCard(card, flight) {
+function getFeaturedPassengerName() {
+  return currentPassport?.fullName || "Passenger";
+}
+
+function getReservationCode(flight) {
+  if (flight.reservationCode) {
+    return String(flight.reservationCode).trim().toUpperCase();
+  }
+
+  const source = `${flight.id || ""}${flight.airline || ""}${flight.flightNumber || ""}${flight.flightDateRaw || ""}`;
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let hash = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash = ((hash << 5) - hash) + source.charCodeAt(index);
+    hash |= 0;
+  }
+
+  let code = "";
+  let value = Math.abs(hash) || 1;
+
+  for (let index = 0; index < 6; index += 1) {
+    code += alphabet[value % alphabet.length];
+    value = Math.floor(value / alphabet.length) + index + 7;
+  }
+
+  return code;
+}
+
+function getFeaturedTimelineInfo(flight) {
+  const phase = getFlightPhase(flight);
+  const actuals = getActualTimes(flight);
+  const originalDeparture = getOriginalDepartureDateTime(flight);
+  const originalArrival = getOriginalArrivalDateTime(flight);
+
+  if (phase === "gateArrival") {
+    const diff = describeDifference(actuals.actualGateArrival, originalArrival);
+
+    return {
+      label: "Arrived",
+      value: formatTime12Hour(flight.actualGateArrival || flight.scheduledArrival),
+      className: diff.good ? "good" : "bad"
+    };
+  }
+
+  if (phase === "takeoff" || phase === "land") {
+    return {
+      label: "Now arrives",
+      value: formatTime12Hour(flight.scheduledArrival),
+      className: ""
+    };
+  }
+
+  if (phase === "gateDeparture" || phase === "taxi") {
+    const diff = describeDifference(actuals.actualGateDeparture, originalDeparture);
+
+    return {
+      label: "Departed",
+      value: formatTime12Hour(flight.actualGateDeparture),
+      className: diff.good ? "good" : "bad"
+    };
+  }
+
+  return {
+    label: "Depart",
+    value: formatTime12Hour(flight.scheduledDeparture),
+    className: ""
+  };
+}
+
+function getFeaturedTerminalValue(flight) {
+  return flight.terminal || flight.boardingTerminal || "--";
+}
+    
+    function populateFeaturedFlightCard(card, flight) {
   const airline = flight.airline || "AA";
   const flightNumber = flight.flightNumber || "0000";
   const departureAirport = flight.departureAirport || "DEP";
@@ -7589,7 +7909,7 @@ function populateFeaturedFlightCard(card, flight) {
   const flightDate = flight.flightDate || "";
 
   const status = getFeaturedStatusFlag(flight);
-  const departInfo = getFeaturedDepartValue(flight);
+  const timelineInfo = getFeaturedTimelineInfo(flight);
   const seatInfo = getFeaturedSeatValue(flight);
 
   const flag = card.querySelector("[data-featured-flag]");
@@ -7598,18 +7918,20 @@ function populateFeaturedFlightCard(card, flight) {
 
   card.querySelector("[data-featured-flight-number]").textContent = `${airline} ${flightNumber}`;
   card.querySelector("[data-featured-main-status]").textContent = getFeaturedMainStatus(flight);
+  card.querySelector("[data-featured-passenger]").textContent = getFeaturedPassengerName();
   card.querySelector("[data-featured-dep-code]").textContent = departureAirport;
   card.querySelector("[data-featured-arr-code]").textContent = arrivalAirport;
-  card.querySelector("[data-featured-date]").textContent = flightDate;
+  card.querySelector("[data-featured-date]").textContent = `${flightDate} • ${getReservationCode(flight)}`;
 
-  card.querySelector("[data-featured-depart-label]").textContent = departInfo.label;
+  card.querySelector("[data-featured-depart-label]").textContent = timelineInfo.label;
+
   const departValueEl = card.querySelector("[data-featured-depart-value]");
-  departValueEl.textContent = departInfo.value;
-  departValueEl.className = `featured-info-value ${departInfo.className || ""}`;
+  departValueEl.textContent = timelineInfo.value;
+  departValueEl.className = `featured-info-value ${timelineInfo.className || ""}`;
 
   card.querySelector("[data-featured-gate-value]").textContent = getFeaturedGateValue(flight);
+  card.querySelector("[data-featured-terminal-value]").textContent = getFeaturedTerminalValue(flight);
 
-  card.querySelector("[data-featured-seat-label]").textContent = seatInfo.label;
   const seatValueEl = card.querySelector("[data-featured-seat-value]");
   seatValueEl.textContent = seatInfo.value;
   seatValueEl.className = `featured-info-value ${seatInfo.className || ""}`;
@@ -7668,12 +7990,14 @@ function startFeaturedCardLiveUpdates() {
 
   card.innerHTML = `
     <div class="featured-flight-top">
-      <div class="featured-status-flag" data-featured-flag></div>
       <div class="featured-flight-number" data-featured-flight-number></div>
+      <div class="featured-status-flag" data-featured-flag></div>
       <div class="featured-main-status" data-featured-main-status></div>
     </div>
 
-    <div class="featured-route-area">
+    <div class="featured-route-area" data-featured-open>
+      <div class="featured-passenger-name" data-featured-passenger></div>
+
       <div class="featured-route-line">
         <span data-featured-dep-code></span>
         <span class="featured-route-arrow">→</span>
@@ -7681,6 +8005,7 @@ function startFeaturedCardLiveUpdates() {
       </div>
 
       <div class="featured-date-line" data-featured-date></div>
+      <div class="featured-route-chevron">›</div>
     </div>
 
     <div class="featured-info-grid">
@@ -7695,21 +8020,30 @@ function startFeaturedCardLiveUpdates() {
       </div>
 
       <div class="featured-info-cell">
-        <div class="featured-info-label" data-featured-seat-label></div>
+        <div class="featured-info-label">Terminal</div>
+        <div class="featured-info-value" data-featured-terminal-value></div>
+      </div>
+
+      <div class="featured-info-cell">
+        <div class="featured-info-label">Seat</div>
         <div class="featured-info-value" data-featured-seat-value></div>
       </div>
     </div>
 
-    <button class="featured-view-button" type="button">View</button>
+    <button class="featured-view-button" type="button">Boarding pass</button>
   `;
 
   populateFeaturedFlightCard(card, flight);
 
-  card.querySelector(".featured-view-button").addEventListener("click", () => {
+  card.querySelector("[data-featured-open]").addEventListener("click", () => {
     const selectedFlight = allFlights.get(flight.id);
     if (selectedFlight) {
       openFlightDetails(selectedFlight);
     }
+  });
+
+  card.querySelector(".featured-view-button").addEventListener("click", () => {
+    // Boarding pass page functionality will be added later.
   });
 
   flightsList.appendChild(card);
