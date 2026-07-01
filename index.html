@@ -4824,6 +4824,49 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .boarding-trip-duration {
   font-weight: 520 !important;
 }
+
+.boarding-info-icon.image-icon.depgate-icon {
+  width: 32px !important;
+  height: 32px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.boarding-info-icon.image-icon.depgate-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: scale(1.85);
+  transform-origin: center;
+}
+
+.mid-flight-icon.image-flight-time {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  flex: 0 0 auto;
+}
+
+.mid-flight-icon.image-flight-time::after {
+  display: none;
+}
+
+.mid-flight-icon.image-flight-time img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: scale(1.9);
+  transform-origin: center;
+}
     
   </style>
 </head>
@@ -5352,7 +5395,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
     <section class="boarding-pass-info-grid">
       <article class="boarding-info-card">
-        <div class="boarding-info-icon">↗</div>
+        <div class="boarding-info-icon image-icon depgate-icon">
+          <img src="./depgate.png" alt="Departure gate" />
+        </div>
         <div class="boarding-info-title">Departure Gate</div>
         <div class="boarding-info-value" id="boardingGateValue">--</div>
         <div class="boarding-info-subtitle" id="boardingTerminalValue">Terminal --</div>
@@ -5443,7 +5488,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         </section>
 
         <div class="mid-flight-line">
-  <span class="mid-flight-icon"></span>
+  <span class="mid-flight-icon image-flight-time">
+    <img src="./flighttime.png" alt="Flight time" />
+  </span>
   <span class="mid-flight-info" id="detailFlightDuration">--</span>
 </div>
 
