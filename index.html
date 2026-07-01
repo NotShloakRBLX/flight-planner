@@ -9880,9 +9880,10 @@ if (activeFlight.boardingSessionId || activeFlight.id) {
   await setDoc(
     doc(db, "boardingSessions", activeFlight.boardingSessionId || activeFlight.id),
     {
-      active: false,
-      endedAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      active: true,
+boardingComplete: true,
+endedAt: serverTimestamp(),
+updatedAt: serverTimestamp()
     },
     { merge: true }
   );
