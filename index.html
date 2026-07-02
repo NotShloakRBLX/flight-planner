@@ -8743,7 +8743,17 @@ function getFeaturedTimelineInfo(flight) {
 }
 
 function getFeaturedTerminalValue(flight) {
-  return flight.terminal || flight.boardingTerminal || "--";
+  const phase = getFlightPhase(flight);
+
+  if (phase === "takeoff" || phase === "land") {
+    return "—";
+  }
+
+  if (phase === "gateArrival") {
+    return flight.arrivalTerminal || "—";
+  }
+
+  return flight.boardingTerminal || "—";
 }
     
     function populateFeaturedFlightCard(card, flight) {
@@ -9847,7 +9857,7 @@ if (phase === "boarding") {
 } else if (phase === "gateArrival") {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "block";
-  markGateInput.placeholder = "Arrival gate C12";
+  markGateInput.placeholder = "Arrival gate and terminal, ex: C12, Terminal 4";
 } else {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "none";
@@ -10171,7 +10181,10 @@ const actualGateArrivalDate = actualLandDate
         updates.actualGateArrival = time;
         updates.actualArrivalTaxiMinutes = arrivalTaxiMinutes;
         updates.actualTotalTimeMinutes = totalMinutes;
-        updates.arrivalGate = gate;
+        const gateParts = gate.split(",").map(part => part.trim()).filter(Boolean);
+
+        updates.arrivalGate = gateParts[0] || gate;
+        updates.arrivalTerminal = gateParts[1] || "";
       }
 
       confirmMarkButton.disabled = true;
