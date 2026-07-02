@@ -5800,7 +5800,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <div class="mark-popup-subtitle">Enter the actual time for this flight phase.</div>
     <input id="markTimeInput" type="time" />
     <input id="markGateInput" type="text" placeholder="Gate C12" style="display: none;" />
-    <input id="markTerminalInput" type="text" placeholder="Terminal 4" style="display: none;" />
 
     <div class="mark-popup-actions">
       <button class="cancel-button" id="cancelMarkButton" type="button">Cancel</button>
@@ -6283,7 +6282,6 @@ const saveScheduleButton = document.getElementById("saveScheduleButton");
     const markPopupTitle = document.getElementById("markPopupTitle");
     const markTimeInput = document.getElementById("markTimeInput");
     const markGateInput = document.getElementById("markGateInput");
-    const markTerminalInput = document.getElementById("markTerminalInput");
     const cancelMarkButton = document.getElementById("cancelMarkButton");
     const confirmMarkButton = document.getElementById("confirmMarkButton");
 
@@ -8745,17 +8743,7 @@ function getFeaturedTimelineInfo(flight) {
 }
 
 function getFeaturedTerminalValue(flight) {
-  const phase = getFlightPhase(flight);
-
-  if (phase === "takeoff" || phase === "land") {
-    return "—";
-  }
-
-  if (phase === "gateArrival") {
-    return flight.arrivalTerminal || "—";
-  }
-
-  return flight.boardingTerminal || "—";
+  return flight.terminal || flight.boardingTerminal || "--";
 }
     
     function populateFeaturedFlightCard(card, flight) {
@@ -9534,10 +9522,6 @@ if (!flight.edtOffset) {
           flight.arrivalGate = "";
         }
 
-        if (!flight.arrivalTerminal) {
-          flight.arrivalTerminal = "";
-        }
-
         if (!flight.boardingGate) {
   flight.boardingGate = "";
 }
@@ -9855,8 +9839,6 @@ const phaseOrder = hasBoarding
       markPopupTitle.textContent = titles[phase] || "Mark Phase";
       markTimeInput.value = "";
 markGateInput.value = "";
-      markTerminalInput.value = "";
-markTerminalInput.style.display = "none";
 
 if (phase === "boarding") {
   markTimeInput.style.display = "none";
@@ -9865,10 +9847,7 @@ if (phase === "boarding") {
 } else if (phase === "gateArrival") {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "block";
-  markTerminalInput.style.display = "block";
-
   markGateInput.placeholder = "Arrival gate C12";
-  markTerminalInput.placeholder = "Arrival terminal";
 } else {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "none";
@@ -10119,10 +10098,7 @@ if (pendingMarkPhase === "boarding" && !markGateInput.value.trim()) return;
 
 if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 
-if (
-  pendingMarkPhase === "gateArrival" &&
-  (!markGateInput.value.trim() || !markTerminalInput.value.trim())
-) return;
+if (pendingMarkPhase === "gateArrival" && !markGateInput.value.trim()) return;
 
       const time = markTimeInput.value;
       const gate = markGateInput.value.trim();
@@ -10196,7 +10172,6 @@ const actualGateArrivalDate = actualLandDate
         updates.actualArrivalTaxiMinutes = arrivalTaxiMinutes;
         updates.actualTotalTimeMinutes = totalMinutes;
         updates.arrivalGate = gate;
-        updates.arrivalTerminal = markTerminalInput.value.trim();
       }
 
       confirmMarkButton.disabled = true;
