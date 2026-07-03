@@ -2023,6 +2023,70 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       padding: 22px 18px 34px;
     }
 
+    .airport-section {
+  position: relative;
+  min-height: 142px;
+}
+
+.airport-section.has-gate-display {
+  padding-right: 136px;
+}
+
+.detail-airport-gate-block {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  display: none;
+  justify-items: end;
+  width: 126px;
+}
+
+.airport-section.has-gate-display .detail-airport-gate-block {
+  display: grid;
+}
+
+.detail-airport-gate-pill {
+  min-width: 88px;
+  padding: 10px 14px 11px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #ffd84a, #ffc21f);
+  color: #05070b;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-align: center;
+}
+
+.detail-airport-terminal {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 18px;
+  font-weight: 520;
+  letter-spacing: -0.35px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 430px) {
+  .airport-section.has-gate-display {
+    padding-right: 124px;
+  }
+
+  .detail-airport-gate-block {
+    width: 116px;
+  }
+
+  .detail-airport-gate-pill {
+    min-width: 80px;
+    font-size: 22px;
+  }
+
+  .detail-airport-terminal {
+    font-size: 16px;
+  }
+}
+    
     .airport-row-title {
       display: flex;
       align-items: center;
@@ -4100,103 +4164,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   line-height: 1;
 }
 
-    .featured-airport-list {
-  margin-top: 14px;
-  display: grid;
-  gap: 18px;
-}
-
-.featured-airport-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-}
-
-.featured-airport-main {
-  min-width: 0;
-}
-
-.featured-airport-code-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #2f9bff;
-  font-size: 32px;
-  font-weight: 430;
-  letter-spacing: -0.7px;
-  line-height: 1;
-}
-
-.featured-airport-direction {
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 24px;
-  line-height: 1;
-}
-
-.featured-airport-name {
-  margin-top: 7px;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 16px;
-  font-weight: 420;
-  letter-spacing: -0.25px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.featured-airport-gate-block {
-  display: none;
-  justify-items: end;
-  min-width: 92px;
-}
-
-.featured-airport-gate-block.active {
-  display: grid;
-}
-
-.featured-airport-gate-pill {
-  min-width: 86px;
-  padding: 9px 13px 10px;
-  border-radius: 15px;
-  background: linear-gradient(180deg, #ffd84a, #ffc21f);
-  color: #08090d;
-  font-size: 23px;
-  font-weight: 900;
-  letter-spacing: -0.45px;
-  line-height: 1;
-  text-align: center;
-}
-
-.featured-airport-terminal {
-  margin-top: 9px;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 17px;
-  font-weight: 390;
-  letter-spacing: -0.35px;
-  text-align: right;
-  white-space: nowrap;
-}
-
-@media (max-width: 430px) {
-  .featured-airport-code-line {
-    font-size: 29px;
-  }
-
-  .featured-airport-name {
-    font-size: 15px;
-  }
-
-  .featured-airport-gate-pill {
-    min-width: 78px;
-    font-size: 21px;
-  }
-
-  .featured-airport-terminal {
-    font-size: 16px;
-  }
-}
-
 .featured-date-line {
   margin-top: 17px;
   color: rgba(255, 255, 255, 0.72);
@@ -5563,8 +5530,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       </section>
 
       <main class="detail-content">
-        <section class="airport-section">
-          <div class="airport-row-title">
+        <section class="airport-section" id="detailDepartureSection">
+  <div class="detail-airport-gate-block" id="detailDepartureGateBlock">
+    <div class="detail-airport-gate-pill" id="detailDepartureGatePill"></div>
+    <div class="detail-airport-terminal" id="detailDepartureTerminal"></div>
+  </div>
+
+  <div class="airport-row-title">
             <span class="direction-dot">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7.05 16.95a1.25 1.25 0 0 1 0-1.77L13.23 9H9.25a1.25 1.25 0 0 1 0-2.5h7a1.25 1.25 0 0 1 1.25 1.25v7a1.25 1.25 0 0 1-2.5 0v-3.98l-6.18 6.18a1.25 1.25 0 0 1-1.77 0Z" />
@@ -5591,8 +5563,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <span class="mid-flight-info" id="detailFlightDuration">--</span>
 </div>
 
-        <section class="airport-section">
-          <div class="airport-row-title">
+        <section class="airport-section" id="detailArrivalSection">
+  <div class="detail-airport-gate-block" id="detailArrivalGateBlock">
+    <div class="detail-airport-gate-pill" id="detailArrivalGatePill"></div>
+    <div class="detail-airport-terminal" id="detailArrivalTerminal"></div>
+  </div>
+
+  <div class="airport-row-title">
             <span class="direction-dot">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M16.95 7.05a1.25 1.25 0 0 1 0 1.77L10.77 15h3.98a1.25 1.25 0 0 1 0 2.5h-7a1.25 1.25 0 0 1-1.25-1.25v-7a1.25 1.25 0 0 1 2.5 0v3.98l6.18-6.18a1.25 1.25 0 0 1 1.77 0Z" />
@@ -6343,15 +6320,23 @@ const backButton = document.getElementById("backButton");
     const statusPanel = document.getElementById("statusPanel");
     const gateStatusTitle = document.getElementById("gateStatusTitle");
     const gateStatusSubtitle = document.getElementById("gateStatusSubtitle");
-    const detailDepartureAirport = document.getElementById("detailDepartureAirport");
-    const detailDepartureTime = document.getElementById("detailDepartureTime");
-    const detailDepartureCountdown = document.getElementById("detailDepartureCountdown");
-    const departureStatusLine = document.getElementById("departureStatusLine");
-    const detailFlightDuration = document.getElementById("detailFlightDuration");
-    const detailArrivalAirport = document.getElementById("detailArrivalAirport");
-    const detailArrivalTime = document.getElementById("detailArrivalTime");
-    const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
-    const arrivalStatusLine = document.getElementById("arrivalStatusLine");
+    const detailDepartureSection = document.getElementById("detailDepartureSection");
+const detailDepartureGateBlock = document.getElementById("detailDepartureGateBlock");
+const detailDepartureGatePill = document.getElementById("detailDepartureGatePill");
+const detailDepartureTerminal = document.getElementById("detailDepartureTerminal");
+const detailDepartureAirport = document.getElementById("detailDepartureAirport");
+const detailDepartureTime = document.getElementById("detailDepartureTime");
+const detailDepartureCountdown = document.getElementById("detailDepartureCountdown");
+const departureStatusLine = document.getElementById("departureStatusLine");
+const detailFlightDuration = document.getElementById("detailFlightDuration");
+const detailArrivalSection = document.getElementById("detailArrivalSection");
+const detailArrivalGateBlock = document.getElementById("detailArrivalGateBlock");
+const detailArrivalGatePill = document.getElementById("detailArrivalGatePill");
+const detailArrivalTerminal = document.getElementById("detailArrivalTerminal");
+const detailArrivalAirport = document.getElementById("detailArrivalAirport");
+const detailArrivalTime = document.getElementById("detailArrivalTime");
+const detailArrivalCountdown = document.getElementById("detailArrivalCountdown");
+const arrivalStatusLine = document.getElementById("arrivalStatusLine");
 const seatCard = document.getElementById("seatCard");
 const seatValue = document.getElementById("seatValue");
 const seatCabin = document.getElementById("seatCabin");
@@ -8841,19 +8826,7 @@ function getFeaturedTimelineInfo(flight) {
   };
 }
 
-function updateFeaturedAirportGateBlock(card, type, gate, terminal) {
-  const block = card.querySelector(`[data-featured-${type}-gate-block]`);
-  const gateEl = card.querySelector(`[data-featured-${type}-gate]`);
-  const terminalEl = card.querySelector(`[data-featured-${type}-terminal]`);
-
-  const hasGateInfo = Boolean(gate || terminal);
-
-  block.classList.toggle("active", hasGateInfo);
-  gateEl.textContent = gate ? `${type === "arr" ? "↘" : "↗"} ${gate}` : "";
-  terminalEl.textContent = terminal ? `Terminal ${terminal}` : "";
-}
-    
-    function getFeaturedTerminalValue(flight) {
+function getFeaturedTerminalValue(flight) {
   const phase = getFlightPhase(flight);
 
   if (phase === "takeoff" || phase === "land") {
@@ -8885,25 +8858,9 @@ function updateFeaturedAirportGateBlock(card, type, gate, terminal) {
   card.querySelector("[data-featured-flight-number]").textContent = `${airline} ${flightNumber}`;
   card.querySelector("[data-featured-main-status]").textContent = getFeaturedMainStatus(flight);
   card.querySelector("[data-featured-passenger]").textContent = getFeaturedPassengerName();
-card.querySelector("[data-featured-dep-code]").textContent = departureAirport;
-card.querySelector("[data-featured-arr-code]").textContent = arrivalAirport;
-card.querySelector("[data-featured-dep-name]").textContent = flight.departureAirportName || flight.cityDeparture || "Departure";
-card.querySelector("[data-featured-arr-name]").textContent = flight.arrivalAirportName || flight.cityArrival || "Arrival";
-card.querySelector("[data-featured-date]").textContent = `${flightDate} • ${getReservationCode(flight)}`;
-
-updateFeaturedAirportGateBlock(
-  card,
-  "dep",
-  flight.boardingGate || "",
-  flight.boardingTerminal || ""
-);
-
-updateFeaturedAirportGateBlock(
-  card,
-  "arr",
-  flight.arrivalGate || "",
-  flight.arrivalTerminal || ""
-);
+  card.querySelector("[data-featured-dep-code]").textContent = departureAirport;
+  card.querySelector("[data-featured-arr-code]").textContent = arrivalAirport;
+  card.querySelector("[data-featured-date]").textContent = `${flightDate} • ${getReservationCode(flight)}`;
 
   card.querySelector("[data-featured-depart-label]").textContent = timelineInfo.label;
 
@@ -9047,37 +9004,11 @@ function closeBoardingPassPage() {
     <div class="featured-route-area" data-featured-open>
       <div class="featured-passenger-name" data-featured-passenger></div>
 
-      <div class="featured-airport-list">
-  <div class="featured-airport-row">
-    <div class="featured-airport-main">
-      <div class="featured-airport-code-line">
-        <span class="featured-airport-direction">↗</span>
+      <div class="featured-route-line">
         <span data-featured-dep-code></span>
-      </div>
-      <div class="featured-airport-name" data-featured-dep-name></div>
-    </div>
-
-    <div class="featured-airport-gate-block" data-featured-dep-gate-block>
-      <div class="featured-airport-gate-pill" data-featured-dep-gate></div>
-      <div class="featured-airport-terminal" data-featured-dep-terminal></div>
-    </div>
-  </div>
-
-  <div class="featured-airport-row">
-    <div class="featured-airport-main">
-      <div class="featured-airport-code-line">
-        <span class="featured-airport-direction">↘</span>
+        <span class="featured-route-arrow">→</span>
         <span data-featured-arr-code></span>
       </div>
-      <div class="featured-airport-name" data-featured-arr-name></div>
-    </div>
-
-    <div class="featured-airport-gate-block" data-featured-arr-gate-block>
-      <div class="featured-airport-gate-pill" data-featured-arr-gate></div>
-      <div class="featured-airport-terminal" data-featured-arr-terminal></div>
-    </div>
-  </div>
-</div>
 
       <div class="featured-date-line" data-featured-date></div>
       <div class="featured-route-chevron">›</div>
@@ -9282,6 +9213,15 @@ if (phase === "boardingComplete") {
       updateTimetable(flight);
     }
 
+    function updateDetailAirportGateDisplay(section, gatePill, terminalEl, gate, terminal, directionIcon) {
+  const hasGateInfo = Boolean(gate || terminal);
+
+  section.classList.toggle("has-gate-display", hasGateInfo);
+
+  gatePill.textContent = gate ? `${directionIcon} ${gate}` : "";
+  terminalEl.textContent = terminal ? `Terminal ${terminal}` : "";
+}
+    
     function updateMainTimes(flight) {
   const schedule = getScheduleTimes(flight);
   const actuals = getActualTimes(flight);
@@ -9370,6 +9310,24 @@ detailFlightDuration.innerHTML = buildMidFlightInfo(flight);
 setAirportRowText(
   detailArrivalAirport,
   `${flight.arrivalAirport || "ARR"} • ${arrivalAirportDisplayName}`
+);
+
+updateDetailAirportGateDisplay(
+  detailDepartureSection,
+  detailDepartureGatePill,
+  detailDepartureTerminal,
+  flight.boardingGate || "",
+  flight.boardingTerminal || "",
+  "↗"
+);
+
+updateDetailAirportGateDisplay(
+  detailArrivalSection,
+  detailArrivalGatePill,
+  detailArrivalTerminal,
+  flight.arrivalGate || "",
+  flight.arrivalTerminal || "",
+  "↘"
 );
 
       updateMainTimes(flight);
