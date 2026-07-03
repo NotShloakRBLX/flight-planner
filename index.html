@@ -4100,6 +4100,103 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   line-height: 1;
 }
 
+    .featured-airport-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 18px;
+}
+
+.featured-airport-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.featured-airport-main {
+  min-width: 0;
+}
+
+.featured-airport-code-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2f9bff;
+  font-size: 32px;
+  font-weight: 430;
+  letter-spacing: -0.7px;
+  line-height: 1;
+}
+
+.featured-airport-direction {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.featured-airport-name {
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 16px;
+  font-weight: 420;
+  letter-spacing: -0.25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.featured-airport-gate-block {
+  display: none;
+  justify-items: end;
+  min-width: 92px;
+}
+
+.featured-airport-gate-block.active {
+  display: grid;
+}
+
+.featured-airport-gate-pill {
+  min-width: 86px;
+  padding: 9px 13px 10px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #ffd84a, #ffc21f);
+  color: #08090d;
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: -0.45px;
+  line-height: 1;
+  text-align: center;
+}
+
+.featured-airport-terminal {
+  margin-top: 9px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 17px;
+  font-weight: 390;
+  letter-spacing: -0.35px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 430px) {
+  .featured-airport-code-line {
+    font-size: 29px;
+  }
+
+  .featured-airport-name {
+    font-size: 15px;
+  }
+
+  .featured-airport-gate-pill {
+    min-width: 78px;
+    font-size: 21px;
+  }
+
+  .featured-airport-terminal {
+    font-size: 16px;
+  }
+}
+
 .featured-date-line {
   margin-top: 17px;
   color: rgba(255, 255, 255, 0.72);
@@ -8744,7 +8841,19 @@ function getFeaturedTimelineInfo(flight) {
   };
 }
 
-function getFeaturedTerminalValue(flight) {
+function updateFeaturedAirportGateBlock(card, type, gate, terminal) {
+  const block = card.querySelector(`[data-featured-${type}-gate-block]`);
+  const gateEl = card.querySelector(`[data-featured-${type}-gate]`);
+  const terminalEl = card.querySelector(`[data-featured-${type}-terminal]`);
+
+  const hasGateInfo = Boolean(gate || terminal);
+
+  block.classList.toggle("active", hasGateInfo);
+  gateEl.textContent = gate ? `${type === "arr" ? "↘" : "↗"} ${gate}` : "";
+  terminalEl.textContent = terminal ? `Terminal ${terminal}` : "";
+}
+    
+    function getFeaturedTerminalValue(flight) {
   const phase = getFlightPhase(flight);
 
   if (phase === "takeoff" || phase === "land") {
@@ -8776,9 +8885,25 @@ function getFeaturedTerminalValue(flight) {
   card.querySelector("[data-featured-flight-number]").textContent = `${airline} ${flightNumber}`;
   card.querySelector("[data-featured-main-status]").textContent = getFeaturedMainStatus(flight);
   card.querySelector("[data-featured-passenger]").textContent = getFeaturedPassengerName();
-  card.querySelector("[data-featured-dep-code]").textContent = departureAirport;
-  card.querySelector("[data-featured-arr-code]").textContent = arrivalAirport;
-  card.querySelector("[data-featured-date]").textContent = `${flightDate} • ${getReservationCode(flight)}`;
+card.querySelector("[data-featured-dep-code]").textContent = departureAirport;
+card.querySelector("[data-featured-arr-code]").textContent = arrivalAirport;
+card.querySelector("[data-featured-dep-name]").textContent = flight.departureAirportName || flight.cityDeparture || "Departure";
+card.querySelector("[data-featured-arr-name]").textContent = flight.arrivalAirportName || flight.cityArrival || "Arrival";
+card.querySelector("[data-featured-date]").textContent = `${flightDate} • ${getReservationCode(flight)}`;
+
+updateFeaturedAirportGateBlock(
+  card,
+  "dep",
+  flight.boardingGate || "",
+  flight.boardingTerminal || ""
+);
+
+updateFeaturedAirportGateBlock(
+  card,
+  "arr",
+  flight.arrivalGate || "",
+  flight.arrivalTerminal || ""
+);
 
   card.querySelector("[data-featured-depart-label]").textContent = timelineInfo.label;
 
@@ -8922,11 +9047,37 @@ function closeBoardingPassPage() {
     <div class="featured-route-area" data-featured-open>
       <div class="featured-passenger-name" data-featured-passenger></div>
 
-      <div class="featured-route-line">
+      <div class="featured-airport-list">
+  <div class="featured-airport-row">
+    <div class="featured-airport-main">
+      <div class="featured-airport-code-line">
+        <span class="featured-airport-direction">↗</span>
         <span data-featured-dep-code></span>
-        <span class="featured-route-arrow">→</span>
+      </div>
+      <div class="featured-airport-name" data-featured-dep-name></div>
+    </div>
+
+    <div class="featured-airport-gate-block" data-featured-dep-gate-block>
+      <div class="featured-airport-gate-pill" data-featured-dep-gate></div>
+      <div class="featured-airport-terminal" data-featured-dep-terminal></div>
+    </div>
+  </div>
+
+  <div class="featured-airport-row">
+    <div class="featured-airport-main">
+      <div class="featured-airport-code-line">
+        <span class="featured-airport-direction">↘</span>
         <span data-featured-arr-code></span>
       </div>
+      <div class="featured-airport-name" data-featured-arr-name></div>
+    </div>
+
+    <div class="featured-airport-gate-block" data-featured-arr-gate-block>
+      <div class="featured-airport-gate-pill" data-featured-arr-gate></div>
+      <div class="featured-airport-terminal" data-featured-arr-terminal></div>
+    </div>
+  </div>
+</div>
 
       <div class="featured-date-line" data-featured-date></div>
       <div class="featured-route-chevron">›</div>
