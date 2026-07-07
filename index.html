@@ -4576,6 +4576,20 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   color: #06172d;
 }
 
+    .editable-gate-card {
+  cursor: pointer;
+  transition: transform 0.22s ease, border-color 0.22s ease, opacity 0.22s ease;
+}
+
+.editable-gate-card:active {
+  transform: scale(0.985);
+}
+
+.editable-gate-card.locked {
+  cursor: default;
+  opacity: 0.72;
+}
+
 .boarding-info-icon {
   color: #06172d;
   font-size: 28px;
@@ -5477,14 +5491,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </section>
 
     <section class="boarding-pass-info-grid">
-      <article class="boarding-info-card">
-        <div class="boarding-info-icon image-icon depgate-icon">
-          <img src="./depgate.png" alt="Departure gate" />
-        </div>
-        <div class="boarding-info-title">Departure Gate</div>
-        <div class="boarding-info-value" id="boardingGateValue">--</div>
-        <div class="boarding-info-subtitle" id="boardingTerminalValue">Terminal --</div>
-      </article>
+      <article class="boarding-info-card editable-gate-card" id="boardingGateCard" role="button" tabindex="0">
+  <div class="boarding-info-icon image-icon depgate-icon">
+    <img src="./depgate.png" alt="Departure gate" />
+  </div>
+  <div class="boarding-info-title">Departure Gate</div>
+  <div class="boarding-info-value" id="boardingGateValue">--</div>
+  <div class="boarding-info-subtitle" id="boardingTerminalValue">Terminal --</div>
+</article>
 
       <article class="boarding-info-card">
         <div class="boarding-info-icon image-icon">
@@ -5901,6 +5915,21 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </div>
   </section>
 
+  <div class="passport-popup-overlay" id="boardingGateEditOverlay"></div>
+
+<section class="passport-popup" id="boardingGateEditPopup">
+  <div class="passport-popup-title" id="boardingGateEditTitle">Edit Departure Gate</div>
+  <div class="passport-popup-subtitle" id="boardingGateEditSubtitle">Update gate and terminal before boarding starts.</div>
+
+  <input id="boardingGateEditInput" type="text" placeholder="Gate A2" />
+  <input id="boardingTerminalEditInput" type="text" placeholder="Terminal Main" />
+
+  <div class="passport-popup-actions">
+    <button class="passport-red-button" id="boardingGateEditCancelButton" type="button">Cancel</button>
+    <button class="passport-green-button" id="boardingGateEditSaveButton" type="button">Save</button>
+  </div>
+</section>
+  
   <div class="passport-popup-overlay" id="passportPopupOverlay"></div>
 
 <section class="passport-popup" id="createPassportPopup">
@@ -6255,8 +6284,17 @@ const boardingCode = document.getElementById("boardingCode");
 const boardingSeatValue = document.getElementById("boardingSeatValue");
 const boardingCabinValue = document.getElementById("boardingCabinValue");
 const boardingPriorityPill = document.getElementById("boardingPriorityPill");
+const boardingGateCard = document.getElementById("boardingGateCard");
 const boardingGateValue = document.getElementById("boardingGateValue");
 const boardingTerminalValue = document.getElementById("boardingTerminalValue");
+const boardingGateEditOverlay = document.getElementById("boardingGateEditOverlay");
+const boardingGateEditPopup = document.getElementById("boardingGateEditPopup");
+const boardingGateEditTitle = document.getElementById("boardingGateEditTitle");
+const boardingGateEditSubtitle = document.getElementById("boardingGateEditSubtitle");
+const boardingGateEditInput = document.getElementById("boardingGateEditInput");
+const boardingTerminalEditInput = document.getElementById("boardingTerminalEditInput");
+const boardingGateEditCancelButton = document.getElementById("boardingGateEditCancelButton");
+const boardingGateEditSaveButton = document.getElementById("boardingGateEditSaveButton");
 const boardingTimeValue = document.getElementById("boardingTimeValue");
 const boardingBoardingSubtitle = document.getElementById("boardingBoardingSubtitle");
 const boardingTripFlight = document.getElementById("boardingTripFlight");
@@ -8988,7 +9026,75 @@ function isPriorityPassenger(flight) {
   return flight.premiumSeat === true || flight.premiumEconomySeat === true;
 }
 
-function openBoardingPassPage(flight) {
+function canEditBoardingGateInfo(flight) {
+  return flight && getFlightPhase(flight) === "scheduled";
+}
+
+function updateBoardingGateCard(flight) {
+  const gate = flight.boardingGate || flight.departureGate || "";
+  const terminal = flight.boardingTerminal || flight.terminal || "";
+
+  boardingGateValue.textContent = gate || "--";
+  boardingTerminalValue.textContent = terminal ? `Terminal ${terminal}` : "Terminal --";
+
+  boardingGateCard.classList.toggle("locked", !canEditBoardingGateInfo(flight));
+}
+
+function closeBoardingGateEditor() {
+  boardingGateEditOverlay.classList.remove("active");
+  boardingGateEditPopup.classList.remove("active");
+  boardingGateEditInput.value = "";
+  boardingTerminalEditInput.value = "";
+}
+
+function openBoardingGateEditor() {
+  if (!activeBoardingPassFlight || !canEditBoardingGateInfo(activeBoardingPassFlight)) {
+    return;
+  }
+
+  const gate = activeBoardingPassFlight.boardingGate || activeBoardingPassFlight.departureGate || "";
+  const terminal = activeBoardingPassFlight.boardingTerminal || activeBoardingPassFlight.terminal || "";
+
+  const missingGate = !gate;
+  const missingTerminal = !terminal;
+
+  boardingGateEditTitle.textContent = "Edit Departure Gate";
+
+  if (missingGate && missingTerminal) {
+    boardingGateEditSubtitle.textContent = "Add a gate and terminal if they have been assigned.";
+    boardingGateEditInput.style.display = "block";
+    boardingTerminalEditInput.style.display = "block";
+  } else if (missingGate) {
+    boardingGateEditSubtitle.textContent = "Add the departure gate if it has been assigned.";
+    boardingGateEditInput.style.display = "block";
+    boardingTerminalEditInput.style.display = "none";
+  } else if (missingTerminal) {
+    boardingGateEditSubtitle.textContent = "Add the terminal if it has been assigned.";
+    boardingGateEditInput.style.display = "none";
+    boardingTerminalEditInput.style.display = "block";
+  } else {
+    boardingGateEditSubtitle.textContent = "Update gate or terminal before boarding starts.";
+    boardingGateEditInput.style.display = "block";
+    boardingTerminalEditInput.style.display = "block";
+  }
+
+  boardingGateEditInput.value = gate;
+  boardingTerminalEditInput.value = terminal;
+
+  boardingGateEditOverlay.classList.add("active");
+  boardingGateEditPopup.classList.add("active");
+
+  setTimeout(() => {
+    const firstVisibleInput = boardingGateEditInput.style.display !== "none"
+      ? boardingGateEditInput
+      : boardingTerminalEditInput;
+
+    firstVisibleInput.focus();
+    firstVisibleInput.select();
+  }, 220);
+}
+    
+    function openBoardingPassPage(flight) {
   activeBoardingPassFlight = flight;
 
   const airline = flight.airline || "AA";
@@ -9011,8 +9117,7 @@ boardingAirlineLogo.onerror = function () {
 
   boardingPriorityPill.classList.toggle("hidden", !isPriorityPassenger(flight));
 
-  boardingGateValue.textContent = flight.boardingGate || flight.departureGate || "--";
-  boardingTerminalValue.textContent = `Terminal ${flight.boardingTerminal || flight.terminal || "--"}`;
+  updateBoardingGateCard(flight);
 
   boardingTimeValue.textContent = flight.boardingTime
     ? formatTime12Hour(flight.boardingTime)
@@ -9273,6 +9378,9 @@ if (phase === "boardingComplete") {
 
   section.classList.toggle("has-gate-display", hasGateInfo);
 
+  gatePill.style.display = gate ? "" : "none";
+  terminalEl.style.display = terminal ? "" : "none";
+
   gatePill.textContent = gate ? `${directionIcon} ${gate}` : "";
   terminalEl.textContent = terminal ? `Terminal ${terminal}` : "";
 }
@@ -9448,6 +9556,60 @@ updateCompleteFlightButton(latest);
     }
 
     boardingPassCloseButton.addEventListener("click", closeBoardingPassPage);
+
+    boardingGateCard.addEventListener("click", openBoardingGateEditor);
+
+boardingGateCard.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+
+  event.preventDefault();
+  openBoardingGateEditor();
+});
+
+boardingGateEditOverlay.addEventListener("click", closeBoardingGateEditor);
+boardingGateEditCancelButton.addEventListener("click", closeBoardingGateEditor);
+
+boardingGateEditSaveButton.addEventListener("click", async () => {
+  if (!activeBoardingPassFlight || !canEditBoardingGateInfo(activeBoardingPassFlight)) {
+    closeBoardingGateEditor();
+    return;
+  }
+
+  const currentGate = activeBoardingPassFlight.boardingGate || activeBoardingPassFlight.departureGate || "";
+  const currentTerminal = activeBoardingPassFlight.boardingTerminal || activeBoardingPassFlight.terminal || "";
+
+  const updates = {
+    boardingGate: boardingGateEditInput.style.display === "none"
+      ? currentGate
+      : boardingGateEditInput.value.trim().toUpperCase(),
+    boardingTerminal: boardingTerminalEditInput.style.display === "none"
+      ? currentTerminal
+      : boardingTerminalEditInput.value.trim()
+  };
+
+  boardingGateEditSaveButton.disabled = true;
+  boardingGateEditSaveButton.style.opacity = "0.72";
+
+  try {
+    await updateDoc(getFlightRef(activeBoardingPassFlight.id), updates);
+
+    activeBoardingPassFlight = {
+      ...activeBoardingPassFlight,
+      ...updates
+    };
+
+    allFlights.set(activeBoardingPassFlight.id, activeBoardingPassFlight);
+    updateBoardingGateCard(activeBoardingPassFlight);
+    closeBoardingGateEditor();
+    showNotification("Departure gate updated!");
+  } catch (error) {
+    console.error("Error updating departure gate:", error);
+    alert("Departure gate could not be updated. Check your Firestore rules.");
+  } finally {
+    boardingGateEditSaveButton.disabled = false;
+    boardingGateEditSaveButton.style.opacity = "1";
+  }
+});
 
 boardingTripDetailsButton.addEventListener("click", () => {
   if (!activeBoardingPassFlight) return;
