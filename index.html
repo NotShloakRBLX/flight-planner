@@ -9346,6 +9346,7 @@ arrivalStatusLine.innerHTML = `
   <span> • </span>
   <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
 `;
+}
 
     function openFlightDetails(flight) {
       activeFlight = flight;
