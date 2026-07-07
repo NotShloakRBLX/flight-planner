@@ -1991,6 +1991,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       border-bottom-color: rgba(255, 75, 75, 0.18);
     }
 
+    .gate-status-panel.scheduled {
+  background: #2b2b2f;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
     .gate-status-title {
   color: #20d47a;
   font-size: 20px;
@@ -2005,6 +2010,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       color: #ff4b4b;
     }
 
+    .gate-status-panel.scheduled .gate-status-title {
+  color: rgba(255, 255, 255, 0.96);
+}
+
     .gate-status-subtitle {
   margin-top: 5px;
   color: rgba(32, 212, 122, 0.74);
@@ -2018,6 +2027,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .gate-status-panel.bad .gate-status-subtitle {
       color: rgba(255, 75, 75, 0.76);
     }
+
+    .gate-status-panel.scheduled .gate-status-subtitle {
+  color: rgba(255, 255, 255, 0.54);
+}
 
     .detail-content {
       padding: 22px 18px 34px;
@@ -2159,6 +2172,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .big-time.bad {
       color: #ff4b4b;
     }
+
+    .big-time.scheduled {
+  color: rgba(255, 255, 255, 0.96);
+}
 
     .old-time {
       margin-left: 6px;
@@ -7551,7 +7568,40 @@ function closeTransactionEditor() {
   return `Boards in ${minutes}m`;
 }
 
-function formatBoardingPanel(flight) {
+function isFlightMoreThan24HoursAway(flight) {
+  const departureDate = getDepartureDateTime(flight);
+
+  if (!departureDate || Number.isNaN(departureDate.getTime())) {
+    return false;
+  }
+
+  return departureDate - new Date() > 24 * 60 * 60 * 1000;
+}
+
+function formatFutureDeparturePanel(flight) {
+  const departureDate = getDepartureDateTime(flight);
+
+  if (!departureDate || Number.isNaN(departureDate.getTime())) {
+    return "Departs in --";
+  }
+
+  const diffMs = departureDate - new Date();
+
+  if (diffMs <= 24 * 60 * 60 * 1000) {
+    return formatCountdown(departureDate, "Departs");
+  }
+
+  const totalHours = Math.floor(diffMs / 3600000);
+
+  if (totalHours < 48) {
+    return "Departs tomorrow";
+  }
+
+  const days = Math.max(2, Math.floor(totalHours / 24));
+  return `Departs in ${days} days`;
+}
+    
+    function formatBoardingPanel(flight) {
   const boardingDateTime = buildLocalDateTime(flight.flightDateRaw, flight.boardingTime);
 
   const shouldShowBoardingTime = Math.floor(Date.now() / 6000) % 2 === 1;
@@ -9131,11 +9181,12 @@ function renderHomeFlights() {
       flightsList.appendChild(card);
     }
 
-    function setStatusPanel(isBad, title, subtitle = "") {
-      statusPanel.classList.toggle("bad", isBad);
-      gateStatusTitle.textContent = title;
-      gateStatusSubtitle.textContent = subtitle;
-    }
+    function setStatusPanel(isBad, title, subtitle = "", mode = "") {
+  statusPanel.classList.toggle("bad", isBad);
+  statusPanel.classList.toggle("scheduled", mode === "scheduled");
+  gateStatusTitle.textContent = title;
+  gateStatusSubtitle.textContent = subtitle;
+}
 
     function updateDetailCountdowns() {
       if (!activeFlight) return;
@@ -9167,7 +9218,9 @@ const arrivalDiff = describeDifference(
         : formatCountdown(schedule.gateArrival, "Arrives");
 
       if (phase === "scheduled") {
-  if (flight.enableBoarding === true) {
+  if (isFlightMoreThan24HoursAway(flight)) {
+    setStatusPanel(false, formatFutureDeparturePanel(flight), "", "scheduled");
+  } else if (flight.enableBoarding === true) {
     setStatusPanel(false, formatBoardingPanel(flight), "");
   } else {
     const isDelayed = schedule.gateDeparture > getOriginalDepartureDateTime(flight);
@@ -9252,11 +9305,15 @@ if (phase === "boardingComplete") {
     originalArrival
   );
 
-  const departureBad = !departureDiff.good;
-  const arrivalBad = !arrivalDiff.good;
+  const isFutureScheduled = getFlightPhase(flight) === "scheduled" && isFlightMoreThan24HoursAway(flight);
 
-  detailDepartureTime.classList.toggle("bad", departureBad);
-  detailArrivalTime.classList.toggle("bad", arrivalBad);
+const departureBad = !departureDiff.good && !isFutureScheduled;
+const arrivalBad = !arrivalDiff.good && !isFutureScheduled;
+
+detailDepartureTime.classList.toggle("bad", departureBad);
+detailArrivalTime.classList.toggle("bad", arrivalBad);
+detailDepartureTime.classList.toggle("scheduled", isFutureScheduled);
+detailArrivalTime.classList.toggle("scheduled", isFutureScheduled);
 
   const originalDepartureTime = flight.originalScheduledDeparture || flight.scheduledDeparture;
   const originalArrivalTime = flight.originalScheduledArrival || flight.scheduledArrival;
@@ -9272,18 +9329,23 @@ if (phase === "boardingComplete") {
   detailDepartureTime.innerHTML = `${formatTime12Hour(displayedDepartureTime)}${departureOld}`;
   detailArrivalTime.innerHTML = `${formatTime12Hour(displayedArrivalTime)}${arrivalOld}`;
 
-  departureStatusLine.innerHTML = `
-    <span class="${departureDiff.good ? "on-time" : "late-text"}">${departureDiff.text}</span>
-    <span> • </span>
-    <span id="detailDepartureCountdown">${flight.actualGateDeparture ? departureDiff.text : formatCountdown(schedule.gateDeparture, "Departs")}</span>
-  `;
-
-  arrivalStatusLine.innerHTML = `
-    <span class="${arrivalDiff.good ? "on-time" : "late-text"}">${arrivalDiff.text}</span>
-    <span> • </span>
-    <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
-  `;
+  if (isFutureScheduled) {
+  departureStatusLine.innerHTML = `<span>Scheduled</span>`;
+  arrivalStatusLine.innerHTML = `<span>Scheduled</span>`;
+  return;
 }
+
+departureStatusLine.innerHTML = `
+  <span class="${departureDiff.good ? "on-time" : "late-text"}">${departureDiff.text}</span>
+  <span> • </span>
+  <span id="detailDepartureCountdown">${flight.actualGateDeparture ? departureDiff.text : formatCountdown(schedule.gateDeparture, "Departs")}</span>
+`;
+
+arrivalStatusLine.innerHTML = `
+  <span class="${arrivalDiff.good ? "on-time" : "late-text"}">${arrivalDiff.text}</span>
+  <span> • </span>
+  <span id="detailArrivalCountdown">${flight.actualGateArrival ? arrivalDiff.text : formatCountdown(schedule.gateArrival, "Arrives")}</span>
+`;
 
     function openFlightDetails(flight) {
       activeFlight = flight;
