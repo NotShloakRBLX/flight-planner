@@ -7616,6 +7616,18 @@ function isFlightMoreThan24HoursAway(flight) {
   return departureDate - new Date() > 24 * 60 * 60 * 1000;
 }
 
+    function getCalendarDaysUntil(date) {
+  if (!date || Number.isNaN(date.getTime())) {
+    return 0;
+  }
+
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const targetStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  return Math.max(0, Math.round((targetStart - todayStart) / 86400000));
+}
+
 function formatFutureDeparturePanel(flight) {
   const departureDate = getDepartureDateTime(flight);
 
@@ -7623,20 +7635,25 @@ function formatFutureDeparturePanel(flight) {
     return "Departs in --";
   }
 
-  const diffMs = departureDate - new Date();
-
-  if (diffMs <= 24 * 60 * 60 * 1000) {
+  if (!isFlightMoreThan24HoursAway(flight)) {
     return formatCountdown(departureDate, "Departs");
   }
 
-  const totalHours = Math.floor(diffMs / 3600000);
+  const calendarDays = getCalendarDaysUntil(departureDate);
 
-  if (totalHours < 48) {
+  if (calendarDays <= 1) {
     return "Departs tomorrow";
   }
 
-  const days = Math.max(2, Math.floor(totalHours / 24));
-  return `Departs in ${days} days`;
+  return `Departs in ${calendarDays} days`;
+}
+    
+    function formatFutureFeaturedDeparture(flight, shouldShowAtTime) {
+  if (shouldShowAtTime && flight.scheduledDeparture) {
+    return `Departs at ${formatTime12Hour(flight.scheduledDeparture)}`;
+  }
+
+  return formatFutureDeparturePanel(flight);
 }
     
     function formatBoardingPanel(flight) {
@@ -8729,6 +8746,10 @@ function getFeaturedMainStatus(flight) {
     return formatCountdown(targetDate, actionWord);
   }
 
+if (phase === "scheduled" && isFlightMoreThan24HoursAway(flight)) {
+  return formatFutureFeaturedDeparture(flight, shouldShowAtTime);
+}
+  
   if (phase === "boarding") {
     return "Now boarding";
   }
@@ -8942,8 +8963,11 @@ function getFeaturedTerminalValue(flight) {
   const seatInfo = getFeaturedSeatValue(flight);
 
   const flag = card.querySelector("[data-featured-flag]");
-  flag.textContent = status.text;
-  flag.className = `featured-status-flag ${status.className || ""}`;
+const hideFutureFlag = getFlightPhase(flight) === "scheduled" && isFlightMoreThan24HoursAway(flight);
+
+flag.textContent = hideFutureFlag ? "" : status.text;
+flag.className = `featured-status-flag ${status.className || ""}`;
+flag.style.display = hideFutureFlag ? "none" : "flex";
 
   card.querySelector("[data-featured-flight-number]").textContent = `${airline} ${flightNumber}`;
   card.querySelector("[data-featured-main-status]").textContent = getFeaturedMainStatus(flight);
