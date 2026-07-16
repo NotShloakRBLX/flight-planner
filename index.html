@@ -9084,29 +9084,28 @@ flag.style.display = hideFutureFlag ? "none" : "flex";
   card.querySelector("[data-featured-gate-value]").textContent = getFeaturedGateValue(flight);
   card.querySelector("[data-featured-terminal-value]").textContent = getFeaturedTerminalValue(flight);
 
-  const seatValueEl = card.querySelector("[data-featured-seat-value]");
+    const seatValueEl = card.querySelector("[data-featured-seat-value]");
   seatValueEl.textContent = seatInfo.value;
   seatValueEl.className = `featured-info-value ${seatInfo.className || ""}`;
-  
-}
 
-    const actionButton = card.querySelector("[data-featured-action-button]");
-const checkInOpen = hasCheckInOpened(flight);
-const checkedIn = isFlightCheckedIn(flight);
+  const actionButton = card.querySelector("[data-featured-action-button]");
+  const checkInOpen = hasCheckInOpened(flight);
+  const checkedIn = isFlightCheckedIn(flight);
 
-if (checkedIn) {
-  actionButton.textContent = "Boarding pass";
-  actionButton.dataset.featuredAction = "boardingPass";
-  actionButton.style.display = "";
-} else if (checkInOpen) {
-  actionButton.textContent = "Check in";
-  actionButton.dataset.featuredAction = "checkIn";
-  actionButton.style.display = "";
-  persistCheckInOpenedIfNeeded(flight);
-} else {
-  actionButton.textContent = "";
-  actionButton.dataset.featuredAction = "";
-  actionButton.style.display = "none";
+  if (checkedIn) {
+    actionButton.textContent = "Boarding pass";
+    actionButton.dataset.featuredAction = "boardingPass";
+    actionButton.style.display = "";
+  } else if (checkInOpen) {
+    actionButton.textContent = "Check in";
+    actionButton.dataset.featuredAction = "checkIn";
+    actionButton.style.display = "";
+    persistCheckInOpenedIfNeeded(flight);
+  } else {
+    actionButton.textContent = "";
+    actionButton.dataset.featuredAction = "";
+    actionButton.style.display = "none";
+  }
 }
 
 function updateFeaturedCardLive() {
