@@ -2032,6 +2032,19 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   color: rgba(255, 255, 255, 0.54);
 }
 
+    .check-in-status-panel {
+  min-height: 62px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.check-in-status-panel.available {
+  cursor: pointer;
+}
+
+.check-in-status-panel.available:active {
+  transform: scale(0.995);
+}
+
     .detail-content {
       padding: 22px 18px 34px;
     }
@@ -5562,6 +5575,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         <div class="gate-status-subtitle" id="gateStatusSubtitle"></div>
       </section>
 
+      <section class="gate-status-panel check-in-status-panel scheduled" id="checkInStatusPanel" role="button" tabindex="-1">
+  <div class="gate-status-title" id="checkInStatusTitle">Check in opens --</div>
+  <div class="gate-status-subtitle" id="checkInStatusSubtitle"></div>
+</section>
+
       <main class="detail-content">
         <section class="airport-section" id="detailDepartureSection">
   <div class="detail-airport-gate-block" id="detailDepartureGateBlock">
@@ -6376,6 +6394,9 @@ const backButton = document.getElementById("backButton");
     const detailRouteTitle = document.getElementById("detailRouteTitle");
     const statusPanel = document.getElementById("statusPanel");
     const gateStatusTitle = document.getElementById("gateStatusTitle");
+    const checkInStatusPanel = document.getElementById("checkInStatusPanel");
+const checkInStatusTitle = document.getElementById("checkInStatusTitle");
+const checkInStatusSubtitle = document.getElementById("checkInStatusSubtitle");
     const gateStatusSubtitle = document.getElementById("gateStatusSubtitle");
     const detailDepartureSection = document.getElementById("detailDepartureSection");
 const detailDepartureGateBlock = document.getElementById("detailDepartureGateBlock");
@@ -6513,10 +6534,12 @@ let activeSeatSelectionWindow = null;
 let activeWorldCupMatch = null;
 let selectedWorldCupPrediction = "";
 let pendingWorldCupFormData = null;
+const checkInOpenWriteLocks = new Set();
 
 const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
 const BOARDING_VERIFICATION_URL = "https://notshloakrblx.github.io/flight-boarding/";
+const CHECK_IN_SITE_URL = "https://notshloakrblx.github.io/msfs-check-in/";
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -7614,6 +7637,82 @@ function isFlightMoreThan24HoursAway(flight) {
   }
 
   return departureDate - new Date() > 24 * 60 * 60 * 1000;
+}
+
+    function getCheckInOpenDate(flight) {
+  const departureDate = getDepartureDateTime(flight);
+  if (!departureDate || Number.isNaN(departureDate.getTime())) return null;
+  return addMinutes(departureDate, -24 * 60);
+}
+
+function hasCheckInOpened(flight) {
+  if (!flight) return false;
+  if (flight.checkInOpened === true) return true;
+
+  const checkInOpenDate = getCheckInOpenDate(flight);
+  if (!checkInOpenDate) return false;
+
+  return new Date() >= checkInOpenDate;
+}
+
+function isFlightCheckedIn(flight) {
+  return flight && flight.checkedIn === true;
+}
+
+    function requiresCheckInBeforePhase(flight) {
+  if (!flight) return true;
+  return !isFlightCheckedIn(flight);
+}
+
+function formatCheckInOpenText(flight) {
+  const checkInOpenDate = getCheckInOpenDate(flight);
+  if (!checkInOpenDate) return "Check in opens --";
+
+  const dayText = checkInOpenDate.toLocaleDateString([], {
+    weekday: "short"
+  });
+
+  const timeText = checkInOpenDate.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+
+  return `Check in opens ${dayText}, ${timeText}`;
+}
+
+    function getCheckInSiteUrl(flight) {
+  const url = new URL(CHECK_IN_SITE_URL);
+  url.searchParams.set("flightId", flight.id || "");
+  url.searchParams.set("returnUrl", MAIN_SITE_RETURN_URL);
+  return url.toString();
+}
+
+function openCheckInPage(flight) {
+  if (!flight) return;
+  window.location.href = getCheckInSiteUrl(flight);
+}
+
+async function persistCheckInOpenedIfNeeded(flight) {
+  if (!flight || !flight.id) return;
+  if (flight.checkInOpened === true) return;
+  if (!hasCheckInOpened(flight)) return;
+  if (checkInOpenWriteLocks.has(flight.id)) return;
+
+  checkInOpenWriteLocks.add(flight.id);
+
+  try {
+    flight.checkInOpened = true;
+    flight.checkInOpenedAt = new Date().toISOString();
+
+    await updateDoc(doc(db, "flights", flight.id), {
+      checkInOpened: true,
+      checkInOpenedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Failed to save check-in open state:", error);
+  } finally {
+    checkInOpenWriteLocks.delete(flight.id);
+  }
 }
 
     function getCalendarDaysUntil(date) {
@@ -8988,6 +9087,26 @@ flag.style.display = hideFutureFlag ? "none" : "flex";
   const seatValueEl = card.querySelector("[data-featured-seat-value]");
   seatValueEl.textContent = seatInfo.value;
   seatValueEl.className = `featured-info-value ${seatInfo.className || ""}`;
+  
+}
+
+    const actionButton = card.querySelector("[data-featured-action-button]");
+const checkInOpen = hasCheckInOpened(flight);
+const checkedIn = isFlightCheckedIn(flight);
+
+if (checkedIn) {
+  actionButton.textContent = "Boarding pass";
+  actionButton.dataset.featuredAction = "boardingPass";
+  actionButton.style.display = "";
+} else if (checkInOpen) {
+  actionButton.textContent = "Check in";
+  actionButton.dataset.featuredAction = "checkIn";
+  actionButton.style.display = "";
+  persistCheckInOpenedIfNeeded(flight);
+} else {
+  actionButton.textContent = "";
+  actionButton.dataset.featuredAction = "";
+  actionButton.style.display = "none";
 }
 
 function updateFeaturedCardLive() {
@@ -9217,7 +9336,7 @@ function closeBoardingPassPage() {
       </div>
     </div>
 
-    <button class="featured-view-button" type="button">Boarding pass</button>
+    <button class="featured-view-button" type="button" data-featured-action-button data-featured-action="">Boarding pass</button>
   `;
 
   populateFeaturedFlightCard(card, flight);
@@ -9229,9 +9348,18 @@ function closeBoardingPassPage() {
     }
   });
 
-  card.querySelector(".featured-view-button").addEventListener("click", () => {
+  card.querySelector("[data-featured-action-button]").addEventListener("click", () => {
   const selectedFlight = allFlights.get(flight.id);
-  if (selectedFlight) {
+  if (!selectedFlight) return;
+
+  const action = card.querySelector("[data-featured-action-button]").dataset.featuredAction;
+
+  if (action === "checkIn") {
+    openCheckInPage(selectedFlight);
+    return;
+  }
+
+  if (action === "boardingPass") {
     openBoardingPassPage(selectedFlight);
   }
 });
@@ -9317,6 +9445,48 @@ function renderHomeFlights() {
   gateStatusSubtitle.textContent = subtitle;
 }
 
+    function updateCheckInStatusPanel(flight) {
+  if (!checkInStatusPanel || !flight) return;
+
+  if (isFlightCheckedIn(flight)) {
+    checkInStatusPanel.style.display = "none";
+    return;
+  }
+
+  const checkInOpen = hasCheckInOpened(flight);
+
+  checkInStatusPanel.style.display = "";
+  checkInStatusPanel.classList.toggle("scheduled", !checkInOpen);
+  checkInStatusPanel.classList.toggle("available", checkInOpen);
+  checkInStatusPanel.tabIndex = checkInOpen ? 0 : -1;
+
+  checkInStatusTitle.textContent = checkInOpen
+    ? "Check in available"
+    : formatCheckInOpenText(flight);
+
+  checkInStatusSubtitle.textContent = checkInOpen
+    ? "Tap to continue to check in"
+    : "";
+
+  if (checkInOpen) {
+    persistCheckInOpenedIfNeeded(flight);
+  }
+}
+
+    checkInStatusPanel.addEventListener("click", () => {
+  if (!activeFlight) return;
+  if (!hasCheckInOpened(activeFlight)) return;
+  if (isFlightCheckedIn(activeFlight)) return;
+
+  openCheckInPage(activeFlight);
+});
+
+checkInStatusPanel.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  checkInStatusPanel.click();
+});
+
     function updateDetailCountdowns() {
       if (!activeFlight) return;
 
@@ -9324,6 +9494,7 @@ function renderHomeFlights() {
       const phase = getFlightPhase(flight);
       const schedule = getScheduleTimes(flight);
       const actuals = getActualTimes(flight);
+      updateCheckInStatusPanel(flight);
 
       const originalDeparture = getOriginalDepartureDateTime(flight);
 const originalArrival = getOriginalArrivalDateTime(flight);
@@ -9695,9 +9866,13 @@ boardingTerminal: enableBoardingToggle.checked ? boardingTerminalInput.value.tri
 boardingCode: generateBoardingCode(),
 boardingVerified: false,
 boardingSessionId: "",
+checkedIn: false,
+checkedInAt: null,
+checkInOpened: false,
+checkInOpenedAt: null,
+phase: "scheduled",
     departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
-    phase: "scheduled",
     createdAt: serverTimestamp()
   };
 
@@ -9917,6 +10092,11 @@ if (flight.boardingVerified !== true) {
 if (!flight.boardingSessionId) {
   flight.boardingSessionId = "";
 }
+
+        if (flight.checkedIn !== true) flight.checkedIn = false;
+if (!flight.checkedInAt) flight.checkedInAt = null;
+if (flight.checkInOpened !== true) flight.checkInOpened = false;
+if (!flight.checkInOpenedAt) flight.checkInOpenedAt = null;
         
         if (!flight.routeDistance) {
   flight.routeDistance = "";
@@ -10147,13 +10327,15 @@ const phaseOrder = hasBoarding
 
         if (phase === "scheduled") {
   const firstPhase = hasBoarding ? "boarding" : "gateDeparture";
+  const checkInRequired = requiresCheckInBeforePhase(flight);
 
-  if (item.key === firstPhase) {
+  if (item.key === firstPhase && !checkInRequired) {
     item.button.classList.add("active");
   } else {
     item.button.classList.add("locked");
     item.button.disabled = true;
   }
+
   return;
 }
 
@@ -10329,7 +10511,12 @@ markPopupOverlay.classList.add("active");
   const phase = getFlightPhase(activeFlight);
 
   if (phase === "scheduled") {
-    const sessionId = activeFlight.id;
+  if (requiresCheckInBeforePhase(activeFlight)) {
+    showNotification("Check in required!");
+    return;
+  }
+
+  const sessionId = activeFlight.id;
     
     const updates = {
       phase: "boarding",
@@ -10422,10 +10609,15 @@ updatedAt: serverTimestamp()
 
   const phase = getFlightPhase(activeFlight);
 
-  if (
-    activeFlight.enableBoarding === true &&
-    activeFlight.boardingVerified !== true
-  ) {
+if (requiresCheckInBeforePhase(activeFlight)) {
+  showNotification("Check in required!");
+  return;
+}
+
+if (
+  activeFlight.enableBoarding === true &&
+  activeFlight.boardingVerified !== true
+) {
     openBoardingBlockedPopup();
     return;
   }
