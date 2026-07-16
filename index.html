@@ -9237,6 +9237,11 @@ function openBoardingGateEditor() {
 }
     
     function openBoardingPassPage(flight) {
+  if (!isFlightCheckedIn(flight)) {
+    showNotification("Check in required!");
+    return;
+  }
+
   activeBoardingPassFlight = flight;
 
   const airline = flight.airline || "AA";
