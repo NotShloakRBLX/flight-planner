@@ -769,14 +769,16 @@
 }
 
 .featured-main-status {
-  margin-top: 14px;
-  color: white;
-  font-size: 48px;
-  font-weight: 820;
-  letter-spacing: -2.3px;
-  line-height: 0.97;
-  text-align: center;
-  text-wrap: balance;
+  margin-top: 34px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: clamp(30px, 8.8vw, 42px);
+  font-weight: 300;
+  letter-spacing: -1.1px;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .featured-route-area {
@@ -7749,7 +7751,17 @@ function formatFutureDeparturePanel(flight) {
     
     function formatFutureFeaturedDeparture(flight, shouldShowAtTime) {
   if (shouldShowAtTime && flight.scheduledDeparture) {
-    return `Departs at ${formatTime12Hour(flight.scheduledDeparture)}`;
+    const departureDate = getDepartureDateTime(flight);
+
+    if (!departureDate || Number.isNaN(departureDate.getTime())) {
+      return `Departs on ${formatTime12Hour(flight.scheduledDeparture)}`;
+    }
+
+    const dayText = departureDate.toLocaleDateString([], {
+      weekday: "short"
+    });
+
+    return `Departs on ${dayText}, ${formatTime12Hour(flight.scheduledDeparture)}`;
   }
 
   return formatFutureDeparturePanel(flight);
