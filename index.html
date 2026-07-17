@@ -2347,6 +2347,87 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   box-shadow: 0 14px 34px rgba(190, 198, 210, 0.22);
 }
     
+    .detail-boarding-pass-card {
+  width: 100%;
+  min-height: 84px;
+  margin-top: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(110deg, #72116f 0%, #a313a5 46%, #d019c7 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 18px 45px rgba(117, 21, 138, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.detail-boarding-pass-card.hidden {
+  display: none;
+}
+
+.detail-boarding-pass-card::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 54px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  transform: translateX(-50%);
+}
+
+.detail-boarding-pass-card:active {
+  transform: scale(0.985);
+}
+
+.detail-boarding-pass-title {
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.detail-boarding-pass-qr {
+  width: 52px;
+  height: 52px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 5px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 430px) {
+  .detail-boarding-pass-card {
+    min-height: 78px;
+    border-radius: 22px;
+    padding: 16px 18px;
+  }
+
+  .detail-boarding-pass-title {
+    font-size: 23px;
+  }
+
+  .detail-boarding-pass-qr {
+    width: 48px;
+    height: 48px;
+  }
+}
+    
     .timezone-card {
       margin-top: 24px;
       padding: 14px 16px;
@@ -5657,8 +5738,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
   <div class="premium-badge" aria-label="Premium seat">P</div>
 </section>
+
+<section class="detail-boarding-pass-card hidden" id="detailBoardingPassCard" role="button" tabindex="0">
+  <div class="detail-boarding-pass-title">Boarding pass</div>
+  <img class="detail-boarding-pass-qr" src="./qrcode.png" alt="QR code" />
+</section>
         
-        <section class="timezone-card" id="timezoneCard">
+<section class="timezone-card" id="timezoneCard">
           <div class="timezone-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 2a10 10 0 1 0 8.66 15H22a1 1 0 0 0 .9-1.44l-2-4a1 1 0 0 0-1.8 0l-2 4A1 1 0 0 0 18 17h.37A8 8 0 1 1 12 4a7.95 7.95 0 0 1 6.1 2.84 1 1 0 0 0 1.53-1.28A9.94 9.94 0 0 0 12 2Zm1 5a1 1 0 1 0-2 0v5a1 1 0 0 0 .45.83l3.5 2.33a1 1 0 1 0 1.1-1.66L13 11.46V7Z" />
@@ -6426,6 +6512,7 @@ const arrivalStatusLine = document.getElementById("arrivalStatusLine");
 const seatCard = document.getElementById("seatCard");
 const seatValue = document.getElementById("seatValue");
 const seatCabin = document.getElementById("seatCabin");
+const detailBoardingPassCard = document.getElementById("detailBoardingPassCard");
     const timezoneTitle = document.getElementById("timezoneTitle");
     const timezoneSubtitle = document.getElementById("timezoneSubtitle");
     const openEditFlightButton = document.getElementById("openEditFlightButton");
@@ -8758,7 +8845,15 @@ showSeatAssignedPopup(seat, cabin);
   }
 }
 
-function updateSeatCard(flight) {
+function updateDetailBoardingPassCard(flight) {
+  if (!detailBoardingPassCard) return;
+
+  const showBoardingPassCard = isFlightCheckedIn(flight);
+
+  detailBoardingPassCard.classList.toggle("hidden", !showBoardingPassCard);
+}
+    
+    function updateSeatCard(flight) {
   if (!flight.assignedSeat) {
     seatCard.classList.add("hidden");
     seatCard.classList.remove("premium", "premium-economy");
@@ -9722,6 +9817,7 @@ updateDetailAirportGateDisplay(
 
       updateMainTimes(flight);
 updateSeatCard(flight);
+updateDetailBoardingPassCard(flight);
 updateTimezoneBox(flight);
 updateCBPInfoCard(flight);
 updateWorldCupInfoCard(flight);
@@ -9763,6 +9859,19 @@ updateCompleteFlightButton(latest);
   document.body.style.overflow = "";
 }
 
+    detailBoardingPassCard.addEventListener("click", () => {
+  if (!activeFlight || !isFlightCheckedIn(activeFlight)) return;
+  openBoardingPassPage(activeFlight);
+});
+
+detailBoardingPassCard.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+
+  if (!activeFlight || !isFlightCheckedIn(activeFlight)) return;
+  openBoardingPassPage(activeFlight);
+});
+    
     detailCloseButton.addEventListener("click", closeFlightDetails);
 
     function showNotification(message = "Flight added!") {
