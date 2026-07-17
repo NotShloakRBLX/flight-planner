@@ -9256,6 +9256,7 @@ function startFeaturedCardLiveUpdates() {
 }
     
     let activeBoardingPassFlight = null;
+let boardingPassReturnTarget = "home";
 
 function getBoardingCode(flight) {
   if (flight.boardingCode) {
@@ -9337,13 +9338,14 @@ function openBoardingGateEditor() {
   }, 220);
 }
     
-    function openBoardingPassPage(flight) {
+    function openBoardingPassPage(flight, returnTarget = "home") {
   if (!isFlightCheckedIn(flight)) {
     showNotification("Check in required!");
     return;
   }
 
   activeBoardingPassFlight = flight;
+boardingPassReturnTarget = returnTarget;
 
   const airline = flight.airline || "AA";
   const flightNumber = flight.flightNumber || "0000";
@@ -9390,7 +9392,20 @@ boardingAirlineLogo.onerror = function () {
 
 function closeBoardingPassPage() {
   boardingPassPage.classList.remove("active");
-  flightsPage.classList.remove("hidden");
+
+  if (boardingPassReturnTarget === "detail" && activeBoardingPassFlight) {
+    const latestFlight = allFlights.get(activeBoardingPassFlight.id) || activeBoardingPassFlight;
+
+    flightsPage.classList.add("hidden");
+    detailPage.classList.add("active");
+    activeFlight = latestFlight;
+    openFlightDetails(latestFlight);
+  } else {
+    flightsPage.classList.remove("hidden");
+    detailPage.classList.remove("active");
+  }
+
+  boardingPassReturnTarget = "home";
   document.body.style.overflow = "";
 }
     
@@ -9849,7 +9864,7 @@ updateCompleteFlightButton(latest);
 
     detailBoardingPassCard.addEventListener("click", () => {
   if (!activeFlight || !isFlightCheckedIn(activeFlight)) return;
-  openBoardingPassPage(activeFlight);
+  openBoardingPassPage(activeFlight, "detail");
 });
 
 detailBoardingPassCard.addEventListener("keydown", (event) => {
@@ -9857,7 +9872,7 @@ detailBoardingPassCard.addEventListener("keydown", (event) => {
   event.preventDefault();
 
   if (!activeFlight || !isFlightCheckedIn(activeFlight)) return;
-  openBoardingPassPage(activeFlight);
+  openBoardingPassPage(activeFlight, "detail");
 });
     
     detailCloseButton.addEventListener("click", closeFlightDetails);
