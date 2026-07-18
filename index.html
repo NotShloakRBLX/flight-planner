@@ -9842,8 +9842,10 @@ updateCompleteFlightButton(latest);
         }
       }, 1000);
 
-      detailPage.classList.add("active");
-      document.body.style.overflow = "hidden";
+      flightsPage.classList.add("hidden");
+detailPage.classList.add("active");
+boardingPassPage.classList.remove("active");
+document.body.style.overflow = "hidden";
     }
 
     function closeFlightDetails() {
