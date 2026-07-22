@@ -29,13 +29,13 @@
     }
 
     .app {
-  width: 100%;
-  max-width: 430px;
-  min-height: 100vh;
-  margin: 0 auto;
-    padding: 22px 18px 98px;
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 18px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
 
     .app.hidden {
       opacity: 0;
@@ -200,112 +200,6 @@
       height: 17px;
       fill: currentColor;
     }
-
-    .passport-button,
-.miles-button,
-.edit-button {
-  display: none !important;
-}
-
-    .app-tabbar {
-  position: fixed;
-  left: 50%;
-  bottom: calc(10px + env(safe-area-inset-bottom));
-  z-index: 300;
-  width: min(356px, calc(100% - 44px));
-  height: 64px;
-  padding: 6px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)),
-    rgba(9, 14, 26, 0.88);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 44px rgba(0, 0, 0, 0.38);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  transform: translateX(-50%);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  overflow: hidden;
-}
-
-.app-tabbar.hidden {
-  display: none;
-}
-
-.app-tabbar-highlight {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: calc((100% - 12px) / 4);
-  height: calc(100% - 12px);
-  border-radius: 19px;
-  background:
-    radial-gradient(circle at top, rgba(59, 166, 255, 0.28), transparent 56%),
-    rgba(38, 83, 145, 0.28);
-  box-shadow: 0 12px 28px rgba(45, 156, 255, 0.18);
-  transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-}
-
-.app-tabbar[data-active-tab="home"] .app-tabbar-highlight {
-  transform: translateX(0%);
-}
-
-.app-tabbar[data-active-tab="miles"] .app-tabbar-highlight {
-  transform: translateX(100%);
-}
-
-.app-tabbar[data-active-tab="passport"] .app-tabbar-highlight {
-  transform: translateX(200%);
-}
-
-.app-tabbar[data-active-tab="add"] .app-tabbar-highlight {
-  transform: translateX(300%);
-}
-
-.app-tab-button {
-  position: relative;
-  z-index: 1;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.48);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  cursor: pointer;
-  transition: color 0.24s ease, transform 0.18s ease;
-}
-
-.app-tab-button:active {
-  transform: scale(0.94);
-}
-
-.app-tab-button svg {
-  width: 21px;
-  height: 21px;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.app-tab-label {
-  font-size: 10px;
-  font-weight: 760;
-}
-
-.app-tabbar[data-active-tab="home"] [data-tab-target="home"],
-.app-tabbar[data-active-tab="miles"] [data-tab-target="miles"],
-.app-tabbar[data-active-tab="passport"] [data-tab-target="passport"],
-.app-tabbar[data-active-tab="add"] [data-tab-target="add"] {
-  color: #35a8ff;
-}
 
     .flights-list {
       margin-top: 38px;
@@ -1721,14 +1615,16 @@
   inset: 0;
   z-index: 45;
   background:
-    radial-gradient(circle at top left, rgba(40, 105, 255, 0.22), transparent 34%),
-    radial-gradient(circle at top right, rgba(255, 215, 80, 0.13), transparent 34%),
+    radial-gradient(circle at top, rgba(255, 215, 80, 0.12), transparent 34%),
+    radial-gradient(circle at top right, rgba(64, 156, 255, 0.12), transparent 32%),
     #070b18;
   color: white;
   opacity: 0;
   pointer-events: none;
   transform: translateY(28px);
-  transition: opacity 0.38s ease, transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.38s ease,
+    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
 }
 
@@ -1743,116 +1639,93 @@
   max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 28px 18px 112px;
+  padding: 28px 18px 42px;
 }
 
 .miles-header {
   position: relative;
-  min-height: 48px;
+  min-height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.miles-page-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 820;
-  letter-spacing: -0.2px;
-}
-
 .miles-back-button {
-  display: none;
-}
-
-    .miles-image-card {
-  position: relative;
-  width: min(430px, calc(100vw - 8px));
-  aspect-ratio: 708 / 330;
-  margin: 14px auto 26px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 24px;
-  overflow: hidden;
-}
-
-.miles-card-image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  border-radius: 24px;
-  object-fit: contain;
-}
-
-.miles-card-live-balance {
-  position: absolute;
-  left: 54px;
-  top: 82px;
+  left: 0;
+  top: 8px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   color: white;
-  font-size: 34px;
-  font-weight: 520;
-  letter-spacing: -0.7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.miles-back-button:active {
+  transform: scale(0.92);
+}
+
+.miles-back-button svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.miles-balance-card {
+  width: 100%;
+  padding: 28px 22px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 215, 80, 0.18), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.045)),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.miles-label {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 14px;
+  font-weight: 760;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.miles-balance {
+  margin-top: 10px;
+  color: white;
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: -1.8px;
   line-height: 1;
-  white-space: nowrap;
-  text-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
 }
 
-@media (max-width: 430px) {
-  .miles-image-card {
-    width: calc(100vw - 8px);
-  }
-
-  .miles-card-live-balance {
-  left: 54px;
-  top: 82px;
-  font-size: 34px;
-}
-}
-
-@media (max-width: 380px) {
-  .miles-image-card {
-    width: calc(100vw - 8px);
-  }
-
-  .miles-card-live-balance {
-  left: 48px;
-  top: 76px;
-  font-size: 30px;
-}
+.miles-balance-subtitle {
+  margin-top: 8px;
+  color: rgba(255, 215, 80, 0.72);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .transactions-section {
-  margin-top: 20px;
-  padding: 18px 14px 14px;
-  border-radius: 22px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
-    rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-}
-
-.transactions-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  margin-top: 28px;
 }
 
 .transactions-title {
-  font-size: 22px;
-  font-weight: 880;
-  letter-spacing: -0.45px;
-}
-
-.transactions-view-all {
-  border: none;
-  background: transparent;
-  color: #ffd76a;
-  font-size: 15px;
-  font-weight: 820;
-  cursor: pointer;
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
 }
 
 .transactions-list {
@@ -1864,28 +1737,28 @@
 .transaction-card {
   min-height: 72px;
   padding: 14px;
-  border-radius: 17px;
+  border-radius: 22px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025)),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
     rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.09);
   display: grid;
-  grid-template-columns: 48px 1fr auto;
+  grid-template-columns: 46px 1fr auto;
   align-items: center;
   gap: 12px;
   animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
+transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
-.transaction-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-}
+    .transaction-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
 
-.transaction-card:active {
-  transform: scale(0.985);
-  opacity: 0.82;
-}
+    .transaction-card:active {
+      transform: scale(0.985);
+      opacity: 0.82;
+    }
 
 .transaction-logo {
   width: 42px;
@@ -1909,7 +1782,7 @@
 .transaction-title {
   color: white;
   font-size: 16px;
-  font-weight: 820;
+  font-weight: 780;
   letter-spacing: -0.2px;
   white-space: nowrap;
   overflow: hidden;
@@ -1918,9 +1791,9 @@
 
 .transaction-subtitle {
   margin-top: 4px;
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255, 255, 255, 0.46);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 620;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1928,108 +1801,28 @@
 
 .transaction-amount {
   font-size: 15px;
-  font-weight: 880;
+  font-weight: 850;
   letter-spacing: -0.2px;
   white-space: nowrap;
 }
 
 .transaction-amount.earned {
-  color: #27dc83;
+  color: #24c36d;
 }
 
 .transaction-amount.spent {
-  color: #ff5a65;
+  color: #ff4b4b;
 }
 
 .empty-transactions {
   padding: 24px 18px;
-  border-radius: 20px;
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.48);
   font-size: 15px;
   font-weight: 650;
   text-align: center;
-}
-
-.transactions-sheet-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 320;
-  background: rgba(0, 0, 0, 0.42);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.transactions-sheet-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.transactions-sheet {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  z-index: 330;
-  width: min(430px, 100%);
-  max-height: 58vh;
-  padding: 12px 18px 24px;
-  border-radius: 30px 30px 0 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
-    rgba(9, 14, 26, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transform: translate(-50%, 105%);
-  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.transactions-sheet.active {
-  transform: translate(-50%, 0);
-}
-
-.transactions-sheet-handle {
-  width: 54px;
-  height: 5px;
-  border-radius: 999px;
-  margin: 0 auto 18px;
-  background: rgba(255, 255, 255, 0.42);
-}
-
-.transactions-sheet-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.transactions-sheet-title {
-  font-size: 22px;
-  font-weight: 880;
-  letter-spacing: -0.45px;
-}
-
-.transactions-sheet-close {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
-  color: white;
-  font-size: 25px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.transactions-sheet-list {
-  margin-top: 16px;
-  max-height: calc(58vh - 94px);
-  overflow-y: auto;
-  display: grid;
-  gap: 12px;
-  padding-bottom: 8px;
 }
     
     .detail-page {
@@ -4790,45 +4583,6 @@
     <section class="flights-list" id="flightsList"></section>
   </main>
 
-<nav class="app-tabbar" id="appTabbar" data-active-tab="home" aria-label="Main navigation">
-  <div class="app-tabbar-highlight"></div>
-
-  <button class="app-tab-button" type="button" data-tab-target="home" aria-label="Home">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 10.5 12 3l9 7.5"></path>
-      <path d="M5 9.5V21h14V9.5"></path>
-      <path d="M9 21v-6h6v6"></path>
-    </svg>
-    <span class="app-tab-label">Home</span>
-  </button>
-
-  <button class="app-tab-button" type="button" data-tab-target="miles" aria-label="Miles">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <ellipse cx="12" cy="6" rx="8" ry="3.5"></ellipse>
-      <path d="M4 6v6c0 1.93 3.58 3.5 8 3.5s8-1.57 8-3.5V6"></path>
-      <path d="M4 12v5.5C4 19.43 7.58 21 12 21s8-1.57 8-3.5V12"></path>
-    </svg>
-    <span class="app-tab-label">Miles</span>
-  </button>
-
-  <button class="app-tab-button" type="button" data-tab-target="passport" aria-label="Passport">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="6" y="3" width="12" height="18" rx="2"></rect>
-      <circle cx="12" cy="10" r="3"></circle>
-      <path d="M9 16h6"></path>
-    </svg>
-    <span class="app-tab-label">Passport</span>
-  </button>
-
-  <button class="app-tab-button" type="button" data-tab-target="add" aria-label="Add Flight">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 5v14"></path>
-      <path d="M5 12h14"></path>
-    </svg>
-    <span class="app-tab-label">Add Flight</span>
-  </button>
-</nav>
-
   <section class="cbp-page" id="cbpPage">
   <div class="cbp-shell">
     <img class="cbp-logo" src="./cbp.png" alt="CBP logo" />
@@ -4924,38 +4678,19 @@
         </svg>
       </button>
 
-      <div class="miles-page-title">Miles</div>
+      <div class="miles-balance-card">
+        <div class="miles-label">Miles Balance</div>
+        <div class="miles-balance" id="milesBalanceDisplay">0</div>
+        <div class="miles-balance-subtitle">Available miles</div>
+      </div>
     </header>
 
-    <section class="miles-image-card">
-  <img src="./miles.png" alt="Miles card" class="miles-card-image" />
-  <div class="miles-card-live-balance" id="milesBalanceDisplay">0</div>
-</section>
-
     <section class="transactions-section">
-      <div class="transactions-header">
-        <h2 class="transactions-title">Recent transactions</h2>
-        <button class="transactions-view-all" id="transactionsViewAllButton" type="button">View all</button>
-      </div>
-
+      <h2 class="transactions-title">Recent transactions</h2>
       <div class="transactions-list" id="transactionsList">
         <div class="empty-transactions">No transactions yet</div>
       </div>
     </section>
-  </div>
-</section>
-
-<div class="transactions-sheet-overlay" id="transactionsSheetOverlay"></div>
-<section class="transactions-sheet" id="transactionsSheet" aria-label="All mile transactions">
-  <div class="transactions-sheet-handle"></div>
-
-  <div class="transactions-sheet-top">
-    <div class="transactions-sheet-title">All transactions</div>
-    <button class="transactions-sheet-close" id="transactionsSheetCloseButton" type="button" aria-label="Close">&times;</button>
-  </div>
-
-  <div class="transactions-sheet-list" id="allTransactionsList">
-    <div class="empty-transactions">No transactions yet</div>
   </div>
 </section>
   
@@ -5931,11 +5666,6 @@ const milesPage = document.getElementById("milesPage");
 const milesBackButton = document.getElementById("milesBackButton");
 const milesBalanceDisplay = document.getElementById("milesBalanceDisplay");
 const transactionsList = document.getElementById("transactionsList");
-    const transactionsViewAllButton = document.getElementById("transactionsViewAllButton");
-const transactionsSheetOverlay = document.getElementById("transactionsSheetOverlay");
-const transactionsSheet = document.getElementById("transactionsSheet");
-const transactionsSheetCloseButton = document.getElementById("transactionsSheetCloseButton");
-const allTransactionsList = document.getElementById("allTransactionsList");
   const transactionEditOverlay = document.getElementById("transactionEditOverlay");
 const transactionEditPopup = document.getElementById("transactionEditPopup");
 const transactionEditSubtitle = document.getElementById("transactionEditSubtitle");
@@ -5972,7 +5702,6 @@ const boardingBlockedCloseButton = document.getElementById("boardingBlockedClose
 
 const editButton = document.getElementById("editButton");
 const backButton = document.getElementById("backButton");
-const appTabbar = document.getElementById("appTabbar");
     const flightsPage = document.getElementById("flightsPage");
     const addFlightPage = document.getElementById("addFlightPage");
     const flightForm = document.getElementById("flightForm");
@@ -6140,7 +5869,6 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let pendingMarkPhase = null;
     let activeTransaction = null;
     let currentMilesBalance = 0;
-    let allTransactionsCache = [];
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
@@ -6185,64 +5913,39 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   }
 });
 
-    function setMainTab(tabName) {
-  appTabbar.dataset.activeTab = tabName;
-  appTabbar.classList.toggle("hidden", tabName === "add");
+    editButton.addEventListener("click", () => {
+      flightsPage.classList.add("hidden");
+      addFlightPage.classList.add("active");
+    });
 
-  flightsPage.classList.toggle("hidden", tabName !== "home");
-  milesPage.classList.toggle("active", tabName === "miles");
-  passportPage.classList.toggle("active", tabName === "passport");
-  addFlightPage.classList.toggle("active", tabName === "add");
+    backButton.addEventListener("click", () => {
+      addFlightPage.classList.remove("active");
+      flightsPage.classList.remove("hidden");
+    });
 
-  editFlightPage.classList.remove("active");
-  detailPage.classList.remove("active");
-  boardingPassPage.classList.remove("active");
-  cbpPage.classList.remove("active");
-      
-      document.body.style.overflow = tabName === "home" || tabName === "add" ? "" : "hidden";
-
-  if (tabName === "passport") {
-    updatePassportUI();
-  }
-}
-
-function openAddFlightFromNavigation() {
-  setMainTab("add");
-}
-
-editButton.addEventListener("click", openAddFlightFromNavigation);
-
-backButton.addEventListener("click", () => {
-  setMainTab("home");
-});
-
-passportButton.addEventListener("click", () => {
-  setMainTab("passport");
+    passportButton.addEventListener("click", () => {
+  flightsPage.classList.add("hidden");
+  passportPage.classList.add("active");
+  document.body.style.overflow = "hidden";
+  updatePassportUI();
 });
 
 passportBackButton.addEventListener("click", () => {
-  setMainTab("home");
+  passportPage.classList.remove("active");
+  flightsPage.classList.remove("hidden");
+  document.body.style.overflow = "";
 });
 
-milesButton.addEventListener("click", () => {
-  setMainTab("miles");
+    milesButton.addEventListener("click", () => {
+  flightsPage.classList.add("hidden");
+  milesPage.classList.add("active");
+  document.body.style.overflow = "hidden";
 });
 
 milesBackButton.addEventListener("click", () => {
-  setMainTab("home");
-});
-
-appTabbar.querySelectorAll("[data-tab-target]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const target = button.dataset.tabTarget;
-
-    if (target === "add") {
-      openAddFlightFromNavigation();
-      return;
-    }
-
-    setMainTab(target);
-  });
+  milesPage.classList.remove("active");
+  flightsPage.classList.remove("hidden");
+  document.body.style.overflow = "";
 });
 
     document.querySelector(".boarding-pass-hero").addEventListener("click", () => {
@@ -6380,7 +6083,6 @@ function openCBPPage(lockData) {
   cbpOperationBox.classList.toggle("hidden", !isPreclearance);
 
   flightsPage.classList.add("hidden");
-  appTabbar.classList.add("hidden");
   addFlightPage.classList.remove("active");
   editFlightPage.classList.remove("active");
   detailPage.classList.remove("active");
@@ -8472,7 +8174,6 @@ boardingAirlineLogo.onerror = function () {
   boardingTripDuration.textContent = flight.flightTime || "--";
 
   flightsPage.classList.add("hidden");
-      appTabbar.classList.add("hidden");
   detailPage.classList.remove("active");
   boardingPassPage.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -8485,14 +8186,11 @@ function closeBoardingPassPage() {
     const latestFlight = allFlights.get(activeBoardingPassFlight.id) || activeBoardingPassFlight;
 
     flightsPage.classList.add("hidden");
-    appTabbar.classList.add("hidden");
     detailPage.classList.add("active");
     activeFlight = latestFlight;
     openFlightDetails(latestFlight);
   } else {
     flightsPage.classList.remove("hidden");
-    appTabbar.classList.remove("hidden");
-appTabbar.dataset.activeTab = "home";
     detailPage.classList.remove("active");
   }
 
@@ -8702,7 +8400,6 @@ boardingTripDetailsButton.addEventListener("click", () => {
 
   boardingPassPage.classList.remove("active");
   flightsPage.classList.add("hidden");
-  appTabbar.classList.add("hidden");
 
   openFlightDetails(selectedFlight);
 });
@@ -8990,7 +8687,6 @@ updateCompleteFlightButton(latest);
       }, 1000);
 
       flightsPage.classList.add("hidden");
-      appTabbar.classList.add("hidden");
 detailPage.classList.add("active");
 boardingPassPage.classList.remove("active");
 document.body.style.overflow = "hidden";
@@ -9000,8 +8696,6 @@ document.body.style.overflow = "hidden";
   detailPage.classList.remove("active");
   boardingPassPage.classList.remove("active");
   flightsPage.classList.remove("hidden");
-      appTabbar.classList.remove("hidden");
-appTabbar.dataset.activeTab = "home";
 
   activeFlight = null;
   activeBoardingPassFlight = null;
@@ -9178,47 +8872,24 @@ checkPreclearanceLocks();
 }, (error) => {
   console.error("Error loading recent arrivals:", error);
 });
-    function renderMilesTransactions() {
-  transactionsList.innerHTML = "";
-  allTransactionsList.innerHTML = "";
-
-  if (!allTransactionsCache.length) {
-    transactionsList.innerHTML = `<div class="empty-transactions">No transactions yet</div>`;
-    allTransactionsList.innerHTML = `<div class="empty-transactions">No transactions yet</div>`;
-    transactionsViewAllButton.style.display = "none";
-    return;
-  }
-
-  transactionsViewAllButton.style.display = allTransactionsCache.length > 5 ? "block" : "none";
-
-  allTransactionsCache.slice(0, 5).forEach((transaction) => {
-    transactionsList.appendChild(createTransactionCard(transaction));
-  });
-
-  allTransactionsCache.forEach((transaction) => {
-    allTransactionsList.appendChild(createTransactionCard(transaction));
-  });
-}
-
-function openTransactionsSheet() {
-  transactionsSheetOverlay.classList.add("active");
-  transactionsSheet.classList.add("active");
-}
-
-function closeTransactionsSheet() {
-  transactionsSheetOverlay.classList.remove("active");
-  transactionsSheet.classList.remove("active");
-}
-    
     const transactionsQuery = query(collection(db, "mileTransactions"), orderBy("createdAt", "desc"));
 
 onSnapshot(transactionsQuery, (snapshot) => {
-  allTransactionsCache = snapshot.docs.map((snapshotDoc) => ({
-    id: snapshotDoc.id,
-    ...snapshotDoc.data()
-  }));
+  transactionsList.innerHTML = "";
 
-  renderMilesTransactions();
+  if (snapshot.empty) {
+    transactionsList.innerHTML = `<div class="empty-transactions">No transactions yet</div>`;
+    return;
+  }
+
+  snapshot.forEach((snapshotDoc) => {
+    const transaction = {
+      id: snapshotDoc.id,
+      ...snapshotDoc.data()
+    };
+
+    transactionsList.appendChild(createTransactionCard(transaction));
+  });
 }, (error) => {
   console.error("Error loading mile transactions:", error);
 });
@@ -9430,10 +9101,6 @@ editBoardingTime.disabled = !canEditBoarding;
 
     openEditFlightButton.addEventListener("click", openEditFlightPage);
     editBackButton.addEventListener("click", closeEditFlightPage);
-
-    transactionsViewAllButton.addEventListener("click", openTransactionsSheet);
-transactionsSheetOverlay.addEventListener("click", closeTransactionsSheet);
-transactionsSheetCloseButton.addEventListener("click", closeTransactionsSheet);
 
     saveScheduleButton.addEventListener("click", async () => {
   if (!activeFlight) return;
@@ -10133,8 +9800,6 @@ if (
 
     closeCBPPage();
     flightsPage.classList.remove("hidden");
-    appTabbar.classList.remove("hidden");
-appTabbar.dataset.activeTab = "home";
 
     if (returnedFlight) {
       openFlightDetails({
