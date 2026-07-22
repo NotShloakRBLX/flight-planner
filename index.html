@@ -1767,57 +1767,49 @@
 
     .miles-image-card {
   position: relative;
-  width: calc(100% + 58px);
-  margin-left: -29px;
-  margin-top: 12px;
-  margin-bottom: 28px;
-  border-radius: 24px;
-  overflow: visible;
+  width: 100%;
+  aspect-ratio: 708 / 330;
+  margin-top: 14px;
+  border-radius: 22px;
+  overflow: hidden;
 }
 
 .miles-card-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  border-radius: 24px;
+  border-radius: 22px;
+  object-fit: fill;
 }
 
 .miles-card-live-balance {
   position: absolute;
-  left: 58px;
-  top: 76px;
+  left: 38px;
+  top: 86px;
   color: white;
-  font-size: 36px;
-  font-weight: 690;
-  letter-spacing: -1px;
+  font-size: 48px;
+  font-weight: 620;
+  letter-spacing: -1.55px;
   line-height: 1;
   white-space: nowrap;
-  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
 
 @media (max-width: 430px) {
-  .miles-image-card {
-    width: calc(100% + 58px);
-    margin-left: -29px;
-  }
-
   .miles-card-live-balance {
-    left: 58px;
-    top: 76px;
-    font-size: 36px;
+    left: 38px;
+    top: 84px;
+    font-size: 47px;
   }
 }
 
 @media (max-width: 380px) {
-  .miles-image-card {
-    width: calc(100% + 46px);
-    margin-left: -23px;
-  }
-
   .miles-card-live-balance {
-    left: 50px;
-    top: 68px;
-    font-size: 32px;
+    left: 34px;
+    top: 76px;
+    font-size: 41px;
   }
 }
 
