@@ -33,7 +33,7 @@
   max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 22px 18px 118px;
+    padding: 22px 18px 98px;
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
@@ -210,12 +210,12 @@
     .app-tabbar {
   position: fixed;
   left: 50%;
-  bottom: calc(14px + env(safe-area-inset-bottom));
-  z-index: 90;
-  width: min(392px, calc(100% - 28px));
-  height: 78px;
-  padding: 8px;
-  border-radius: 30px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 300;
+  width: min(356px, calc(100% - 44px));
+  height: 64px;
+  padding: 6px;
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)),
@@ -237,11 +237,11 @@
 
 .app-tabbar-highlight {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  width: calc((100% - 16px) / 4);
-  height: calc(100% - 16px);
-  border-radius: 24px;
+  top: 6px;
+  left: 6px;
+  width: calc((100% - 12px) / 4);
+  height: calc(100% - 12px);
+  border-radius: 19px;
   background:
     radial-gradient(circle at top, rgba(59, 166, 255, 0.28), transparent 56%),
     rgba(38, 83, 145, 0.28);
@@ -276,7 +276,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 3px;
   cursor: pointer;
   transition: color 0.24s ease, transform 0.18s ease;
 }
@@ -286,8 +286,8 @@
 }
 
 .app-tab-button svg {
-  width: 24px;
-  height: 24px;
+  width: 21px;
+  height: 21px;
   stroke: currentColor;
   stroke-width: 2.2;
   fill: none;
@@ -296,7 +296,7 @@
 }
 
 .app-tab-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 760;
 }
 
@@ -6073,7 +6073,8 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   boardingPassPage.classList.remove("active");
   cbpPage.classList.remove("active");
 
-  document.body.style.overflow = tabName === "home" || tabName === "add" ? "" : "hidden";
+    appTabbar.classList.toggle("hidden", tabName === "add");
+      document.body.style.overflow = tabName === "home" || tabName === "add" ? "" : "hidden";
 
   if (tabName === "passport") {
     updatePassportUI();
@@ -6254,6 +6255,7 @@ function openCBPPage(lockData) {
   cbpOperationBox.classList.toggle("hidden", !isPreclearance);
 
   flightsPage.classList.add("hidden");
+  appTabbar.classList.add("hidden");
   addFlightPage.classList.remove("active");
   editFlightPage.classList.remove("active");
   detailPage.classList.remove("active");
@@ -8345,6 +8347,7 @@ boardingAirlineLogo.onerror = function () {
   boardingTripDuration.textContent = flight.flightTime || "--";
 
   flightsPage.classList.add("hidden");
+      appTabbar.classList.add("hidden");
   detailPage.classList.remove("active");
   boardingPassPage.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -8357,6 +8360,7 @@ function closeBoardingPassPage() {
     const latestFlight = allFlights.get(activeBoardingPassFlight.id) || activeBoardingPassFlight;
 
     flightsPage.classList.add("hidden");
+    appTabbar.classList.add("hidden");
     detailPage.classList.add("active");
     activeFlight = latestFlight;
     openFlightDetails(latestFlight);
@@ -8571,6 +8575,7 @@ boardingTripDetailsButton.addEventListener("click", () => {
 
   boardingPassPage.classList.remove("active");
   flightsPage.classList.add("hidden");
+  appTabbar.classList.add("hidden");
 
   openFlightDetails(selectedFlight);
 });
@@ -8858,6 +8863,7 @@ updateCompleteFlightButton(latest);
       }, 1000);
 
       flightsPage.classList.add("hidden");
+      appTabbar.classList.add("hidden");
 detailPage.classList.add("active");
 boardingPassPage.classList.remove("active");
 document.body.style.overflow = "hidden";
