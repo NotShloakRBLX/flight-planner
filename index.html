@@ -1765,51 +1765,50 @@
   display: none;
 }
 
-.miles-balance-card {
+    .miles-image-card {
+  position: relative;
   width: 100%;
-  min-height: 184px;
-  margin-top: 12px;
-  padding: 26px 26px;
+  margin-top: 14px;
   border-radius: 22px;
-  background:
-    radial-gradient(circle at 84% 22%, rgba(255, 215, 80, 0.14), transparent 24%),
-    radial-gradient(circle at 58% 44%, rgba(255, 255, 255, 0.055), transparent 36%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.028)),
-    rgba(16, 23, 40, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
   box-shadow:
-    0 22px 62px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.11);
-  display: flex;
-  align-items: center;
+    0 24px 70px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.miles-balance-left {
-  min-width: 0;
+.miles-card-image {
+  width: 100%;
+  display: block;
+  border-radius: 22px;
 }
 
-.miles-label {
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 11px;
-  font-weight: 760;
-  letter-spacing: 1.15px;
-  text-transform: uppercase;
-}
-
-.miles-balance {
-  margin-top: 17px;
+.miles-card-live-balance {
+  position: absolute;
+  left: 38px;
+  top: 78px;
   color: white;
-  font-size: 50px;
-  font-weight: 680;
-  letter-spacing: -1.7px;
-  line-height: 0.95;
+  font-size: 52px;
+  font-weight: 720;
+  letter-spacing: -1.8px;
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
 }
 
-.miles-balance-subtitle {
-  margin-top: 9px;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 17px;
-  font-weight: 520;
+@media (max-width: 430px) {
+  .miles-card-live-balance {
+    left: 37px;
+    top: 76px;
+    font-size: 50px;
+  }
+}
+
+@media (max-width: 380px) {
+  .miles-card-live-balance {
+    left: 32px;
+    top: 68px;
+    font-size: 45px;
+  }
 }
 
 .transactions-section {
@@ -4916,12 +4915,9 @@
       <div class="miles-page-title">Miles</div>
     </header>
 
-    <section class="miles-balance-card">
-  <div class="miles-balance-left">
-    <div class="miles-label">Available miles</div>
-    <div class="miles-balance" id="milesBalanceDisplay">0</div>
-    <div class="miles-balance-subtitle">miles</div>
-  </div>
+    <section class="miles-image-card">
+  <img src="./miles.png" alt="Miles card" class="miles-card-image" />
+  <div class="miles-card-live-balance" id="milesBalanceDisplay">0</div>
 </section>
 
     <section class="transactions-section">
