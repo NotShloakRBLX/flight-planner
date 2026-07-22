@@ -6072,8 +6072,7 @@ edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
   detailPage.classList.remove("active");
   boardingPassPage.classList.remove("active");
   cbpPage.classList.remove("active");
-
-    appTabbar.classList.toggle("hidden", tabName === "add");
+      
       document.body.style.overflow = tabName === "home" || tabName === "add" ? "" : "hidden";
 
   if (tabName === "passport") {
@@ -8366,6 +8365,8 @@ function closeBoardingPassPage() {
     openFlightDetails(latestFlight);
   } else {
     flightsPage.classList.remove("hidden");
+    appTabbar.classList.remove("hidden");
+appTabbar.dataset.activeTab = "home";
     detailPage.classList.remove("active");
   }
 
@@ -8873,6 +8874,8 @@ document.body.style.overflow = "hidden";
   detailPage.classList.remove("active");
   boardingPassPage.classList.remove("active");
   flightsPage.classList.remove("hidden");
+      appTabbar.classList.remove("hidden");
+appTabbar.dataset.activeTab = "home";
 
   activeFlight = null;
   activeBoardingPassFlight = null;
@@ -9977,6 +9980,8 @@ if (
 
     closeCBPPage();
     flightsPage.classList.remove("hidden");
+    appTabbar.classList.remove("hidden");
+appTabbar.dataset.activeTab = "home";
 
     if (returnedFlight) {
       openFlightDetails({
