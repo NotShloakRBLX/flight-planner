@@ -1721,16 +1721,14 @@
   inset: 0;
   z-index: 45;
   background:
-    radial-gradient(circle at top, rgba(255, 215, 80, 0.12), transparent 34%),
-    radial-gradient(circle at top right, rgba(64, 156, 255, 0.12), transparent 32%),
+    radial-gradient(circle at top left, rgba(40, 105, 255, 0.22), transparent 34%),
+    radial-gradient(circle at top right, rgba(255, 215, 80, 0.13), transparent 34%),
     #070b18;
   color: white;
   opacity: 0;
   pointer-events: none;
   transform: translateY(28px);
-  transition:
-    opacity 0.38s ease,
-    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.38s ease, transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
 }
 
@@ -1745,93 +1743,92 @@
   max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 28px 18px 42px;
+  padding: 34px 18px 112px;
 }
 
 .miles-header {
-  position: relative;
-  min-height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  gap: 16px;
+}
+
+.miles-page-title {
+  text-align: center;
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -0.25px;
 }
 
 .miles-back-button {
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-}
-
-.miles-back-button:active {
-  transform: scale(0.92);
-}
-
-.miles-back-button svg {
-  width: 19px;
-  height: 19px;
-  fill: currentColor;
+  display: none;
 }
 
 .miles-balance-card {
   width: 100%;
-  padding: 28px 22px;
-  border-radius: 30px;
+  min-height: 210px;
+  padding: 28px 24px;
+  border-radius: 28px;
   background:
-    radial-gradient(circle at top left, rgba(255, 215, 80, 0.18), transparent 42%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.045)),
-    rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+    radial-gradient(circle at 84% 20%, rgba(255, 215, 80, 0.18), transparent 28%),
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.08), transparent 38%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
+    rgba(13, 20, 38, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.28),
+    0 26px 70px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .miles-label {
-  color: rgba(255, 255, 255, 0.52);
-  font-size: 14px;
-  font-weight: 760;
-  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 12px;
+  font-weight: 820;
+  letter-spacing: 0.7px;
   text-transform: uppercase;
 }
 
 .miles-balance {
-  margin-top: 10px;
+  margin-top: 14px;
   color: white;
-  font-size: 46px;
+  font-size: 60px;
   font-weight: 900;
-  letter-spacing: -1.8px;
-  line-height: 1;
+  letter-spacing: -2px;
+  line-height: 0.95;
 }
 
 .miles-balance-subtitle {
-  margin-top: 8px;
-  color: rgba(255, 215, 80, 0.72);
-  font-size: 15px;
-  font-weight: 700;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 17px;
+  font-weight: 650;
 }
 
 .transactions-section {
   margin-top: 28px;
 }
 
+.transactions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
 .transactions-title {
-  font-size: 24px;
-  font-weight: 850;
-  letter-spacing: -0.6px;
+  font-size: 22px;
+  font-weight: 880;
+  letter-spacing: -0.45px;
+}
+
+.transactions-view-all {
+  border: none;
+  background: transparent;
+  color: #ffd76a;
+  font-size: 15px;
+  font-weight: 820;
+  cursor: pointer;
 }
 
 .transactions-list {
@@ -1841,34 +1838,34 @@
 }
 
 .transaction-card {
-  min-height: 72px;
+  min-height: 76px;
   padding: 14px;
-  border-radius: 22px;
+  border-radius: 20px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025)),
     rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.09);
   display: grid;
-  grid-template-columns: 46px 1fr auto;
+  grid-template-columns: 48px 1fr auto;
   align-items: center;
   gap: 12px;
   animation: flightCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
-    .transaction-card:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-    }
+.transaction-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
 
-    .transaction-card:active {
-      transform: scale(0.985);
-      opacity: 0.82;
-    }
+.transaction-card:active {
+  transform: scale(0.985);
+  opacity: 0.82;
+}
 
 .transaction-logo {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1888,7 +1885,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .transaction-title {
   color: white;
   font-size: 16px;
-  font-weight: 780;
+  font-weight: 820;
   letter-spacing: -0.2px;
   white-space: nowrap;
   overflow: hidden;
@@ -1897,9 +1894,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
 .transaction-subtitle {
   margin-top: 4px;
-  color: rgba(255, 255, 255, 0.46);
+  color: rgba(255, 255, 255, 0.48);
   font-size: 13px;
-  font-weight: 620;
+  font-weight: 650;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1907,28 +1904,108 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
 .transaction-amount {
   font-size: 15px;
-  font-weight: 850;
+  font-weight: 880;
   letter-spacing: -0.2px;
   white-space: nowrap;
 }
 
 .transaction-amount.earned {
-  color: #24c36d;
+  color: #27dc83;
 }
 
 .transaction-amount.spent {
-  color: #ff4b4b;
+  color: #ff5a65;
 }
 
 .empty-transactions {
   padding: 24px 18px;
-  border-radius: 22px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.48);
   font-size: 15px;
   font-weight: 650;
   text-align: center;
+}
+
+.transactions-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  background: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.transactions-sheet-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.transactions-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 330;
+  width: min(430px, 100%);
+  max-height: 58vh;
+  padding: 12px 18px 24px;
+  border-radius: 30px 30px 0 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
+    rgba(9, 14, 26, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transform: translate(-50%, 105%);
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transactions-sheet.active {
+  transform: translate(-50%, 0);
+}
+
+.transactions-sheet-handle {
+  width: 54px;
+  height: 5px;
+  border-radius: 999px;
+  margin: 0 auto 18px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.transactions-sheet-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.transactions-sheet-title {
+  font-size: 22px;
+  font-weight: 880;
+  letter-spacing: -0.45px;
+}
+
+.transactions-sheet-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.transactions-sheet-list {
+  margin-top: 16px;
+  max-height: calc(58vh - 94px);
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  padding-bottom: 8px;
 }
     
     .detail-page {
@@ -4823,19 +4900,39 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         </svg>
       </button>
 
+      <div class="miles-page-title">Miles</div>
+
       <div class="miles-balance-card">
-        <div class="miles-label">Miles Balance</div>
+        <div class="miles-label">Available miles</div>
         <div class="miles-balance" id="milesBalanceDisplay">0</div>
-        <div class="miles-balance-subtitle">Available miles</div>
+        <div class="miles-balance-subtitle">miles</div>
       </div>
     </header>
 
     <section class="transactions-section">
-      <h2 class="transactions-title">Recent transactions</h2>
+      <div class="transactions-header">
+        <h2 class="transactions-title">Recent transactions</h2>
+        <button class="transactions-view-all" id="transactionsViewAllButton" type="button">View all</button>
+      </div>
+
       <div class="transactions-list" id="transactionsList">
         <div class="empty-transactions">No transactions yet</div>
       </div>
     </section>
+  </div>
+</section>
+
+<div class="transactions-sheet-overlay" id="transactionsSheetOverlay"></div>
+<section class="transactions-sheet" id="transactionsSheet" aria-label="All mile transactions">
+  <div class="transactions-sheet-handle"></div>
+
+  <div class="transactions-sheet-top">
+    <div class="transactions-sheet-title">All transactions</div>
+    <button class="transactions-sheet-close" id="transactionsSheetCloseButton" type="button" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="transactions-sheet-list" id="allTransactionsList">
+    <div class="empty-transactions">No transactions yet</div>
   </div>
 </section>
   
@@ -5811,6 +5908,11 @@ const milesPage = document.getElementById("milesPage");
 const milesBackButton = document.getElementById("milesBackButton");
 const milesBalanceDisplay = document.getElementById("milesBalanceDisplay");
 const transactionsList = document.getElementById("transactionsList");
+    const transactionsViewAllButton = document.getElementById("transactionsViewAllButton");
+const transactionsSheetOverlay = document.getElementById("transactionsSheetOverlay");
+const transactionsSheet = document.getElementById("transactionsSheet");
+const transactionsSheetCloseButton = document.getElementById("transactionsSheetCloseButton");
+const allTransactionsList = document.getElementById("allTransactionsList");
   const transactionEditOverlay = document.getElementById("transactionEditOverlay");
 const transactionEditPopup = document.getElementById("transactionEditPopup");
 const transactionEditSubtitle = document.getElementById("transactionEditSubtitle");
@@ -6015,6 +6117,7 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let pendingMarkPhase = null;
     let activeTransaction = null;
     let currentMilesBalance = 0;
+    let allTransactionsCache = [];
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
@@ -9052,24 +9155,47 @@ checkPreclearanceLocks();
 }, (error) => {
   console.error("Error loading recent arrivals:", error);
 });
-    const transactionsQuery = query(collection(db, "mileTransactions"), orderBy("createdAt", "desc"));
-
-onSnapshot(transactionsQuery, (snapshot) => {
+    function renderMilesTransactions() {
   transactionsList.innerHTML = "";
+  allTransactionsList.innerHTML = "";
 
-  if (snapshot.empty) {
+  if (!allTransactionsCache.length) {
     transactionsList.innerHTML = `<div class="empty-transactions">No transactions yet</div>`;
+    allTransactionsList.innerHTML = `<div class="empty-transactions">No transactions yet</div>`;
+    transactionsViewAllButton.style.display = "none";
     return;
   }
 
-  snapshot.forEach((snapshotDoc) => {
-    const transaction = {
-      id: snapshotDoc.id,
-      ...snapshotDoc.data()
-    };
+  transactionsViewAllButton.style.display = allTransactionsCache.length > 5 ? "block" : "none";
 
+  allTransactionsCache.slice(0, 5).forEach((transaction) => {
     transactionsList.appendChild(createTransactionCard(transaction));
   });
+
+  allTransactionsCache.forEach((transaction) => {
+    allTransactionsList.appendChild(createTransactionCard(transaction));
+  });
+}
+
+function openTransactionsSheet() {
+  transactionsSheetOverlay.classList.add("active");
+  transactionsSheet.classList.add("active");
+}
+
+function closeTransactionsSheet() {
+  transactionsSheetOverlay.classList.remove("active");
+  transactionsSheet.classList.remove("active");
+}
+    
+    const transactionsQuery = query(collection(db, "mileTransactions"), orderBy("createdAt", "desc"));
+
+onSnapshot(transactionsQuery, (snapshot) => {
+  allTransactionsCache = snapshot.docs.map((snapshotDoc) => ({
+    id: snapshotDoc.id,
+    ...snapshotDoc.data()
+  }));
+
+  renderMilesTransactions();
 }, (error) => {
   console.error("Error loading mile transactions:", error);
 });
@@ -9281,6 +9407,10 @@ editBoardingTime.disabled = !canEditBoarding;
 
     openEditFlightButton.addEventListener("click", openEditFlightPage);
     editBackButton.addEventListener("click", closeEditFlightPage);
+
+    transactionsViewAllButton.addEventListener("click", openTransactionsSheet);
+transactionsSheetOverlay.addEventListener("click", closeTransactionsSheet);
+transactionsSheetCloseButton.addEventListener("click", closeTransactionsSheet);
 
     saveScheduleButton.addEventListener("click", async () => {
   if (!activeFlight) return;
