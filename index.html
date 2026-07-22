@@ -1767,23 +1767,21 @@
 
 .miles-balance-card {
   width: 100%;
-  min-height: 190px;
+  min-height: 205px;
   margin-top: 14px;
-  padding: 24px 22px;
+  padding: 30px 28px;
   border-radius: 24px;
   background:
-    radial-gradient(circle at 82% 26%, rgba(255, 215, 80, 0.22), transparent 20%),
-    radial-gradient(circle at 54% 44%, rgba(255, 255, 255, 0.09), transparent 34%),
+    radial-gradient(circle at 84% 24%, rgba(255, 215, 80, 0.18), transparent 24%),
+    radial-gradient(circle at 58% 46%, rgba(255, 255, 255, 0.07), transparent 36%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
-    rgba(15, 22, 39, 0.86);
+    rgba(16, 23, 40, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.13);
-  display: grid;
-  grid-template-columns: 1fr 132px;
+  display: flex;
   align-items: center;
-  gap: 16px;
 }
 
 .miles-balance-left {
@@ -1794,97 +1792,28 @@
   color: rgba(255, 255, 255, 0.58);
   font-size: 12px;
   font-weight: 820;
-  letter-spacing: 0.8px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
 }
 
 .miles-balance {
-  margin-top: 14px;
+  margin-top: 16px;
   color: white;
-  font-size: 54px;
-  font-weight: 900;
-  letter-spacing: -1.8px;
+  font-size: 58px;
+  font-weight: 780;
+  letter-spacing: -1.9px;
   line-height: 0.95;
 }
 
 .miles-balance-subtitle {
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 16px;
-  font-weight: 650;
-}
-
-.miles-tier-ring {
-  width: 124px;
-  height: 124px;
-  border-radius: 50%;
-  background:
-    conic-gradient(#ffd86b 0deg 74deg, rgba(255, 255, 255, 0.16) 74deg 360deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.miles-tier-inner {
-  width: 104px;
-  height: 104px;
-  border-radius: 50%;
-  background: rgba(12, 17, 32, 0.86);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.miles-tier-label {
-  color: rgba(255, 255, 255, 0.48);
-  font-size: 9px;
-  font-weight: 820;
-  letter-spacing: 0.65px;
-  text-transform: uppercase;
-}
-
-.miles-tier-value {
-  margin-top: 7px;
-  color: white;
-  font-size: 23px;
-  font-weight: 900;
-  letter-spacing: -0.6px;
-}
-
-.miles-tier-small {
-  margin-top: 3px;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 11px;
-  font-weight: 650;
-}
-
-    .miles-action-grid {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.miles-action-tile {
-  min-height: 78px;
-  padding: 12px 8px;
-  border-radius: 16px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
-    rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.105);
-  color: rgba(255, 215, 106, 0.92);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 760;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 18px;
+  font-weight: 620;
 }
 
 .transactions-section {
-  margin-top: 22px;
+  margin-top: 24px;
   padding: 18px 14px 14px;
   border-radius: 22px;
   background:
@@ -4988,35 +4917,12 @@
     </header>
 
     <section class="miles-balance-card">
-      <div class="miles-balance-left">
-        <div class="miles-label">Available miles</div>
-        <div class="miles-balance" id="milesBalanceDisplay">0</div>
-        <div class="miles-balance-subtitle">miles</div>
-      </div>
-
-      <div class="miles-tier-ring">
-        <div class="miles-tier-inner">
-          <div class="miles-tier-label">To next tier</div>
-          <div class="miles-tier-value">--</div>
-          <div class="miles-tier-small">miles</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="miles-action-grid">
-      <div class="miles-action-tile">
-        <span>Buy Miles</span>
-      </div>
-      <div class="miles-action-tile">
-        <span>Transfer Miles</span>
-      </div>
-      <div class="miles-action-tile">
-        <span>Ways to Earn</span>
-      </div>
-      <div class="miles-action-tile">
-        <span>Miles Activity</span>
-      </div>
-    </section>
+  <div class="miles-balance-left">
+    <div class="miles-label">Available miles</div>
+    <div class="miles-balance" id="milesBalanceDisplay">0</div>
+    <div class="miles-balance-subtitle">miles</div>
+  </div>
+</section>
 
     <section class="transactions-section">
       <div class="transactions-header">
