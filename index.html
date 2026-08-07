@@ -7274,6 +7274,18 @@ function assignBoardingGroupForFlight({
 
   return getRandomEconomyBoardingGroup();
 }
+  function getBoardingGroupForExistingFlight(flight) {
+  if (!flight || !flight.assignedSeat) {
+    return 0;
+  }
+
+  return assignBoardingGroupForFlight({
+    flight,
+    seat: flight.assignedSeat,
+    isPremium: flight.premiumSeat === true,
+    isPremiumEconomy: flight.premiumEconomySeat === true
+  });
+}  
 
     function getRandomInteger(min, max) {
   const low = Math.ceil(min);
@@ -9170,6 +9182,16 @@ if (flight.cbpSubmitted !== true) {
 
 if (!flight.premiumSeatCost) {
   flight.premiumSeatCost = 0;
+}
+
+if (!flight.boardingGroup && flight.assignedSeat) {
+  flight.boardingGroup = getBoardingGroupForExistingFlight(flight);
+
+  updateDoc(getFlightRef(flight.id), {
+    boardingGroup: flight.boardingGroup
+  }).catch((error) => {
+    console.error("Error backfilling boarding group:", error);
+  });
 }
 
         allFlights.set(flight.id, flight);
