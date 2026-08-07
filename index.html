@@ -4117,6 +4117,18 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   letter-spacing: 4px;
 }
 
+    .boarding-group-text {
+  margin-top: 12px;
+  color: white;
+  font-size: 18px;
+  font-weight: 820;
+  letter-spacing: -0.15px;
+}
+
+.boarding-group-text.hidden {
+  display: none;
+}
+
 .boarding-seat-row {
   padding: 0 20px 22px;
   display: flex;
@@ -4982,11 +4994,12 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       </div>
 
       <div class="boarding-code-wrap">
-        <div class="boarding-code-label">BOARDING CODE</div>
-        <div class="boarding-code-line"></div>
-        <div class="boarding-code" id="boardingCode">------</div>
-        <div class="boarding-code-line"></div>
-      </div>
+  <div class="boarding-code-label">BOARDING CODE</div>
+  <div class="boarding-code-line"></div>
+  <div class="boarding-code" id="boardingCode">------</div>
+  <div class="boarding-code-line"></div>
+  <div class="boarding-group-text hidden" id="boardingGroupText">Group --</div>
+</div>
 
       <div class="boarding-seat-row">
         <div>
@@ -5538,6 +5551,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </div>
 </section>
 
+  <section class="seat-popup" id="groupAssignedPopup">
+  <div class="seat-popup-title">Group Assigned</div>
+  <div class="assigned-seat-display">
+    <div class="assigned-seat-big" id="assignedGroupBig">Group --</div>
+    <div class="assigned-seat-cabin">Boarding group</div>
+  </div>
+</section>
+
   <section class="seat-popup" id="seatRedirectPopup">
   <div class="seat-popup-title">Redirecting to seat map...</div>
   <div class="seat-popup-subtitle">Your First/Business seat selection is opening in a new tab.</div>
@@ -5704,6 +5725,8 @@ const premiumPayButton = document.getElementById("premiumPayButton");
 const seatAssignedPopup = document.getElementById("seatAssignedPopup");
 const assignedSeatBig = document.getElementById("assignedSeatBig");
 const assignedSeatCabin = document.getElementById("assignedSeatCabin");
+const groupAssignedPopup = document.getElementById("groupAssignedPopup");
+const assignedGroupBig = document.getElementById("assignedGroupBig");
 const seatRedirectPopup = document.getElementById("seatRedirectPopup");
 const externalSeatConfirmPopup = document.getElementById("externalSeatConfirmPopup");
 const externalSeatNumberDisplay = document.getElementById("externalSeatNumberDisplay");
@@ -5736,6 +5759,7 @@ const boardingPassengerName = document.getElementById("boardingPassengerName");
 const boardingAirlineLogo = document.getElementById("boardingAirlineLogo");
 const boardingFlightNumber = document.getElementById("boardingFlightNumber");
 const boardingCode = document.getElementById("boardingCode");
+    const boardingGroupText = document.getElementById("boardingGroupText");
 const boardingSeatValue = document.getElementById("boardingSeatValue");
 const boardingCabinValue = document.getElementById("boardingCabinValue");
 const boardingPriorityPill = document.getElementById("boardingPriorityPill");
@@ -5890,6 +5914,7 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
+    let pendingAssignedBoardingGroup = "";
     let currentPassport = null;
     let passportCountdownTimer = null;
     let currentCBPLock = null;
@@ -7205,6 +7230,51 @@ function assignPremiumSeatFromFlight(flight) {
   );
 }
 
+    function getSeatRowNumber(seat) {
+  const match = String(seat || "").trim().match(/^(\d+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function getEconomyPriorityBoundaryRow(flight) {
+  if (flight.premiumEconomyEnabled === true) {
+    return Number(flight.premiumEconomyLastRow || 0);
+  }
+
+  return Number(flight.premiumRows || 0);
+}
+
+function getRandomEconomyBoardingGroup() {
+  return getRandomInteger(7, 9);
+}
+
+function assignBoardingGroupForFlight({
+  flight,
+  seat,
+  isPremium,
+  isPremiumEconomy
+}) {
+  if (isPremiumEconomy === true) {
+    return 4;
+  }
+
+  if (isPremium === true) {
+    return 1;
+  }
+
+  const seatRow = getSeatRowNumber(seat);
+  const boundaryRow = getEconomyPriorityBoundaryRow(flight);
+
+  if (seatRow > 0 && boundaryRow > 0 && seatRow <= boundaryRow + 7) {
+    return 5;
+  }
+
+  if (currentMilesBalance >= 35000) {
+    return 6;
+  }
+
+  return getRandomEconomyBoardingGroup();
+}
+
     function getRandomInteger(min, max) {
   const low = Math.ceil(min);
   const high = Math.floor(max);
@@ -7249,6 +7319,7 @@ function closeSeatPopups() {
   cabinSelectPopup.classList.remove("active");
   premiumPaymentPopup.classList.remove("active");
   seatAssignedPopup.classList.remove("active");
+  groupAssignedPopup.classList.remove("active");
   seatRedirectPopup.classList.remove("active");
   externalSeatConfirmPopup.classList.remove("active");
 }
@@ -7273,6 +7344,17 @@ function showSeatAssignedPopup(seat, cabin) {
   assignedSeatCabin.textContent = cabin;
 
   seatAssignedPopup.classList.add("active");
+}
+
+    function showGroupAssignedPopup(group) {
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+
+  assignedGroupBig.textContent = group ? `Group ${group}` : "Group --";
+
+  groupAssignedPopup.classList.add("active");
 }
 
 function showPremiumPaymentPopup() {
@@ -7534,13 +7616,21 @@ async function saveFlightWithSeat({
 }) {
   if (!pendingFlightToAdd) return;
 
+    const boardingGroup = assignBoardingGroupForFlight({
+    flight: pendingFlightToAdd,
+    seat,
+    isPremium,
+    isPremiumEconomy
+  });
+
   const flightToSave = {
     ...pendingFlightToAdd,
     assignedSeat: seat,
     seatCabin: cabin,
     premiumSeat: isPremium,
     premiumEconomySeat: isPremiumEconomy,
-    premiumSeatCost: milesCost
+    premiumSeatCost: milesCost,
+    boardingGroup
   };
 
   try {
@@ -7632,6 +7722,7 @@ seatRedirectPopup.classList.remove("active");
 premiumPaymentPopup.classList.remove("active");
 cabinSelectPopup.classList.remove("active");
 
+pendingAssignedBoardingGroup = boardingGroup;
 showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
@@ -8073,6 +8164,16 @@ function getBoardingCode(flight) {
   return getReservationCode(flight);
 }
 
+    function getBoardingGroupText(flight) {
+  const group = Number(flight?.boardingGroup || 0);
+
+  if (!Number.isFinite(group) || group <= 0) {
+    return "";
+  }
+
+  return `Group ${group}`;
+}
+
 function isPriorityPassenger(flight) {
   return flight.premiumSeat === true || flight.premiumEconomySeat === true;
 }
@@ -8176,6 +8277,9 @@ boardingAirlineLogo.onerror = function () {
 
   boardingFlightNumber.textContent = `${airline}${flightNumber}`;
   boardingCode.textContent = getBoardingCode(flight);
+      const boardingGroupLabel = getBoardingGroupText(flight);
+boardingGroupText.textContent = boardingGroupLabel || "Group --";
+boardingGroupText.classList.toggle("hidden", !boardingGroupLabel);
 
   boardingSeatValue.textContent = flight.assignedSeat || "--";
   boardingCabinValue.textContent = cabin;
@@ -8521,7 +8625,17 @@ const arrivalDiff = describeDifference(
 }
 
 if (phase === "boarding") {
-  setStatusPanel(false, `Now boarding at Gate ${flight.boardingGate || "--"}`, "");
+  const boardingGroupLabel = getBoardingGroupText(flight);
+  const gateLabel = flight.boardingGate ? ` at Gate ${flight.boardingGate}` : "";
+
+  setStatusPanel(
+    false,
+    boardingGroupLabel
+      ? `Now boarding ${boardingGroupLabel}${gateLabel}`
+      : `Now boarding${gateLabel || " at Gate --"}`,
+    ""
+  );
+  return;
 }
 
 if (phase === "boardingComplete") {
@@ -9973,13 +10087,35 @@ confirmRenewPassportButton.addEventListener("click", async () => {
 
     seatFlowOverlay.addEventListener("click", () => {
   if (seatAssignedPopup.classList.contains("active")) {
+    if (pendingAssignedBoardingGroup) {
+      showGroupAssignedPopup(pendingAssignedBoardingGroup);
+      return;
+    }
+
     closeSeatPopups();
     showNotification("Flight added!");
     return;
   }
+
+  if (groupAssignedPopup.classList.contains("active")) {
+    pendingAssignedBoardingGroup = "";
+    closeSeatPopups();
+    showNotification("Flight added!");
+  }
 });
 
 seatAssignedPopup.addEventListener("click", () => {
+  if (pendingAssignedBoardingGroup) {
+    showGroupAssignedPopup(pendingAssignedBoardingGroup);
+    return;
+  }
+
+  closeSeatPopups();
+  showNotification("Flight added!");
+});
+
+    groupAssignedPopup.addEventListener("click", () => {
+  pendingAssignedBoardingGroup = "";
   closeSeatPopups();
   showNotification("Flight added!");
 });
