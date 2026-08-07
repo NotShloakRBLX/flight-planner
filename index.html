@@ -8186,6 +8186,31 @@ function getBoardingCode(flight) {
   return `Group ${group}`;
 }
 
+    function getActiveBoardingGroupNumber(flight) {
+  const boardingStartMs = Number(flight?.boardingStartMs || 0);
+
+  if (!boardingStartMs || !Number.isFinite(boardingStartMs)) {
+    return 1;
+  }
+
+  const elapsedMinutes = Math.max(0, (Date.now() - boardingStartMs) / 60000);
+
+  if (elapsedMinutes < 1.5) return 1;
+  if (elapsedMinutes < 3) return 2;
+  if (elapsedMinutes < 5) return 3;
+  if (elapsedMinutes < 7) return 4;
+  if (elapsedMinutes < 11) return 5;
+  if (elapsedMinutes < 15) return 6;
+  if (elapsedMinutes < 20) return 7;
+  if (elapsedMinutes < 25) return 8;
+
+  return 9;
+}
+
+function getActiveBoardingGroupText(flight) {
+  return `Group ${getActiveBoardingGroupNumber(flight)}`;
+}
+
 function isPriorityPassenger(flight) {
   return flight.premiumSeat === true || flight.premiumEconomySeat === true;
 }
@@ -8637,14 +8662,12 @@ const arrivalDiff = describeDifference(
 }
 
 if (phase === "boarding") {
-  const boardingGroupLabel = getBoardingGroupText(flight);
-  const gateLabel = flight.boardingGate ? ` at Gate ${flight.boardingGate}` : "";
+  const activeBoardingGroupLabel = getActiveBoardingGroupText(flight);
+  const gateLabel = flight.boardingGate ? ` at Gate ${flight.boardingGate}` : " at Gate --";
 
   setStatusPanel(
     false,
-    boardingGroupLabel
-      ? `Now boarding ${boardingGroupLabel}${gateLabel}`
-      : `Now boarding${gateLabel || " at Gate --"}`,
+    `Now boarding ${activeBoardingGroupLabel}${gateLabel}`,
     ""
   );
   return;
