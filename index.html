@@ -7242,7 +7242,9 @@ function updateCompleteFlightButton(flight) {
     ? flight?.cbpSubmitted === true
     : true;
 
-  const canComplete = arrivedAtGate && cbpClear;
+const documentsClear = hasCompletedAllDocuments(flight);
+
+const canComplete = arrivedAtGate && cbpClear && documentsClear;
 
   completeFlightButton.disabled = !canComplete;
   completeFlightButton.classList.toggle("disabled", !canComplete);
@@ -7434,8 +7436,9 @@ function createDocumentPacketForFlight(flight, flightId) {
   return {
     flightId,
     status: "active",
-    documentsComplete: false,
-    requiredDocuments,
+    preDepartureDocumentsComplete: false,
+documentsComplete: false,
+requiredDocuments,
     documents,
     internationalUSArrival: flight.internationalUSArrival === true,
     internationalUSDeparture: flight.internationalUSDeparture === true,
@@ -7472,7 +7475,11 @@ function openDocumentsSiteForFlight(flightId) {
   window.location.href = getDocumentsSiteUrl(flightId);
 }
 
-function hasCompletedRequiredDocuments(flight) {
+function hasCompletedPreDepartureDocuments(flight) {
+  return flight?.preDepartureDocumentsComplete === true || flight?.documentsComplete === true;
+}
+
+function hasCompletedAllDocuments(flight) {
   return flight?.documentsComplete === true;
 }
 
@@ -7832,6 +7839,7 @@ async function saveFlightWithSeat({
     premiumEconomySeat: isPremiumEconomy,
     premiumSeatCost: milesCost,
 boardingGroup,
+preDepartureDocumentsComplete: false,
 documentsComplete: false,
 documentsStatus: "active"
   };
@@ -9358,6 +9366,10 @@ if (!flight.boardingSessionId) {
   flight.boardingSessionId = "";
 }
 
+if (flight.preDepartureDocumentsComplete !== true) {
+  flight.preDepartureDocumentsComplete = false;
+}
+
 if (flight.documentsComplete !== true) {
   flight.documentsComplete = false;
 }
@@ -9890,8 +9902,8 @@ if (requiresCheckInBeforePhase(activeFlight)) {
   return;
 }
 
-if (!hasCompletedRequiredDocuments(activeFlight)) {
-  const openDocs = confirm("Required documents must be completed before gate departure. Open documents now?");
+if (!hasCompletedPreDepartureDocuments(activeFlight)) {
+  const openDocs = confirm("Required pre-departure documents must be completed before gate departure. Open documents now?");
 
   if (openDocs) {
     openDocumentsSiteForFlight(activeFlight.id);
@@ -9952,8 +9964,8 @@ if (
     confirmMarkButton.addEventListener("click", async () => {
       if (!activeFlight || !pendingMarkPhase) return;
 
-if (pendingMarkPhase === "gateDeparture" && !hasCompletedRequiredDocuments(activeFlight)) {
-  const openDocs = confirm("Required documents must be completed before gate departure. Open documents now?");
+if (pendingMarkPhase === "gateDeparture" && !hasCompletedPreDepartureDocuments(activeFlight)) {
+  const openDocs = confirm("Required pre-departure documents must be completed before gate departure. Open documents now?");
 
   if (openDocs) {
     openDocumentsSiteForFlight(activeFlight.id);
