@@ -6001,6 +6001,7 @@ let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
     let pendingAssignedBoardingGroup = "";
+let pendingDocumentFlightId = "";
     let currentPassport = null;
     let passportCountdownTimer = null;
     let currentCBPLock = null;
@@ -6017,6 +6018,7 @@ const checkInOpenWriteLocks = new Set();
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
 const BOARDING_VERIFICATION_URL = "https://notshloakrblx.github.io/flight-boarding/";
 const CHECK_IN_SITE_URL = "https://notshloakrblx.github.io/flight-check-in/";
+const DOCUMENTS_SITE_URL = "https://notshloakrblx.github.io/flight-documents/";
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -7385,6 +7387,95 @@ function assignBoardingGroupForFlight({
   });
 }  
 
+    function getRequiredDocumentKeys(flight) {
+  if (flight?.internationalUSDeparture === true) {
+    return ["cbp7507", "loadsheet", "eapis"];
+  }
+
+  if (flight?.internationalUSArrival === true) {
+    return ["cbp7507", "loadsheet"];
+  }
+
+  return ["loadsheet"];
+}
+
+function getDocumentTitle(key) {
+  const titles = {
+    cbp7507: "CBP Form 7507",
+    loadsheet: "Loadsheet Form",
+    eapis: "eAPIS Form"
+  };
+
+  return titles[key] || key;
+}
+
+function createEmptyDocumentState(key) {
+  return {
+    key,
+    title: getDocumentTitle(key),
+    required: true,
+    signed: false,
+    method: "",
+    answers: [],
+    signatureDataUrl: "",
+    photoPath: "",
+    signedAt: null
+  };
+}
+
+function createDocumentPacketForFlight(flight, flightId) {
+  const requiredDocuments = getRequiredDocumentKeys(flight);
+  const documents = {};
+
+  requiredDocuments.forEach((key) => {
+    documents[key] = createEmptyDocumentState(key);
+  });
+
+  return {
+    flightId,
+    status: "active",
+    documentsComplete: false,
+    requiredDocuments,
+    documents,
+    internationalUSArrival: flight.internationalUSArrival === true,
+    internationalUSDeparture: flight.internationalUSDeparture === true,
+    flightSnapshot: {
+      airline: flight.airline || "",
+      flightNumber: flight.flightNumber || "",
+      flightDate: flight.flightDate || "",
+      flightDateRaw: flight.flightDateRaw || "",
+      departureAirport: flight.departureAirport || "",
+      arrivalAirport: flight.arrivalAirport || "",
+      departureAirportName: flight.departureAirportName || "",
+      arrivalAirportName: flight.arrivalAirportName || "",
+      cityDeparture: flight.cityDeparture || "",
+      cityArrival: flight.cityArrival || "",
+      scheduledDeparture: flight.scheduledDeparture || "",
+      scheduledArrival: flight.scheduledArrival || "",
+      assignedSeat: flight.assignedSeat || "",
+      seatCabin: flight.seatCabin || ""
+    },
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function getDocumentsSiteUrl(flightId) {
+  const url = new URL(DOCUMENTS_SITE_URL);
+  url.searchParams.set("flightId", flightId || "");
+  url.searchParams.set("returnUrl", MAIN_SITE_RETURN_URL);
+  return url.toString();
+}
+
+function openDocumentsSiteForFlight(flightId) {
+  if (!flightId) return;
+  window.location.href = getDocumentsSiteUrl(flightId);
+}
+
+function hasCompletedRequiredDocuments(flight) {
+  return flight?.documentsComplete === true;
+}
+
     function getRandomInteger(min, max) {
   const low = Math.ceil(min);
   const high = Math.floor(max);
@@ -7740,7 +7831,9 @@ async function saveFlightWithSeat({
     premiumSeat: isPremium,
     premiumEconomySeat: isPremiumEconomy,
     premiumSeatCost: milesCost,
-    boardingGroup
+boardingGroup,
+documentsComplete: false,
+documentsStatus: "active"
   };
 
   try {
@@ -7756,6 +7849,10 @@ async function saveFlightWithSeat({
       savedFlightId = flightRef.id;
 
       batch.set(flightRef, flightToSave);
+      batch.set(
+  doc(db, "documentPackets", savedFlightId),
+  createDocumentPacketForFlight(flightToSave, savedFlightId)
+);
 
       batch.set(
         milesBalanceRef,
@@ -7796,6 +7893,10 @@ async function saveFlightWithSeat({
     } else {
       const createdFlight = await addDoc(collection(db, "flights"), flightToSave);
       savedFlightId = createdFlight.id;
+      await setDoc(
+  doc(db, "documentPackets", savedFlightId),
+  createDocumentPacketForFlight(flightToSave, savedFlightId)
+);
 
       if (seatSelectionSessionId) {
         await updateDoc(doc(db, "seatSelectionSessions", seatSelectionSessionId), {
@@ -7836,6 +7937,7 @@ premiumPaymentPopup.classList.remove("active");
 cabinSelectPopup.classList.remove("active");
 
 pendingAssignedBoardingGroup = boardingGroup;
+pendingDocumentFlightId = savedFlightId;
 showSeatAssignedPopup(seat, cabin);
 
     pendingFlightToAdd = null;
@@ -9256,6 +9358,14 @@ if (!flight.boardingSessionId) {
   flight.boardingSessionId = "";
 }
 
+if (flight.documentsComplete !== true) {
+  flight.documentsComplete = false;
+}
+
+if (!flight.documentsStatus) {
+  flight.documentsStatus = "active";
+}
+
         if (flight.checkedIn !== true) flight.checkedIn = false;
 if (!flight.checkedInAt) flight.checkedInAt = null;
 if (flight.checkInOpened !== true) flight.checkInOpened = false;
@@ -9780,6 +9890,16 @@ if (requiresCheckInBeforePhase(activeFlight)) {
   return;
 }
 
+if (!hasCompletedRequiredDocuments(activeFlight)) {
+  const openDocs = confirm("Required documents must be completed before gate departure. Open documents now?");
+
+  if (openDocs) {
+    openDocumentsSiteForFlight(activeFlight.id);
+  }
+
+  return;
+}
+
 if (
   activeFlight.enableBoarding === true &&
   activeFlight.boardingVerified !== true
@@ -9832,7 +9952,16 @@ if (
     confirmMarkButton.addEventListener("click", async () => {
       if (!activeFlight || !pendingMarkPhase) return;
 
-if (pendingMarkPhase === "boarding" && !markGateInput.value.trim()) return;
+if (pendingMarkPhase === "gateDeparture" && !hasCompletedRequiredDocuments(activeFlight)) {
+  const openDocs = confirm("Required documents must be completed before gate departure. Open documents now?");
+
+  if (openDocs) {
+    openDocumentsSiteForFlight(activeFlight.id);
+  }
+
+  return;
+}
+      if (pendingMarkPhase === "boarding" && !markGateInput.value.trim()) return;
 
 if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 
@@ -10022,7 +10151,19 @@ if (
       });
     }
 
-    batch.delete(flightRef);
+    batch.set(
+  doc(db, "documentPackets", completedFlight.id),
+  {
+    status: "archived",
+    flightCompleted: true,
+    documentsStatus: "archived",
+    archivedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  },
+  { merge: true }
+);
+
+batch.delete(flightRef);
 
     await batch.commit();
 
@@ -10244,6 +10385,14 @@ confirmRenewPassportButton.addEventListener("click", async () => {
   }
 });
 
+    function finishFlightAddedFlow() {
+  pendingAssignedBoardingGroup = "";
+  pendingDocumentFlightId = "";
+
+  closeSeatPopups();
+  showNotification("Flight added!");
+}
+    
     seatFlowOverlay.addEventListener("click", () => {
   if (seatAssignedPopup.classList.contains("active")) {
     if (pendingAssignedBoardingGroup) {
@@ -10251,15 +10400,12 @@ confirmRenewPassportButton.addEventListener("click", async () => {
       return;
     }
 
-    closeSeatPopups();
-    showNotification("Flight added!");
+    finishFlightAddedFlow();
     return;
   }
 
   if (groupAssignedPopup.classList.contains("active")) {
-    pendingAssignedBoardingGroup = "";
-    closeSeatPopups();
-    showNotification("Flight added!");
+    finishFlightAddedFlow();
   }
 });
 
@@ -10269,14 +10415,11 @@ seatAssignedPopup.addEventListener("click", () => {
     return;
   }
 
-  closeSeatPopups();
-  showNotification("Flight added!");
+  finishFlightAddedFlow();
 });
 
-    groupAssignedPopup.addEventListener("click", () => {
-  pendingAssignedBoardingGroup = "";
-  closeSeatPopups();
-  showNotification("Flight added!");
+groupAssignedPopup.addEventListener("click", () => {
+  finishFlightAddedFlow();
 });
 
 choosePremiumEconomyButton.addEventListener("click", () => {
@@ -10511,7 +10654,11 @@ transactionDeleteButton.addEventListener("click", async () => {
 
       try {
         const deletingId = activeFlight.id;
-        await deleteDoc(getFlightRef(deletingId));
+
+const batch = writeBatch(db);
+batch.delete(getFlightRef(deletingId));
+batch.delete(doc(db, "documentPackets", deletingId));
+await batch.commit();
 
         closeFlightDetails();
         allFlights.delete(deletingId);
