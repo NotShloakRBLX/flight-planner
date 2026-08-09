@@ -7441,8 +7441,9 @@ documentsComplete: false,
 requiredDocuments,
     documents,
     internationalUSArrival: flight.internationalUSArrival === true,
-    internationalUSDeparture: flight.internationalUSDeparture === true,
-    flightSnapshot: {
+internationalUSDeparture: flight.internationalUSDeparture === true,
+usPreclearance: flight.usPreclearance === true,
+flightSnapshot: {
       airline: flight.airline || "",
       flightNumber: flight.flightNumber || "",
       flightDate: flight.flightDate || "",
@@ -7456,7 +7457,8 @@ requiredDocuments,
       scheduledDeparture: flight.scheduledDeparture || "",
       scheduledArrival: flight.scheduledArrival || "",
       assignedSeat: flight.assignedSeat || "",
-      seatCabin: flight.seatCabin || ""
+      seatCabin: flight.seatCabin || "",
+usPreclearance: flight.usPreclearance === true
     },
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
