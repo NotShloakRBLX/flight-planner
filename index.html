@@ -4908,6 +4908,18 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </label>
 </div>
 
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">International US departure</div>
+    <div class="toggle-subtitle">Requires an active passport before adding flight</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="intlUSDepartureToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+
 <div class="form-field">
   <label for="timezoneDifference">Timezone difference</label>
   <input id="timezoneDifference" type="text" placeholder="-6 or +5 / -6 30" />
@@ -5895,6 +5907,7 @@ const edtArrivalToggle = document.getElementById("edtArrivalToggle");
 const edtOffsetOptions = document.getElementById("edtOffsetOptions");
 const edtOffsetInput = document.getElementById("edtOffset");
 const intlUSArrivalToggle = document.getElementById("intlUSArrivalToggle");
+const intlUSDepartureToggle = document.getElementById("intlUSDepartureToggle");
 const enableBoardingToggle = document.getElementById("enableBoardingToggle");
 const boardingOptions = document.getElementById("boardingOptions");
 const boardingTimeInput = document.getElementById("boardingTime");
@@ -5935,6 +5948,18 @@ const CHECK_IN_SITE_URL = "https://notshloakrblx.github.io/flight-check-in/";
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
 edtArrivalToggle.addEventListener("change", updateEDTOffsetVisibility);
+
+intlUSArrivalToggle.addEventListener("change", () => {
+  if (intlUSArrivalToggle.checked) {
+    intlUSDepartureToggle.checked = false;
+  }
+});
+
+intlUSDepartureToggle.addEventListener("change", () => {
+  if (intlUSDepartureToggle.checked) {
+    intlUSArrivalToggle.checked = false;
+  }
+});
     
     enableBoardingToggle.addEventListener("change", () => {
   boardingOptions.classList.toggle("active", enableBoardingToggle.checked);
@@ -7711,6 +7736,9 @@ async function saveFlightWithSeat({
 
     flightForm.reset();
 
+    intlUSArrivalToggle.checked = false;
+intlUSDepartureToggle.checked = false;
+    
     if (boardingOptions) {
       boardingOptions.classList.remove("active");
     }
@@ -8938,6 +8966,7 @@ economyLetters: economyLettersInput.value.trim().toUpperCase() || "",
 edtOffset: edtArrivalToggle.checked ? "" : edtOffsetInput.value.trim() || "",
 edtArrival: edtArrivalToggle.checked,
 internationalUSArrival: intlUSArrivalToggle.checked,
+internationalUSDeparture: intlUSDepartureToggle.checked,
 usPreclearance: intlUSArrivalToggle.checked && isUSPreclearanceAirport(departureAirportInput.value),
 cbpRequired: intlUSArrivalToggle.checked,
 cbpSubmitted: false,
@@ -8959,8 +8988,11 @@ phase: "scheduled",
     createdAt: serverTimestamp()
   };
 
-  if (flight.internationalUSArrival === true && !isPassportActive()) {
-  showNotification("Active passport required!");
+  if (
+  (flight.internationalUSArrival === true || flight.internationalUSDeparture === true) &&
+  !isPassportActive()
+) {
+  alert("A valid passport is required for International US flights.");
   return;
 }
 
@@ -9189,6 +9221,10 @@ if (flight.premiumSeat !== true) {
 
 if (flight.internationalUSArrival !== true) {
   flight.internationalUSArrival = false;
+}
+
+if (flight.internationalUSDeparture !== true) {
+  flight.internationalUSDeparture = false;
 }
 
         if (flight.usPreclearance !== true) {
