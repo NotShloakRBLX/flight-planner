@@ -7671,7 +7671,15 @@ function calculateFlightBaseFare(flight) {
   return getRandomFareInDistanceSlot(getRouteDistanceMiles(flight));
 }
 
-function dollarsToMiles(amount) {
+function getPremiumSeatDollarCost(routeDistance) {
+  return Math.round(getPremiumSeatCost(routeDistance) / MILES_PER_DOLLAR_REDEMPTION);
+}
+
+function getPremiumEconomySeatDollarCost(routeDistance) {
+  return Math.round(getPremiumEconomySeatCost(routeDistance) / MILES_PER_DOLLAR_REDEMPTION);
+}
+    
+    function dollarsToMiles(amount) {
   return Math.ceil(Number(amount || 0) * MILES_PER_DOLLAR_REDEMPTION);
 }
 
@@ -8314,9 +8322,22 @@ async function savePaidFlightWithSeat(review) {
     });
   }
 
-  await batch.commit();
+  if (review.seatSelectionSessionId) {
+  batch.set(
+    doc(db, "seatSelectionSessions", review.seatSelectionSessionId),
+    {
+      status: "completed",
+      finalizedFlightId: savedFlightId,
+      finalizedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
 
-  pendingAssignedBoardingGroup = review.boardingGroup;
+await batch.commit();
+
+pendingAssignedBoardingGroup = review.boardingGroup;
   pendingDocumentFlightId = savedFlightId;
 
   resetAddFlightAfterPayment();
@@ -8382,13 +8403,12 @@ async function processTransactionReviewPayment() {
       const session = snapshot.data();
 
       if (
-        session.status !== "redirecting" ||
-        !session.flightDraft ||
-        !session.selectedSeat ||
-        !session.paidMiles
-      ) {
-        return;
-      }
+  session.status !== "redirecting" ||
+  !session.flightDraft ||
+  !session.selectedSeat
+) {
+  return;
+}
 
       activeSeatSelectionSessionId = sessionId;
 
@@ -8404,13 +8424,24 @@ async function processTransactionReviewPayment() {
         premiumEconomy: false
       };
 
-      pendingPremiumCost = Number(session.paidMiles || 0);
+      pendingPremiumCost = Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION);
 
       addFlightButton.disabled = true;
       addFlightButton.style.opacity = "0.72";
       addFlightButton.style.cursor = "not-allowed";
 
-      showExternalSeatConfirmPopup();
+      const review = buildTransactionReview({
+  flight: pendingFlightToAdd,
+  cabin: pendingSeatAssignment.cabin,
+  seat: pendingSeatAssignment.seat,
+  isPremium: true,
+  isPremiumEconomy: false,
+  seatCost: pendingPremiumCost,
+  seatType: "First/Business"
+});
+
+review.seatSelectionSessionId = activeSeatSelectionSessionId;
+showTransactionReview(review);
 
       if (activeSeatSelectionUnsubscribe) {
         activeSeatSelectionUnsubscribe();
@@ -8515,10 +8546,10 @@ async function processReturnedSeatSelection() {
       return;
     }
 
-    if (!session.flightDraft || !session.selectedSeat || !session.paidMiles) {
-      showNotification("Seat selection incomplete!");
-      return;
-    }
+    if (!session.flightDraft || !session.selectedSeat) {
+  showNotification("Seat selection incomplete!");
+  return;
+}
 
     activeSeatSelectionSessionId = sessionId;
 
@@ -8534,13 +8565,24 @@ async function processReturnedSeatSelection() {
       premiumEconomy: false
     };
 
-    pendingPremiumCost = Number(session.paidMiles || 0);
+    pendingPremiumCost = Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION);
 
     addFlightButton.disabled = true;
     addFlightButton.style.opacity = "0.72";
     addFlightButton.style.cursor = "not-allowed";
 
-    showExternalSeatConfirmPopup();
+    const review = buildTransactionReview({
+  flight: pendingFlightToAdd,
+  cabin: pendingSeatAssignment.cabin,
+  seat: pendingSeatAssignment.seat,
+  isPremium: true,
+  isPremiumEconomy: false,
+  seatCost: pendingPremiumCost,
+  seatType: "First/Business"
+});
+
+review.seatSelectionSessionId = activeSeatSelectionSessionId;
+showTransactionReview(review);
   } catch (error) {
     console.error("Error loading returned seat session:", error);
     showNotification("Seat session could not be loaded!");
@@ -11229,9 +11271,19 @@ choosePremiumEconomyButton.addEventListener("click", () => {
     premiumEconomy: true
   };
 
-  pendingPremiumCost = getPremiumEconomySeatCost(getRouteDistanceMiles(pendingFlightToAdd));
+  pendingPremiumCost = getPremiumEconomySeatDollarCost(getRouteDistanceMiles(pendingFlightToAdd));
 
-  showPremiumPaymentPopup();
+  const review = buildTransactionReview({
+    flight: pendingFlightToAdd,
+    cabin: "Premium Economy",
+    seat,
+    isPremium: true,
+    isPremiumEconomy: true,
+    seatCost: pendingPremiumCost,
+    seatType: "Premium Economy"
+  });
+
+  showTransactionReview(review);
 });
     
 chooseEconomyButton.addEventListener("click", () => {
