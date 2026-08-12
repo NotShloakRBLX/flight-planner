@@ -8604,6 +8604,8 @@ async function processReturnedSeatSelection() {
 
     const returnedCabin = session.selectedCabin || "First/Business";
 
+const returnedCabin = session.selectedCabin || "First/Business";
+
 pendingSeatAssignment = {
   seat: session.selectedSeat,
   cabin: returnedCabin,
@@ -8624,9 +8626,9 @@ pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.pai
   cabin: pendingSeatAssignment.cabin,
   seat: pendingSeatAssignment.seat,
   isPremium: pendingSeatAssignment.premium === true,
-isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
-seatCost: pendingPremiumCost,
-seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
+  isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
+  seatCost: pendingPremiumCost,
+  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
 });
 
 review.seatSelectionSessionId = activeSeatSelectionSessionId;
