@@ -3233,13 +3233,20 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
 .transaction-payment-icon {
-  width: 54px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg,#1c1c1c,#050505 55%,#7a5a22);
+  width: 58px;
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
   border: 1px solid rgba(255,210,121,.35);
-  box-shadow: inset 0 0 18px rgba(255,210,121,.12);
+  background: rgba(255,255,255,.08);
   flex: 0 0 auto;
+}
+
+    .transaction-payment-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .transaction-payment-icon.miles {
@@ -4793,6 +4800,15 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   transform: scale(1.45);
   transform-origin: center;
 }
+
+    .payment-confirmation-popup .seat-popup-title,
+.payment-confirmation-subtitle {
+  text-align: center;
+}
+
+.payment-confirmation-popup .seat-popup-title {
+  width: 100%;
+}
     
   </style>
 </head>
@@ -5763,6 +5779,23 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </div>
 </section>
 
+<section class="seat-popup cabin-select-popup" id="economyChoicePopup">
+  <div class="seat-popup-title">Economy seating</div>
+  <div class="seat-popup-subtitle">Choose how you want your Economy seat assigned.</div>
+
+  <div class="cabin-choice-grid">
+    <button class="cabin-choice-button" id="chooseEconomyRandomButton" type="button">
+      <div class="cabin-choice-title">Random seat</div>
+      <div class="cabin-choice-subtitle">Free automatic seat assignment</div>
+    </button>
+
+    <button class="cabin-choice-button" id="chooseEconomyCustomButton" type="button">
+      <div class="cabin-choice-title">Choose seat</div>
+      <div class="cabin-choice-subtitle">Open seat map with paid options</div>
+    </button>
+  </div>
+</section>
+  
 <section class="seat-popup" id="premiumPaymentPopup">
   <div class="seat-popup-title">Premium seat</div>
   <div class="seat-popup-subtitle">Review your assigned seat and mileage cost.</div>
@@ -5847,7 +5880,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <div class="transaction-payment-label">Payment method</div>
 
   <div class="transaction-payment-box">
-    <div class="transaction-payment-icon" id="transactionPaymentIcon"></div>
+    <div class="transaction-payment-icon" id="transactionPaymentIcon">
+  <img id="transactionPaymentCardImage" src="cc.png" alt="Aviator Reserve card" />
+</div>
     <div>
       <div class="transaction-payment-name" id="transactionPaymentName">Aviator Reserve (...7250)</div>
       <div class="transaction-payment-subtitle" id="transactionPaymentSubtitle">Available credit: $20,000.00</div>
@@ -6133,6 +6168,9 @@ const cabinSelectPopup = document.getElementById("cabinSelectPopup");
 const chooseEconomyButton = document.getElementById("chooseEconomyButton");
 const choosePremiumEconomyButton = document.getElementById("choosePremiumEconomyButton");
 const choosePremiumButton = document.getElementById("choosePremiumButton");
+const economyChoicePopup = document.getElementById("economyChoicePopup");
+const chooseEconomyRandomButton = document.getElementById("chooseEconomyRandomButton");
+const chooseEconomyCustomButton = document.getElementById("chooseEconomyCustomButton");
 const premiumPaymentPopup = document.getElementById("premiumPaymentPopup");
 const premiumBalanceDisplay = document.getElementById("premiumBalanceDisplay");
 const premiumSeatDisplay = document.getElementById("premiumSeatDisplay");
@@ -7945,6 +7983,7 @@ function closeSeatPopups() {
   externalSeatConfirmPopup.classList.remove("active");
   transactionReviewPopup.classList.remove("active");
   paymentConfirmationPopup.classList.remove("active");
+  economyChoicePopup.classList.remove("active");
 }
 
 function showCabinSelectPopup() {
@@ -7952,6 +7991,7 @@ function showCabinSelectPopup() {
   cabinSelectPopup.classList.add("active");
   premiumPaymentPopup.classList.remove("active");
   seatAssignedPopup.classList.remove("active");
+  economyChoicePopup.classList.remove("active");
   
   choosePremiumEconomyButton.style.display = pendingFlightToAdd?.premiumEconomyEnabled === true
   ? "flex"
@@ -8084,6 +8124,7 @@ function showTransactionReview(review) {
   seatRedirectPopup.classList.remove("active");
   externalSeatConfirmPopup.classList.remove("active");
   paymentConfirmationPopup.classList.remove("active");
+  economyChoicePopup.classList.remove("active");
 
   transactionReviewLogo.src = getAirlineLogoPath(flight.airline);
   transactionReviewLogo.onerror = function() {
@@ -8099,6 +8140,10 @@ function showTransactionReview(review) {
   transactionTotalUsd.textContent = formatMoney(review.totalFare);
 
   transactionPaymentIcon.classList.toggle("miles", review.paymentMethod === "miles");
+  const cardImage = document.getElementById("transactionPaymentCardImage");
+if (cardImage) {
+  cardImage.style.display = review.paymentMethod === "miles" ? "none" : "block";
+}
   transactionPaymentName.textContent = getPaymentMethodLabel(review.paymentMethod);
 
   if (review.paymentMethod === "miles") {
@@ -11186,6 +11231,11 @@ choosePremiumEconomyButton.addEventListener("click", () => {
 });
     
 chooseEconomyButton.addEventListener("click", () => {
+  cabinSelectPopup.classList.remove("active");
+  economyChoicePopup.classList.add("active");
+});
+
+chooseEconomyRandomButton.addEventListener("click", () => {
   if (!pendingFlightToAdd) return;
 
   const seat = assignEconomySeatFromFlight(pendingFlightToAdd);
@@ -11219,6 +11269,10 @@ chooseEconomyButton.addEventListener("click", () => {
   showTransactionReview(review);
 });
 
+chooseEconomyCustomButton.addEventListener("click", () => {
+  alert("Economy custom seat map is coming in the next coding batch.");
+});
+
 choosePremiumButton.addEventListener("click", async () => {
   if (!pendingFlightToAdd) return;
 
@@ -11228,7 +11282,10 @@ choosePremiumButton.addEventListener("click", async () => {
 transactionCancelButton.addEventListener("click", () => {
   pendingTransactionReview = null;
   pendingSeatAssignment = null;
-  showCabinSelectPopup();
+  pendingPremiumCost = 0;
+  pendingFlightToAdd = null;
+
+  closeSeatPopups();
 
   addFlightButton.disabled = false;
   addFlightButton.style.opacity = "1";
