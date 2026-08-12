@@ -6863,7 +6863,7 @@ function closeTransactionEditor() {
 
   card.innerHTML = `
     <div class="transaction-logo">
-      <img src="${getAirlineLogoPath(airline)}" alt="${airline} logo" onerror="this.style.display='none';" />
+      <img src="${transaction.icon === "cc" || transaction.type === "card_payment" ? "cc.png" : getAirlineLogoPath(airline)}" alt="${transaction.icon === "cc" || transaction.type === "card_payment" ? "Aviator Reserve" : airline} logo" onerror="this.style.display='none';" />
     </div>
 
     <div class="transaction-main">
@@ -8328,17 +8328,6 @@ const flightToSave = {
     batch.set(
       doc(db, "documentPackets", savedFlightId),
       createDocumentPacketForFlight(flightToSave, savedFlightId)
-    );
-
-    batch.set(
-      doc(db, "cardAccount", "aviatorReserve"),
-      {
-        currentBalance: increment(review.totalFare),
-        creditLimit: AVIATOR_RESERVE_LIMIT,
-        last4: AVIATOR_RESERVE_LAST4,
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
     );
 
     batch.set(cardTransactionRef, {
@@ -11099,6 +11088,17 @@ if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransacti
     { merge: true }
   );
 
+  batch.set(
+    doc(db, "cardAccount", "aviatorReserve"),
+    {
+      currentBalance: increment(Number(cardTransaction?.amount || completedFlight.totalFare || 0)),
+      creditLimit: AVIATOR_RESERVE_LIMIT,
+      last4: AVIATOR_RESERVE_LAST4,
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+
   if (awardedMiles > 0) {
     const milesBalanceRef = doc(db, "miles", "balance");
     const transactionRef = doc(collection(db, "mileTransactions"));
@@ -11620,16 +11620,23 @@ batch.delete(getFlightRef(deletingId));
 batch.delete(doc(db, "documentPackets", deletingId));
 
 if (deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId) {
-  batch.delete(doc(db, "cardTransactions", deletingFlight.paymentTransactionId));
+  const cardTransactionRef = doc(db, "cardTransactions", deletingFlight.paymentTransactionId);
+  const cardTransactionSnap = await getDoc(cardTransactionRef);
+  const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
+  const shouldReverseCardBalance = cardTransaction && cardTransaction.status !== "pending";
 
-  batch.set(
-    doc(db, "cardAccount", "aviatorReserve"),
-    {
-      currentBalance: increment(-Number(deletingFlight.totalFare || 0)),
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
+  batch.delete(cardTransactionRef);
+
+  if (shouldReverseCardBalance) {
+    batch.set(
+      doc(db, "cardAccount", "aviatorReserve"),
+      {
+        currentBalance: increment(-Number(cardTransaction.amount || deletingFlight.totalFare || 0)),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  }
 }
 
 if (deletingFlight.paymentMethod === "miles") {
