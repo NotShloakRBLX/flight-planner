@@ -11092,39 +11092,13 @@ if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransacti
     doc(db, "cardAccount", "aviatorReserve"),
     {
       currentBalance: increment(Number(cardTransaction?.amount || completedFlight.totalFare || 0)),
+      rewardsMiles: increment(awardedMiles),
       creditLimit: AVIATOR_RESERVE_LIMIT,
       last4: AVIATOR_RESERVE_LAST4,
       updatedAt: serverTimestamp()
     },
     { merge: true }
   );
-
-  if (awardedMiles > 0) {
-    const milesBalanceRef = doc(db, "miles", "balance");
-    const transactionRef = doc(collection(db, "mileTransactions"));
-
-    batch.set(
-      milesBalanceRef,
-      {
-        balance: increment(awardedMiles),
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
-
-    batch.set(transactionRef, {
-      type: "earned",
-      title: "Aviator Reserve Miles",
-      amount: awardedMiles,
-      airline: completedFlight.airline || "",
-      airlineName: completedFlight.airlineName || completedFlight.airline || "Airline",
-      flightNumber: completedFlight.flightNumber || "",
-      departureAirport: completedFlight.departureAirport || "",
-      arrivalAirport: completedFlight.arrivalAirport || "",
-      sourceTransactionId: completedFlight.paymentTransactionId,
-      createdAt: serverTimestamp()
-    });
-  }
 }
     
     batch.set(
@@ -11146,11 +11120,7 @@ batch.delete(flightRef);
     closeFlightDetails();
     allFlights.delete(completedFlight.id);
 
-    if (awardedMiles > 0) {
-  showNotification(`Flight completed! +${awardedMiles.toLocaleString("en-US")} miles`);
-} else {
-  showNotification("Flight completed!");
-}
+    showNotification("Flight completed!");
   } catch (error) {
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
