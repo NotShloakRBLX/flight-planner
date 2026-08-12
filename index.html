@@ -1694,6 +1694,60 @@
   text-align: center;
 }
 
+    .aviator-reserve-card-link {
+  width: 100%;
+  margin-top: 16px;
+  min-height: 82px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.035)),
+    rgba(8,13,27,.92);
+  box-shadow: 0 18px 42px rgba(0,0,0,.28);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: transform .22s ease, border-color .22s ease, background .22s ease;
+}
+
+.aviator-reserve-card-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,210,121,.35);
+  background:
+    linear-gradient(135deg, rgba(255,210,121,.11), rgba(255,255,255,.035)),
+    rgba(8,13,27,.95);
+}
+
+.aviator-reserve-card-link:active {
+  transform: scale(.985);
+}
+
+.aviator-reserve-card-link img {
+  width: 76px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255,210,121,.32);
+  flex: 0 0 auto;
+}
+
+.aviator-reserve-title {
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: -.02em;
+}
+
+.aviator-reserve-subtitle {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,.55);
+}
+
 .miles-label {
   color: rgba(255, 255, 255, 0.52);
   font-size: 14px;
@@ -4946,6 +5000,15 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         <div class="miles-balance" id="milesBalanceDisplay">0</div>
         <div class="miles-balance-subtitle">Available miles</div>
       </div>
+      
+<button class="aviator-reserve-card-link" id="aviatorReserveButton" type="button">
+  <img src="cc.png" alt="Aviator Reserve card" />
+  <div>
+    <div class="aviator-reserve-title">Aviator Reserve (...7250)</div>
+    <div class="aviator-reserve-subtitle">View balance and statements</div>
+  </div>
+</button>
+      
     </header>
 
     <section class="transactions-section">
@@ -6160,6 +6223,7 @@ const confirmRenewPassportButton = document.getElementById("confirmRenewPassport
 const milesPage = document.getElementById("milesPage");
 const milesBackButton = document.getElementById("milesBackButton");
 const milesBalanceDisplay = document.getElementById("milesBalanceDisplay");
+    const aviatorReserveButton = document.getElementById("aviatorReserveButton");
 const transactionsList = document.getElementById("transactionsList");
   const transactionEditOverlay = document.getElementById("transactionEditOverlay");
 const transactionEditPopup = document.getElementById("transactionEditPopup");
@@ -6497,6 +6561,10 @@ milesBackButton.addEventListener("click", () => {
   milesPage.classList.remove("active");
   flightsPage.classList.remove("hidden");
   document.body.style.overflow = "";
+});
+
+    aviatorReserveButton.addEventListener("click", () => {
+  window.location.href = CREDIT_CARD_SITE_URL;
 });
 
     document.querySelector(".boarding-pass-hero").addEventListener("click", () => {
