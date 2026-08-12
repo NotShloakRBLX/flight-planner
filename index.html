@@ -8293,10 +8293,12 @@ const flightToSave = {
       updatedAt: serverTimestamp()
     });
   } else {
-    const requiredMiles = dollarsToMiles(review.totalFare);
-    const milesTransactionRef = doc(collection(db, "mileTransactions"));
+  const requiredMiles = dollarsToMiles(review.totalFare);
+  const milesTransactionRef = doc(collection(db, "mileTransactions"));
 
-    batch.set(flightRef, flightToSave);
+  flightToSave.paymentTransactionId = milesTransactionRef.id;
+
+  batch.set(flightRef, flightToSave);
     batch.set(
       doc(db, "documentPackets", savedFlightId),
       createDocumentPacketForFlight(flightToSave, savedFlightId)
@@ -10998,43 +11000,61 @@ if (
 
   const completedFlight = activeFlight;
 
-  const usedPremiumSeat = completedFlight.premiumSeat === true;
-  const earnedMiles = usedPremiumSeat ? 0 : getEarnedMiles(completedFlight);
-
-  completeFlightButton.disabled = true;
-  completeFlightButton.classList.add("disabled");
+completeFlightButton.disabled = true;
+completeFlightButton.classList.add("disabled");
 
   try {
     const batch = writeBatch(db);
 
     const flightRef = getFlightRef(completedFlight.id);
 
-    if (!usedPremiumSeat && earnedMiles > 0) {
-      const milesBalanceRef = doc(db, "miles", "balance");
-      const transactionRef = doc(collection(db, "mileTransactions"));
+let awardedMiles = 0;
 
-      batch.set(
-        milesBalanceRef,
-        {
-          balance: increment(earnedMiles),
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
+if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransactionId) {
+  const cardTransactionRef = doc(db, "cardTransactions", completedFlight.paymentTransactionId);
+  const cardTransactionSnap = await getDoc(cardTransactionRef);
+  const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
 
-      batch.set(transactionRef, {
-        type: "earned",
-        title: "Flight Completed",
-        amount: earnedMiles,
-        airline: completedFlight.airline || "",
-        flightNumber: completedFlight.flightNumber || "",
-        departureAirport: completedFlight.departureAirport || "",
-        arrivalAirport: completedFlight.arrivalAirport || "",
-        routeDistance: getRouteDistanceMiles(completedFlight),
-        createdAt: serverTimestamp()
-      });
-    }
+  awardedMiles = Math.floor(Number(cardTransaction?.milesEarned || completedFlight.totalFare * CARD_MILES_MULTIPLIER || 0));
 
+  batch.set(
+    cardTransactionRef,
+    {
+      status: "approved",
+      postedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+
+  if (awardedMiles > 0) {
+    const milesBalanceRef = doc(db, "miles", "balance");
+    const transactionRef = doc(collection(db, "mileTransactions"));
+
+    batch.set(
+      milesBalanceRef,
+      {
+        balance: increment(awardedMiles),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(transactionRef, {
+      type: "earned",
+      title: "Aviator Reserve Miles",
+      amount: awardedMiles,
+      airline: completedFlight.airline || "",
+      airlineName: completedFlight.airlineName || completedFlight.airline || "Airline",
+      flightNumber: completedFlight.flightNumber || "",
+      departureAirport: completedFlight.departureAirport || "",
+      arrivalAirport: completedFlight.arrivalAirport || "",
+      sourceTransactionId: completedFlight.paymentTransactionId,
+      createdAt: serverTimestamp()
+    });
+  }
+}
+    
     batch.set(
   doc(db, "documentPackets", completedFlight.id),
   {
@@ -11054,11 +11074,11 @@ batch.delete(flightRef);
     closeFlightDetails();
     allFlights.delete(completedFlight.id);
 
-    if (usedPremiumSeat) {
-      showNotification("Flight completed!");
-    } else {
-      showNotification(`Flight completed! +${earnedMiles.toLocaleString("en-US")} miles`);
-    }
+    if (awardedMiles > 0) {
+  showNotification(`Flight completed! +${awardedMiles.toLocaleString("en-US")} miles`);
+} else {
+  showNotification("Flight completed!");
+}
   } catch (error) {
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
@@ -11393,53 +11413,14 @@ paymentContinueButton.addEventListener("click", () => {
   showCabinSelectPopup();
 });
 
-premiumPayButton.addEventListener("click", async () => {
-  if (!pendingFlightToAdd || !pendingSeatAssignment) return;
-
-  if (currentMilesBalance < pendingPremiumCost) {
-    return;
-  }
-
-  premiumPayButton.disabled = true;
-
-  await saveFlightWithSeat({
-    cabin: pendingSeatAssignment.cabin,
-seat: pendingSeatAssignment.seat,
-isPremium: true,
-isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
-milesCost: pendingPremiumCost
-  });
-
-  premiumPayButton.disabled = false;
+premiumPayButton.addEventListener("click", () => {
+  alert("This old premium payment flow has been replaced by Review transaction.");
 });
 
     cancelExternalSeatButton.addEventListener("click", cancelExternalSeatSelection);
 
-confirmExternalSeatButton.addEventListener("click", async () => {
-  if (!pendingFlightToAdd || !pendingSeatAssignment || !activeSeatSelectionSessionId) {
-    return;
-  }
-
-  if (currentMilesBalance < pendingPremiumCost) {
-    externalSeatInsufficientText.classList.add("active");
-    confirmExternalSeatButton.disabled = true;
-    return;
-  }
-
-  confirmExternalSeatButton.disabled = true;
-  confirmExternalSeatButton.style.opacity = "0.72";
-
-  await saveFlightWithSeat({
-    cabin: pendingSeatAssignment.cabin,
-    seat: pendingSeatAssignment.seat,
-    isPremium: true,
-    isPremiumEconomy: false,
-    milesCost: pendingPremiumCost,
-    seatSelectionSessionId: activeSeatSelectionSessionId
-  });
-
-  confirmExternalSeatButton.disabled = false;
-  confirmExternalSeatButton.style.opacity = "1";
+confirmExternalSeatButton.addEventListener("click", () => {
+  alert("This old seat confirmation flow has been replaced by Review transaction.");
 });
     
     transactionEditOverlay.addEventListener("click", closeTransactionEditor);
@@ -11560,9 +11541,56 @@ transactionDeleteButton.addEventListener("click", async () => {
       try {
         const deletingId = activeFlight.id;
 
+const deletingFlight = activeFlight;
 const batch = writeBatch(db);
+
 batch.delete(getFlightRef(deletingId));
 batch.delete(doc(db, "documentPackets", deletingId));
+
+if (deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId) {
+  batch.delete(doc(db, "cardTransactions", deletingFlight.paymentTransactionId));
+
+  batch.set(
+    doc(db, "cardAccount", "aviatorReserve"),
+    {
+      currentBalance: increment(-Number(deletingFlight.totalFare || 0)),
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+if (deletingFlight.paymentMethod === "miles") {
+  const refundMiles = dollarsToMiles(Number(deletingFlight.totalFare || 0));
+
+  if (refundMiles > 0) {
+    batch.set(
+      doc(db, "miles", "balance"),
+      {
+        balance: increment(refundMiles),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(doc(collection(db, "mileTransactions")), {
+      type: "earned",
+      title: "Flight Purchase Refund",
+      amount: refundMiles,
+      airline: deletingFlight.airline || "",
+      airlineName: deletingFlight.airlineName || deletingFlight.airline || "Airline",
+      flightNumber: deletingFlight.flightNumber || "",
+      departureAirport: deletingFlight.departureAirport || "",
+      arrivalAirport: deletingFlight.arrivalAirport || "",
+      createdAt: serverTimestamp()
+    });
+  }
+
+  if (deletingFlight.paymentTransactionId) {
+    batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
+  }
+}
+
 await batch.commit();
 
         closeFlightDetails();
