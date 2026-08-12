@@ -8094,12 +8094,12 @@ function buildTransactionReview({
   const baseFare = calculateFlightBaseFare(flight);
   const totalFare = Math.round((baseFare + Number(seatCost || 0)) * 100) / 100;
   const paymentMethod = flight.payWithMiles === true ? "miles" : "card";
-  const boardingGroup = assignBoardingGroupForFlight({
-    flight,
-    seat,
-    isPremium,
-    isPremiumEconomy
-  });
+  const boardingGroup = Number(pendingSeatAssignment?.boardingGroup || 0) || assignBoardingGroupForFlight({
+  flight,
+  seat,
+  isPremium,
+  isPremiumEconomy
+});
 
   return {
     flight,
@@ -8454,19 +8454,57 @@ showTransactionReview(review);
   );
 }
     
-    async function createSeatMapSessionAndRedirect() {
+    async function createSeatMapSessionAndRedirect(cabinMode = "firstBusiness") {
   if (!pendingFlightToAdd) return;
 
   const firstBusinessLastRow = Number(pendingFlightToAdd.premiumRows || 0);
+const premiumEconomyLastRow = Number(pendingFlightToAdd.premiumEconomyLastRow || 0);
+const economyLastRow = Number(pendingFlightToAdd.economyRows || 0);
 
-  if (!Number.isFinite(firstBusinessLastRow) || firstBusinessLastRow <= 0) {
-    alert("First/Business seat map could not be created. Check First/Business Last Row.");
-    addFlightButton.disabled = false;
-    addFlightButton.style.opacity = "1";
-    addFlightButton.style.cursor = "pointer";
-    closeSeatPopups();
-    return;
-  }
+const premiumEconomyStartRow = firstBusinessLastRow + 1;
+const economyStartRow = pendingFlightToAdd.premiumEconomyEnabled === true
+  ? premiumEconomyLastRow + 1
+  : firstBusinessLastRow + 1;
+
+if (cabinMode === "firstBusiness" && (!Number.isFinite(firstBusinessLastRow) || firstBusinessLastRow <= 0)) {
+  alert("First/Business seat map could not be created. Check First/Business Last Row.");
+  addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1";
+  addFlightButton.style.cursor = "pointer";
+  closeSeatPopups();
+  return;
+}
+
+if (
+  cabinMode === "premiumEconomy" &&
+  (
+    pendingFlightToAdd.premiumEconomyEnabled !== true ||
+    !Number.isFinite(premiumEconomyLastRow) ||
+    premiumEconomyLastRow < premiumEconomyStartRow
+  )
+) {
+  alert("Premium Economy seat map could not be created. Check Premium Economy rows.");
+  addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1";
+  addFlightButton.style.cursor = "pointer";
+  closeSeatPopups();
+  return;
+}
+
+if (
+  cabinMode === "economy" &&
+  (
+    !Number.isFinite(economyLastRow) ||
+    economyLastRow < economyStartRow
+  )
+) {
+  alert("Economy seat map could not be created. Check Economy rows.");
+  addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1";
+  addFlightButton.style.cursor = "pointer";
+  closeSeatPopups();
+  return;
+}
 
   showSeatRedirectPopup();
 
@@ -8485,8 +8523,14 @@ showTransactionReview(review);
     flightDate: pendingFlightToAdd.flightDate || "",
     flightDateRaw: pendingFlightToAdd.flightDateRaw || "",
     routeDistanceMiles: getRouteDistanceMiles(pendingFlightToAdd),
-    firstBusinessLastRow,
-    returnUrl: MAIN_SITE_RETURN_URL,
+cabinMode,
+firstBusinessLastRow,
+premiumEconomyStartRow,
+premiumEconomyLastRow,
+economyStartRow,
+economyLastRow,
+hasMilesStatus: currentMilesBalance >= 35000,
+returnUrl: MAIN_SITE_RETURN_URL,
     selectedSeat: "",
     selectedCabin: "",
     paidMiles: 0,
@@ -8558,14 +8602,18 @@ async function processReturnedSeatSelection() {
       createdAt: serverTimestamp()
     };
 
-    pendingSeatAssignment = {
-      seat: session.selectedSeat,
-      cabin: session.selectedCabin || "First/Business",
-      premium: true,
-      premiumEconomy: false
-    };
+    const returnedCabin = session.selectedCabin || "First/Business";
 
-    pendingPremiumCost = Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION);
+pendingSeatAssignment = {
+  seat: session.selectedSeat,
+  cabin: returnedCabin,
+  premium: returnedCabin === "First/Business" || returnedCabin === "Premium Economy",
+  premiumEconomy: returnedCabin === "Premium Economy",
+  seatType: session.selectedSeatType || returnedCabin,
+  boardingGroup: Number(session.selectedBoardingGroup || 0)
+};
+
+pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
 
     addFlightButton.disabled = true;
     addFlightButton.style.opacity = "0.72";
@@ -8575,10 +8623,10 @@ async function processReturnedSeatSelection() {
   flight: pendingFlightToAdd,
   cabin: pendingSeatAssignment.cabin,
   seat: pendingSeatAssignment.seat,
-  isPremium: true,
-  isPremiumEconomy: false,
-  seatCost: pendingPremiumCost,
-  seatType: "First/Business"
+  isPremium: pendingSeatAssignment.premium === true,
+isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
+seatCost: pendingPremiumCost,
+seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
 });
 
 review.seatSelectionSessionId = activeSeatSelectionSessionId;
@@ -11250,40 +11298,9 @@ groupAssignedPopup.addEventListener("click", () => {
   finishFlightAddedFlow();
 });
 
-choosePremiumEconomyButton.addEventListener("click", () => {
+choosePremiumEconomyButton.addEventListener("click", async () => {
   if (!pendingFlightToAdd) return;
-
-  const seat = assignPremiumEconomySeatFromFlight(pendingFlightToAdd);
-
-  if (!seat) {
-    alert("Premium Economy seat could not be assigned. Check Premium Economy Last Row and Premium Economy Window Letters.");
-    addFlightButton.disabled = false;
-    addFlightButton.style.opacity = "1";
-    addFlightButton.style.cursor = "pointer";
-    closeSeatPopups();
-    return;
-  }
-
-  pendingSeatAssignment = {
-    seat,
-    cabin: "Premium Economy",
-    premium: true,
-    premiumEconomy: true
-  };
-
-  pendingPremiumCost = getPremiumEconomySeatDollarCost(getRouteDistanceMiles(pendingFlightToAdd));
-
-  const review = buildTransactionReview({
-    flight: pendingFlightToAdd,
-    cabin: "Premium Economy",
-    seat,
-    isPremium: true,
-    isPremiumEconomy: true,
-    seatCost: pendingPremiumCost,
-    seatType: "Premium Economy"
-  });
-
-  showTransactionReview(review);
+  await createSeatMapSessionAndRedirect("premiumEconomy");
 });
     
 chooseEconomyButton.addEventListener("click", () => {
@@ -11325,14 +11342,15 @@ chooseEconomyRandomButton.addEventListener("click", () => {
   showTransactionReview(review);
 });
 
-chooseEconomyCustomButton.addEventListener("click", () => {
-  alert("Economy custom seat map is coming in the next coding batch.");
+chooseEconomyCustomButton.addEventListener("click", async () => {
+  if (!pendingFlightToAdd) return;
+  await createSeatMapSessionAndRedirect("economy");
 });
 
 choosePremiumButton.addEventListener("click", async () => {
   if (!pendingFlightToAdd) return;
 
-  await createSeatMapSessionAndRedirect();
+  await createSeatMapSessionAndRedirect("firstBusiness");
 });
 
 transactionCancelButton.addEventListener("click", () => {
