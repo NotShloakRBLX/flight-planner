@@ -3149,6 +3149,220 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   text-align: center;
 }
 
+    .transaction-review-popup,
+.payment-confirmation-popup {
+  width: min(92vw, 540px);
+  cursor: default;
+}
+
+.transaction-review-line {
+  height: 1px;
+  width: 100%;
+  background: rgba(255,255,255,.12);
+  margin: 18px 0;
+}
+
+.transaction-route-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.transaction-review-logo {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.transaction-route-text {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+.transaction-breakdown {
+  display: grid;
+  gap: 12px;
+}
+
+.transaction-breakdown-row,
+.transaction-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(255,255,255,.72);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.transaction-breakdown-row strong,
+.transaction-total-row strong {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.transaction-total-row {
+  font-size: 20px;
+}
+
+.transaction-total-row strong {
+  font-size: 28px;
+}
+
+.transaction-payment-label {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.transaction-payment-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 76px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 22px;
+  background: rgba(255,255,255,.06);
+}
+
+.transaction-payment-icon {
+  width: 54px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#1c1c1c,#050505 55%,#7a5a22);
+  border: 1px solid rgba(255,210,121,.35);
+  box-shadow: inset 0 0 18px rgba(255,210,121,.12);
+  flex: 0 0 auto;
+}
+
+.transaction-payment-icon.miles {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 25%, #ffe58c, #d8a722 52%, #7a5312);
+  border-color: rgba(255,220,120,.7);
+}
+
+.transaction-payment-name {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.transaction-payment-subtitle {
+  margin-top: 3px;
+  color: rgba(255,255,255,.55);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.transaction-actions {
+  display: grid;
+  grid-template-columns: .8fr 1.2fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.transaction-cancel-button,
+.transaction-pay-button {
+  min-height: 54px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.transaction-cancel-button {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255,77,77,.95), rgba(170,12,20,.95));
+}
+
+.transaction-pay-button {
+  color: #04140b;
+  background: linear-gradient(180deg,#2ce98c,#12b967);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.transaction-pay-button svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.transaction-pay-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.payment-confirmation-check {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+  background: linear-gradient(180deg,#2ce98c,#12b967);
+  box-shadow: 0 18px 50px rgba(18,185,103,.32);
+}
+
+.payment-confirmation-check svg {
+  width: 42px;
+  height: 42px;
+  fill: #04140b;
+}
+
+.payment-confirmation-subtitle {
+  color: rgba(255,255,255,.6);
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+  margin-top: -6px;
+}
+
+.payment-confirmation-summary {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.payment-continue-button {
+  width: 100%;
+}
+
+@media (max-width: 520px) {
+  .transaction-route-text {
+    font-size: 22px;
+  }
+
+  .transaction-breakdown-row,
+  .transaction-total-row {
+    font-size: 16px;
+  }
+
+  .transaction-breakdown-row strong {
+    font-size: 18px;
+  }
+
+  .transaction-total-row strong {
+    font-size: 24px;
+  }
+}
+
 .assigned-seat-big {
   color: white;
   font-size: 54px;
@@ -4745,6 +4959,11 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <input id="airline" type="text" maxlength="2" placeholder="AA" />
 </div>
 
+          <div class="form-field">
+  <label for="airlineName">Airline name</label>
+  <input id="airlineName" type="text" placeholder="American Airlines" />
+</div>
+
 <div class="form-field">
   <label for="flightNumber">Flight number</label>
   <input id="flightNumber" type="text" inputmode="numeric" maxlength="4" placeholder="2247" />
@@ -4871,6 +5090,18 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           
           <div class="form-section-heading">Extras</div>
 <div class="form-section-subtitle">Optional display and timing features for this flight.</div>
+
+          <div class="toggle-field">
+  <div class="toggle-text">
+    <div class="toggle-title">Pay with miles</div>
+    <div class="toggle-subtitle">Use miles instead of Aviator Reserve credit</div>
+  </div>
+
+  <label class="toggle-switch">
+    <input id="payWithMilesToggle" type="checkbox" />
+    <span class="toggle-slider"></span>
+  </label>
+</div>
 
 <div class="toggle-field">
   <div class="toggle-text">
@@ -5571,6 +5802,108 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   </div>
 </section>
 
+  <section class="seat-popup transaction-review-popup" id="transactionReviewPopup">
+  <div class="seat-popup-title">Review transaction</div>
+  <div class="transaction-review-line"></div>
+
+  <div class="transaction-route-row">
+    <img id="transactionReviewLogo" class="transaction-review-logo" src="" alt="Airline logo" />
+    <div class="transaction-route-text" id="transactionReviewRoute">DEP to ARR</div>
+  </div>
+
+  <div class="transaction-review-line"></div>
+
+  <div class="transaction-breakdown">
+    <div class="transaction-breakdown-row">
+      <span>Base fare:</span>
+      <strong id="transactionBaseFare">$0.00</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Seat:</span>
+      <strong id="transactionSeatCost">$0.00</strong>
+    </div>
+  </div>
+
+  <div class="transaction-review-line"></div>
+
+  <div class="transaction-breakdown">
+    <div class="transaction-breakdown-row">
+      <span>Seat number:</span>
+      <strong id="transactionSeatNumber">--</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Boarding group:</span>
+      <strong id="transactionBoardingGroup">Group --</strong>
+    </div>
+  </div>
+
+  <div class="transaction-review-line"></div>
+
+  <div class="transaction-total-row">
+    <span>Total USD:</span>
+    <strong id="transactionTotalUsd">$0.00</strong>
+  </div>
+
+  <div class="transaction-payment-label">Payment method</div>
+
+  <div class="transaction-payment-box">
+    <div class="transaction-payment-icon" id="transactionPaymentIcon"></div>
+    <div>
+      <div class="transaction-payment-name" id="transactionPaymentName">Aviator Reserve (...7250)</div>
+      <div class="transaction-payment-subtitle" id="transactionPaymentSubtitle">Available credit: $20,000.00</div>
+    </div>
+  </div>
+
+  <div class="transaction-actions">
+    <button class="transaction-cancel-button" id="transactionCancelButton" type="button">Cancel</button>
+    <button class="transaction-pay-button" id="transactionPayButton" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1ZM9 9V7a3 3 0 0 1 6 0v2H9Z" />
+      </svg>
+      Pay now
+    </button>
+  </div>
+</section>
+
+<section class="seat-popup payment-confirmation-popup" id="paymentConfirmationPopup">
+  <div class="payment-confirmation-check">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9.55 16.2 5.8 12.45a1 1 0 1 1 1.4-1.42l2.35 2.35 7.25-7.25a1 1 0 0 1 1.42 1.42L9.55 16.2Z" />
+    </svg>
+  </div>
+  <div class="seat-popup-title" id="paymentConfirmationTitle">Payment approved</div>
+  <div class="payment-confirmation-subtitle" id="paymentConfirmationSubtitle">Your flight is ready.</div>
+
+  <div class="payment-confirmation-summary">
+    <div class="transaction-breakdown-row">
+      <span>Route</span>
+      <strong id="paymentConfirmationRoute">DEP to ARR</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Seat</span>
+      <strong id="paymentConfirmationSeat">--</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Group</span>
+      <strong id="paymentConfirmationGroup">Group --</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Total</span>
+      <strong id="paymentConfirmationTotal">$0.00</strong>
+    </div>
+    <div class="transaction-breakdown-row">
+      <span>Payment</span>
+      <strong id="paymentConfirmationMethod">Aviator Reserve</strong>
+    </div>
+    <div class="transaction-breakdown-row" id="paymentConfirmationMilesRow">
+      <span>Miles pending</span>
+      <strong id="paymentConfirmationMiles">0 mi</strong>
+    </div>
+  </div>
+
+  <button class="transaction-pay-button payment-continue-button" id="paymentContinueButton" type="button">Continue</button>
+</section>
+
   <section class="seat-popup" id="seatRedirectPopup">
   <div class="seat-popup-title">Redirecting to seat map...</div>
   <div class="seat-popup-subtitle">Your First/Business seat selection is opening in a new tab.</div>
@@ -5812,6 +6145,30 @@ const assignedSeatBig = document.getElementById("assignedSeatBig");
 const assignedSeatCabin = document.getElementById("assignedSeatCabin");
 const groupAssignedPopup = document.getElementById("groupAssignedPopup");
 const assignedGroupBig = document.getElementById("assignedGroupBig");
+const transactionReviewPopup = document.getElementById("transactionReviewPopup");
+const transactionReviewLogo = document.getElementById("transactionReviewLogo");
+const transactionReviewRoute = document.getElementById("transactionReviewRoute");
+const transactionBaseFare = document.getElementById("transactionBaseFare");
+const transactionSeatCost = document.getElementById("transactionSeatCost");
+const transactionSeatNumber = document.getElementById("transactionSeatNumber");
+const transactionBoardingGroup = document.getElementById("transactionBoardingGroup");
+const transactionTotalUsd = document.getElementById("transactionTotalUsd");
+const transactionPaymentIcon = document.getElementById("transactionPaymentIcon");
+const transactionPaymentName = document.getElementById("transactionPaymentName");
+const transactionPaymentSubtitle = document.getElementById("transactionPaymentSubtitle");
+const transactionCancelButton = document.getElementById("transactionCancelButton");
+const transactionPayButton = document.getElementById("transactionPayButton");
+
+const paymentConfirmationPopup = document.getElementById("paymentConfirmationPopup");
+const paymentConfirmationSubtitle = document.getElementById("paymentConfirmationSubtitle");
+const paymentConfirmationRoute = document.getElementById("paymentConfirmationRoute");
+const paymentConfirmationSeat = document.getElementById("paymentConfirmationSeat");
+const paymentConfirmationGroup = document.getElementById("paymentConfirmationGroup");
+const paymentConfirmationTotal = document.getElementById("paymentConfirmationTotal");
+const paymentConfirmationMethod = document.getElementById("paymentConfirmationMethod");
+const paymentConfirmationMilesRow = document.getElementById("paymentConfirmationMilesRow");
+const paymentConfirmationMiles = document.getElementById("paymentConfirmationMiles");
+const paymentContinueButton = document.getElementById("paymentContinueButton");
 const seatRedirectPopup = document.getElementById("seatRedirectPopup");
 const externalSeatConfirmPopup = document.getElementById("externalSeatConfirmPopup");
 const externalSeatNumberDisplay = document.getElementById("externalSeatNumberDisplay");
@@ -5951,7 +6308,8 @@ const ttActualBoarding = document.getElementById("ttActualBoarding");
     const ttActualTotalTime = document.getElementById("ttActualTotalTime");
 
     const airlineInput = document.getElementById("airline");
-    const flightNumberInput = document.getElementById("flightNumber");
+const airlineNameInput = document.getElementById("airlineName");
+const flightNumberInput = document.getElementById("flightNumber");
     const departureAirportInput = document.getElementById("departureAirport");
     const arrivalAirportInput = document.getElementById("arrivalAirport");
     const departureAirportNameInput = document.getElementById("departureAirportName");
@@ -5966,7 +6324,8 @@ const routeDistanceInput = document.getElementById("routeDistance");
 const premiumRowsInput = document.getElementById("premiumRows");
 const premiumLettersInput = document.getElementById("premiumLetters");
 
-const premiumEconomyToggle = document.getElementById("premiumEconomyToggle");
+const payWithMilesToggle = document.getElementById("payWithMilesToggle");
+    const premiumEconomyToggle = document.getElementById("premiumEconomyToggle");
 const premiumEconomyOptions = document.getElementById("premiumEconomyOptions");
 const premiumEconomyLastRowInput = document.getElementById("premiumEconomyLastRow");
 const premiumEconomyLettersInput = document.getElementById("premiumEconomyLetters");
@@ -5997,9 +6356,11 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let pendingMarkPhase = null;
     let activeTransaction = null;
     let currentMilesBalance = 0;
+let currentCardBalance = 0;
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
+let pendingTransactionReview = null;
     let pendingAssignedBoardingGroup = "";
 let pendingDocumentFlightId = "";
     let currentPassport = null;
@@ -6019,6 +6380,11 @@ const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathnam
 const BOARDING_VERIFICATION_URL = "https://notshloakrblx.github.io/flight-boarding/";
 const CHECK_IN_SITE_URL = "https://notshloakrblx.github.io/flight-check-in/";
 const DOCUMENTS_SITE_URL = "https://notshloakrblx.github.io/flight-documents/";
+    const CREDIT_CARD_SITE_URL = "https://notshloakrblx.github.io/flight-credit-card/";
+const AVIATOR_RESERVE_LAST4 = "7250";
+const AVIATOR_RESERVE_LIMIT = 20000;
+const MILES_PER_DOLLAR_REDEMPTION = 100;
+const CARD_MILES_MULTIPLIER = 3;
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -7229,6 +7595,51 @@ function buildMidFlightInfo(flight) {
   return Math.round(numberOnly);
 }
 
+    function getBaseFareBucket(distance) {
+  const miles = Number(distance || 0);
+
+  if (miles <= 500) return { minMiles: 0, maxMiles: 500, minFare: 75, maxFare: 150 };
+  if (miles <= 1500) return { minMiles: 501, maxMiles: 1500, minFare: 125, maxFare: 275 };
+  if (miles <= 2500) return { minMiles: 1501, maxMiles: 2500, minFare: 200, maxFare: 425 };
+  if (miles <= 3500) return { minMiles: 2501, maxMiles: 3500, minFare: 300, maxFare: 575 };
+  if (miles <= 4000) return { minMiles: 3501, maxMiles: 4000, minFare: 400, maxFare: 700 };
+  if (miles <= 5000) return { minMiles: 4001, maxMiles: 5000, minFare: 500, maxFare: 850 };
+  if (miles <= 6000) return { minMiles: 5001, maxMiles: 6000, minFare: 625, maxFare: 1000 };
+  if (miles <= 7500) return { minMiles: 6001, maxMiles: 7500, minFare: 750, maxFare: 1200 };
+
+  return { minMiles: 7501, maxMiles: 10000, minFare: 900, maxFare: 1500 };
+}
+
+function getRandomFareInDistanceSlot(distance) {
+  const bucket = getBaseFareBucket(distance);
+  const safeDistance = Math.max(bucket.minMiles, Math.min(Number(distance || 0), bucket.maxMiles));
+  const bucketMiles = Math.max(1, bucket.maxMiles - bucket.minMiles + 1);
+  const fareSpread = bucket.maxFare - bucket.minFare;
+  const slotSize = fareSpread / bucketMiles;
+  const slotIndex = Math.max(0, safeDistance - bucket.minMiles);
+
+  const slotMin = bucket.minFare + (slotIndex * slotSize);
+  const slotMax = slotMin + slotSize;
+  const rawFare = slotMin + (Math.random() * Math.max(0.01, slotMax - slotMin));
+
+  return Math.round(rawFare * 100) / 100;
+}
+
+function calculateFlightBaseFare(flight) {
+  return getRandomFareInDistanceSlot(getRouteDistanceMiles(flight));
+}
+
+function dollarsToMiles(amount) {
+  return Math.ceil(Number(amount || 0) * MILES_PER_DOLLAR_REDEMPTION);
+}
+
+function formatMoney(amount) {
+  return `$${Number(amount || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
+
 function getEarnedMiles(flight) {
   const distance = getRouteDistanceMiles(flight);
   return Math.round(distance * 0.5);
@@ -7346,7 +7757,7 @@ function getEconomyPriorityBoundaryRow(flight) {
 }
 
 function getRandomEconomyBoardingGroup() {
-  return getRandomInteger(7, 9);
+  return getRandomInteger(8, 9);
 }
 
 function assignBoardingGroupForFlight({
@@ -7371,8 +7782,8 @@ function assignBoardingGroupForFlight({
   }
 
   if (currentMilesBalance >= 35000) {
-    return 6;
-  }
+  return 7;
+}
 
   return getRandomEconomyBoardingGroup();
 }
@@ -7532,6 +7943,8 @@ function closeSeatPopups() {
   groupAssignedPopup.classList.remove("active");
   seatRedirectPopup.classList.remove("active");
   externalSeatConfirmPopup.classList.remove("active");
+  transactionReviewPopup.classList.remove("active");
+  paymentConfirmationPopup.classList.remove("active");
 }
 
 function showCabinSelectPopup() {
@@ -7609,7 +8022,302 @@ function showExternalSeatConfirmPopup() {
   externalSeatConfirmPopup.classList.add("active");
 }
 
-function watchActiveSeatSelectionSession(sessionId) {
+function getAvailableCredit() {
+  return Math.max(0, AVIATOR_RESERVE_LIMIT - currentCardBalance);
+}
+
+function getPaymentMethodLabel(method) {
+  return method === "miles" ? "Miles" : `Aviator Reserve (...${AVIATOR_RESERVE_LAST4})`;
+}
+
+function buildTransactionReview({
+  flight,
+  cabin,
+  seat,
+  isPremium,
+  isPremiumEconomy = false,
+  seatCost = 0,
+  seatType = ""
+}) {
+  const baseFare = calculateFlightBaseFare(flight);
+  const totalFare = Math.round((baseFare + Number(seatCost || 0)) * 100) / 100;
+  const paymentMethod = flight.payWithMiles === true ? "miles" : "card";
+  const boardingGroup = assignBoardingGroupForFlight({
+    flight,
+    seat,
+    isPremium,
+    isPremiumEconomy
+  });
+
+  return {
+    flight,
+    cabin,
+    seat,
+    isPremium,
+    isPremiumEconomy,
+    seatType,
+    baseFare,
+    seatCost: Number(seatCost || 0),
+    totalFare,
+    paymentMethod,
+    boardingGroup,
+    seatSelectionSessionId: ""
+  };
+}
+
+function showTransactionReview(review) {
+  pendingTransactionReview = review;
+
+  const flight = review.flight;
+  const route = `${flight.departureAirport || "DEP"} to ${flight.arrivalAirport || "ARR"}`;
+  const requiredMiles = dollarsToMiles(review.totalFare);
+  const availableCredit = getAvailableCredit();
+  const canPay = review.paymentMethod === "miles"
+    ? currentMilesBalance >= requiredMiles
+    : availableCredit >= review.totalFare;
+
+  seatFlowOverlay.classList.add("active");
+  cabinSelectPopup.classList.remove("active");
+  premiumPaymentPopup.classList.remove("active");
+  seatAssignedPopup.classList.remove("active");
+  groupAssignedPopup.classList.remove("active");
+  seatRedirectPopup.classList.remove("active");
+  externalSeatConfirmPopup.classList.remove("active");
+  paymentConfirmationPopup.classList.remove("active");
+
+  transactionReviewLogo.src = getAirlineLogoPath(flight.airline);
+  transactionReviewLogo.onerror = function() {
+    this.style.display = "none";
+  };
+  transactionReviewLogo.style.display = "";
+
+  transactionReviewRoute.textContent = route;
+  transactionBaseFare.textContent = formatMoney(review.baseFare);
+  transactionSeatCost.textContent = formatMoney(review.seatCost);
+  transactionSeatNumber.textContent = review.seat || "--";
+  transactionBoardingGroup.textContent = review.boardingGroup ? `Group ${review.boardingGroup}` : "Group --";
+  transactionTotalUsd.textContent = formatMoney(review.totalFare);
+
+  transactionPaymentIcon.classList.toggle("miles", review.paymentMethod === "miles");
+  transactionPaymentName.textContent = getPaymentMethodLabel(review.paymentMethod);
+
+  if (review.paymentMethod === "miles") {
+    transactionPaymentSubtitle.textContent = `Available miles: ${currentMilesBalance.toLocaleString("en-US")} mi`;
+  } else {
+    transactionPaymentSubtitle.textContent = `Available credit: ${formatMoney(availableCredit)}`;
+  }
+
+  transactionPayButton.disabled = !canPay;
+
+  if (!canPay) {
+    transactionPaymentSubtitle.textContent = review.paymentMethod === "miles"
+      ? `Not enough miles: ${requiredMiles.toLocaleString("en-US")} mi required`
+      : `Not enough available credit`;
+  }
+
+  transactionReviewPopup.classList.add("active");
+}
+
+function showPaymentConfirmation(review) {
+  transactionReviewPopup.classList.remove("active");
+  paymentConfirmationRoute.textContent = `${review.flight.departureAirport || "DEP"} to ${review.flight.arrivalAirport || "ARR"}`;
+  paymentConfirmationSeat.textContent = review.seat || "--";
+  paymentConfirmationGroup.textContent = review.boardingGroup ? `Group ${review.boardingGroup}` : "Group --";
+  paymentConfirmationTotal.textContent = formatMoney(review.totalFare);
+  paymentConfirmationMethod.textContent = getPaymentMethodLabel(review.paymentMethod);
+
+  if (review.paymentMethod === "card") {
+    paymentConfirmationSubtitle.textContent = "Your Aviator Reserve transaction is pending.";
+    paymentConfirmationMiles.textContent = `${Math.floor(review.totalFare * CARD_MILES_MULTIPLIER).toLocaleString("en-US")} mi`;
+    paymentConfirmationMilesRow.style.display = "flex";
+  } else {
+    paymentConfirmationSubtitle.textContent = "Your miles payment has been completed.";
+    paymentConfirmationMilesRow.style.display = "none";
+  }
+
+  paymentConfirmationPopup.classList.add("active");
+}
+
+function resetAddFlightAfterPayment() {
+  flightForm.reset();
+
+  intlUSArrivalToggle.checked = false;
+  intlUSDepartureToggle.checked = false;
+
+  if (boardingOptions) {
+    boardingOptions.classList.remove("active");
+  }
+
+  if (premiumEconomyOptions) {
+    premiumEconomyOptions.classList.remove("active");
+  }
+
+  if (edtOffsetOptions) {
+    edtOffsetOptions.classList.remove("active");
+  }
+
+  if (edtOffsetInput) {
+    edtOffsetInput.value = "";
+  }
+}
+
+async function savePaidFlightWithSeat(review) {
+  const flightToSave = {
+    ...review.flight,
+    assignedSeat: review.seat,
+    seatCabin: review.cabin,
+    seatType: review.seatType || review.cabin,
+    premiumSeat: review.isPremium,
+    premiumEconomySeat: review.isPremiumEconomy,
+    premiumSeatCost: 0,
+    baseFare: review.baseFare,
+    seatCost: review.seatCost,
+    totalFare: review.totalFare,
+    paymentMethod: review.paymentMethod,
+    paymentStatus: review.paymentMethod === "card" ? "pending" : "paid",
+    paymentTransactionId: "",
+    boardingGroup: review.boardingGroup,
+    preDepartureDocumentsComplete: false,
+    documentsComplete: false,
+    documentsStatus: "active"
+  };
+
+  const batch = writeBatch(db);
+  const flightRef = doc(collection(db, "flights"));
+  const savedFlightId = flightRef.id;
+
+  if (review.paymentMethod === "card") {
+    const cardTransactionRef = doc(collection(db, "cardTransactions"));
+
+    flightToSave.paymentTransactionId = cardTransactionRef.id;
+
+    batch.set(flightRef, flightToSave);
+    batch.set(
+      doc(db, "documentPackets", savedFlightId),
+      createDocumentPacketForFlight(flightToSave, savedFlightId)
+    );
+
+    batch.set(
+      doc(db, "cardAccount", "aviatorReserve"),
+      {
+        currentBalance: increment(review.totalFare),
+        creditLimit: AVIATOR_RESERVE_LIMIT,
+        last4: AVIATOR_RESERVE_LAST4,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(cardTransactionRef, {
+      type: "flight_purchase",
+      status: "pending",
+      amount: review.totalFare,
+      baseFare: review.baseFare,
+      seatCost: review.seatCost,
+      milesEarned: Math.floor(review.totalFare * CARD_MILES_MULTIPLIER),
+      cardName: "Aviator Reserve",
+      cardLast4: AVIATOR_RESERVE_LAST4,
+      airline: flightToSave.airline || "",
+      airlineName: flightToSave.airlineName || flightToSave.airline || "Airline",
+      flightNumber: flightToSave.flightNumber || "",
+      departureAirport: flightToSave.departureAirport || "",
+      arrivalAirport: flightToSave.arrivalAirport || "",
+      flightDate: flightToSave.flightDate || "",
+      flightDateRaw: flightToSave.flightDateRaw || "",
+      assignedSeat: review.seat || "",
+      seatCabin: review.cabin || "",
+      boardingGroup: review.boardingGroup || 0,
+      flightId: savedFlightId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  } else {
+    const requiredMiles = dollarsToMiles(review.totalFare);
+    const milesTransactionRef = doc(collection(db, "mileTransactions"));
+
+    batch.set(flightRef, flightToSave);
+    batch.set(
+      doc(db, "documentPackets", savedFlightId),
+      createDocumentPacketForFlight(flightToSave, savedFlightId)
+    );
+
+    batch.set(
+      doc(db, "miles", "balance"),
+      {
+        balance: increment(-requiredMiles),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    batch.set(milesTransactionRef, {
+      type: "spent",
+      title: "Flight Purchase",
+      amount: requiredMiles,
+      airline: flightToSave.airline || "",
+      airlineName: flightToSave.airlineName || flightToSave.airline || "Airline",
+      flightNumber: flightToSave.flightNumber || "",
+      departureAirport: flightToSave.departureAirport || "",
+      arrivalAirport: flightToSave.arrivalAirport || "",
+      assignedSeat: review.seat || "",
+      cabin: review.cabin || "",
+      createdAt: serverTimestamp()
+    });
+  }
+
+  await batch.commit();
+
+  pendingAssignedBoardingGroup = review.boardingGroup;
+  pendingDocumentFlightId = savedFlightId;
+
+  resetAddFlightAfterPayment();
+
+  activeSeatSelectionSessionId = "";
+  pendingFlightToAdd = null;
+  pendingSeatAssignment = null;
+  pendingPremiumCost = 0;
+
+  return savedFlightId;
+}
+
+async function processTransactionReviewPayment() {
+  if (!pendingTransactionReview) return;
+
+  const review = pendingTransactionReview;
+  const requiredMiles = dollarsToMiles(review.totalFare);
+
+  if (review.paymentMethod === "miles" && currentMilesBalance < requiredMiles) {
+    alert("Not enough miles for this purchase.");
+    return;
+  }
+
+  if (review.paymentMethod === "card" && getAvailableCredit() < review.totalFare) {
+    alert("Not enough available credit.");
+    return;
+  }
+
+  transactionPayButton.disabled = true;
+  transactionPayButton.textContent = "Processing...";
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    await savePaidFlightWithSeat(review);
+    showPaymentConfirmation(review);
+  } catch (error) {
+    console.error("Payment could not be processed:", error);
+    alert("Payment could not be processed. Check Firestore rules.");
+    transactionPayButton.disabled = false;
+  } finally {
+    transactionPayButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1ZM9 9V7a3 3 0 0 1 6 0v2H9Z" />
+      </svg>
+      Pay now
+    `;
+  }
+}
+    
+    function watchActiveSeatSelectionSession(sessionId) {
   if (!sessionId) return;
 
   if (activeSeatSelectionUnsubscribe) {
@@ -9121,7 +9829,8 @@ detailBoardingPassCard.addEventListener("keydown", (event) => {
     addFlightButton.addEventListener("click", () => {
   const flight = {
     airline: airlineInput.value.trim().toUpperCase() || "AA",
-    flightNumber: flightNumberInput.value.trim() || "0000",
+airlineName: airlineNameInput.value.trim() || airlineInput.value.trim().toUpperCase() || "Airline",
+flightNumber: flightNumberInput.value.trim() || "0000",
     departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
     arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
     departureAirportName: departureAirportNameInput.value.trim() || "",
@@ -9170,7 +9879,14 @@ checkInOpenedAt: null,
 phase: "scheduled",
     departureTaxiTime: departureTaxiTimeInput.value.trim() || "",
     arrivalTaxiTime: arrivalTaxiTimeInput.value.trim() || "",
-    createdAt: serverTimestamp()
+    payWithMiles: payWithMilesToggle.checked,
+baseFare: 0,
+seatCost: 0,
+totalFare: 0,
+paymentMethod: payWithMilesToggle.checked ? "miles" : "card",
+paymentStatus: "unpaid",
+paymentTransactionId: "",
+createdAt: serverTimestamp()
   };
 
   if (
@@ -9239,6 +9955,13 @@ phase: "scheduled",
   milesBalanceDisplay.textContent = balance.toLocaleString("en-US");
 }, (error) => {
   console.error("Error loading miles balance:", error);
+});
+
+      onSnapshot(doc(db, "cardAccount", "aviatorReserve"), (snapshot) => {
+  const data = snapshot.exists() ? snapshot.data() : {};
+  currentCardBalance = Number(data.currentBalance || 0);
+}, (error) => {
+  console.error("Error loading Aviator Reserve account:", error);
 });
     const arrivalsQuery = query(collection(db, "cbpArrivals"), orderBy("createdAt", "desc"));
 
@@ -10462,7 +11185,7 @@ choosePremiumEconomyButton.addEventListener("click", () => {
   showPremiumPaymentPopup();
 });
     
-chooseEconomyButton.addEventListener("click", async () => {
+chooseEconomyButton.addEventListener("click", () => {
   if (!pendingFlightToAdd) return;
 
   const seat = assignEconomySeatFromFlight(pendingFlightToAdd);
@@ -10479,15 +11202,21 @@ chooseEconomyButton.addEventListener("click", async () => {
   pendingSeatAssignment = {
     seat,
     cabin: "Economy",
-    premium: false
+    premium: false,
+    premiumEconomy: false
   };
 
-  await saveFlightWithSeat({
+  const review = buildTransactionReview({
+    flight: pendingFlightToAdd,
     cabin: "Economy",
     seat,
     isPremium: false,
-    milesCost: 0
+    isPremiumEconomy: false,
+    seatCost: 0,
+    seatType: "Standard Economy"
   });
+
+  showTransactionReview(review);
 });
 
 choosePremiumButton.addEventListener("click", async () => {
@@ -10496,7 +11225,30 @@ choosePremiumButton.addEventListener("click", async () => {
   await createSeatMapSessionAndRedirect();
 });
 
-premiumCancelButton.addEventListener("click", () => {
+transactionCancelButton.addEventListener("click", () => {
+  pendingTransactionReview = null;
+  pendingSeatAssignment = null;
+  showCabinSelectPopup();
+
+  addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1";
+  addFlightButton.style.cursor = "pointer";
+});
+
+transactionPayButton.addEventListener("click", processTransactionReviewPayment);
+
+paymentContinueButton.addEventListener("click", () => {
+  paymentConfirmationPopup.classList.remove("active");
+
+  if (pendingSeatAssignment) {
+    showSeatAssignedPopup(pendingSeatAssignment.seat, pendingSeatAssignment.cabin);
+    return;
+  }
+
+  closeSeatPopups();
+});
+    
+    premiumCancelButton.addEventListener("click", () => {
   pendingSeatAssignment = null;
   pendingPremiumCost = 0;
   showCabinSelectPopup();
