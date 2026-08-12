@@ -8421,6 +8421,8 @@ async function processTransactionReviewPayment() {
         createdAt: serverTimestamp()
       };
 
+      const returnedCabin = session.selectedCabin || "First/Business";
+
 pendingSeatAssignment = {
   seat: session.selectedSeat,
   cabin: returnedCabin,
