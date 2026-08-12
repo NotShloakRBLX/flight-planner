@@ -1644,10 +1644,13 @@
 
 .miles-header {
   position: relative;
-  min-height: 160px;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 16px;
+  padding-top: 54px;
 }
 
 .miles-back-button {
@@ -1696,7 +1699,7 @@
 
     .aviator-reserve-card-link {
   width: 100%;
-  margin-top: 16px;
+  margin-top: 0;
   min-height: 82px;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 22px;
@@ -1706,6 +1709,7 @@
   box-shadow: 0 18px 42px rgba(0,0,0,.28);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   padding: 12px 14px;
   color: white;
