@@ -8219,13 +8219,17 @@ function resetAddFlightAfterPayment() {
 }
 
 async function savePaidFlightWithSeat(review) {
-  const flightToSave = {
-    ...review.flight,
-    assignedSeat: review.seat,
-    seatCabin: review.cabin,
-    seatType: review.seatType || review.cabin,
-    premiumSeat: review.isPremium,
-    premiumEconomySeat: review.isPremiumEconomy,
+  const savedSeatType = review.seatType || review.cabin;
+const savedPremiumEconomy = review.cabin === "Premium Economy";
+const savedFirstBusiness = review.cabin === "First/Business";
+
+const flightToSave = {
+  ...review.flight,
+  assignedSeat: review.seat,
+  seatCabin: review.cabin,
+  seatType: savedSeatType,
+  premiumSeat: savedFirstBusiness,
+  premiumEconomySeat: savedPremiumEconomy,
     premiumSeatCost: 0,
     baseFare: review.baseFare,
     seatCost: review.seatCost,
@@ -8417,14 +8421,16 @@ async function processTransactionReviewPayment() {
         createdAt: serverTimestamp()
       };
 
-      pendingSeatAssignment = {
-        seat: session.selectedSeat,
-        cabin: session.selectedCabin || "First/Business",
-        premium: true,
-        premiumEconomy: false
-      };
+pendingSeatAssignment = {
+  seat: session.selectedSeat,
+  cabin: returnedCabin,
+  premium: returnedCabin === "First/Business" || returnedCabin === "Premium Economy",
+  premiumEconomy: returnedCabin === "Premium Economy",
+  seatType: session.selectedSeatType || returnedCabin,
+  boardingGroup: Number(session.selectedBoardingGroup || 0)
+};
 
-      pendingPremiumCost = Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION);
+pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
 
       addFlightButton.disabled = true;
       addFlightButton.style.opacity = "0.72";
@@ -8434,10 +8440,10 @@ async function processTransactionReviewPayment() {
   flight: pendingFlightToAdd,
   cabin: pendingSeatAssignment.cabin,
   seat: pendingSeatAssignment.seat,
-  isPremium: true,
-  isPremiumEconomy: false,
+  isPremium: pendingSeatAssignment.premium === true,
+  isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
   seatCost: pendingPremiumCost,
-  seatType: "First/Business"
+  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
 });
 
 review.seatSelectionSessionId = activeSeatSelectionSessionId;
