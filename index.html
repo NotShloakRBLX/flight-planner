@@ -6161,6 +6161,7 @@ const authProvider = new GoogleAuthProvider();
 const OWNER_UID = "VUyX2rFavOc2wL06uM3icLUTqyW2";
 
 let ownerAuthStarted = false;
+let ownerAuthStarting = false;
 
 function showAuthGate(title = "Sign in required", subtitle = "Sign in to access your flight system.") {
   let gate = document.getElementById("authGate");
@@ -6197,9 +6198,24 @@ function hideAuthGate() {
   if (gate) gate.style.display = "none";
 }
 
+async function ensureOwnerAuthFresh() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("No signed-in user.");
+  }
+
+  if (OWNER_UID && user.uid !== OWNER_UID) {
+    throw new Error("Signed-in user is not the owner.");
+  }
+
+  await user.getIdToken(true);
+  return user;
+}
+
 function requireOwnerAuth(startApp) {
   setPersistence(auth, browserLocalPersistence).finally(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
         showAuthGate();
         return;
@@ -6212,11 +6228,20 @@ function requireOwnerAuth(startApp) {
         return;
       }
 
-      hideAuthGate();
+      if (ownerAuthStarted || ownerAuthStarting) return;
+      ownerAuthStarting = true;
 
-      if (ownerAuthStarted) return;
-      ownerAuthStarted = true;
-      startApp(user);
+      try {
+        await ensureOwnerAuthFresh();
+        hideAuthGate();
+        ownerAuthStarted = true;
+        startApp(user);
+      } catch (error) {
+        console.error("Auth token refresh failed:", error);
+        showAuthGate();
+      } finally {
+        ownerAuthStarting = false;
+      }
     });
   });
 }
@@ -8533,7 +8558,7 @@ async function processTransactionReviewPayment() {
   }
 }
     
-    function watchActiveSeatSelectionSession(sessionId) {
+    function watchActiveSeatSelectionSession(sessionId, allowRetry = true) {
   if (!sessionId) return;
 
   if (activeSeatSelectionUnsubscribe) {
@@ -8600,6 +8625,14 @@ showTransactionReview(review);
     },
     (error) => {
       console.error("Error watching seat selection session:", error);
+
+      if (allowRetry && error?.code === "permission-denied") {
+        ensureOwnerAuthFresh()
+          .then(() => watchActiveSeatSelectionSession(sessionId, false))
+          .catch((refreshError) => {
+            console.error("Seat selection auth retry failed:", refreshError);
+          });
+      }
     }
   );
 }
@@ -8692,6 +8725,7 @@ returnUrl: MAIN_SITE_RETURN_URL,
   };
 
   try {
+    await ensureOwnerAuthFresh();
     await setDoc(sessionRef, sessionData);
 
 watchActiveSeatSelectionSession(sessionId);
@@ -8727,6 +8761,8 @@ async function processReturnedSeatSelection() {
   window.history.replaceState({}, document.title, MAIN_SITE_RETURN_URL);
 
   try {
+    await ensureOwnerAuthFresh();
+
     const sessionRef = doc(db, "seatSelectionSessions", sessionId);
     const snapshot = await getDoc(sessionRef);
 
