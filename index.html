@@ -1609,6 +1609,24 @@
 .passport-insufficient.active {
   display: block;
 }
+
+.passport-renew-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 13px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.045);
+}
+
+.passport-renew-toggle-text {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+}
     
     .miles-page {
   position: fixed;
@@ -5808,14 +5826,29 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
 <section class="passport-popup" id="renewPassportPopup">
   <div class="passport-popup-title">Passport Renewal</div>
-  <div class="passport-popup-subtitle">Renewing your passport costs 1,000 miles.</div>
+  <div class="passport-popup-subtitle" id="renewPassportSubtitle">Renewing your passport costs $85.00.</div>
 
   <div class="passport-payment-card">
-    <div class="passport-payment-label">Current balance</div>
-    <div class="passport-payment-value" id="renewBalanceDisplay">0 mi</div>
+    <div class="passport-payment-label">Renewal cost</div>
+    <div class="passport-payment-value" id="renewCostDisplay">$85.00</div>
 
-    <div class="passport-payment-label" style="margin-top: 16px;">Renewal cost</div>
-    <div class="passport-payment-value">1,000 mi</div>
+    <div class="transaction-payment-box" style="margin-top: 16px;">
+      <div class="transaction-payment-icon" id="renewPaymentIcon">
+        <img id="renewPaymentCardImage" src="cc.png" alt="Aviator Reserve card" />
+      </div>
+      <div>
+        <div class="transaction-payment-name" id="renewPaymentName">Aviator Reserve (...7250)</div>
+        <div class="transaction-payment-subtitle" id="renewPaymentSubtitle">Available credit: $20,000.00</div>
+      </div>
+    </div>
+
+    <div class="passport-renew-toggle-row">
+      <div class="passport-renew-toggle-text">Pay with miles</div>
+      <label class="toggle-switch">
+        <input id="renewPayWithMilesToggle" type="checkbox" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
 
     <div class="passport-insufficient" id="passportInsufficientText">Insufficient balance</div>
   </div>
@@ -6219,7 +6252,13 @@ const passportActionSubtitle = document.getElementById("passportActionSubtitle")
 const cancelPassportActionButton = document.getElementById("cancelPassportActionButton");
 const openRenewPassportButton = document.getElementById("openRenewPassportButton");
 const renewPassportPopup = document.getElementById("renewPassportPopup");
-const renewBalanceDisplay = document.getElementById("renewBalanceDisplay");
+const renewPassportSubtitle = document.getElementById("renewPassportSubtitle");
+const renewCostDisplay = document.getElementById("renewCostDisplay");
+const renewPaymentIcon = document.getElementById("renewPaymentIcon");
+const renewPaymentCardImage = document.getElementById("renewPaymentCardImage");
+const renewPaymentName = document.getElementById("renewPaymentName");
+const renewPaymentSubtitle = document.getElementById("renewPaymentSubtitle");
+const renewPayWithMilesToggle = document.getElementById("renewPayWithMilesToggle");
 const passportInsufficientText = document.getElementById("passportInsufficientText");
 const cancelRenewPassportButton = document.getElementById("cancelRenewPassportButton");
 const confirmRenewPassportButton = document.getElementById("confirmRenewPassportButton");
@@ -6495,6 +6534,7 @@ const AVIATOR_RESERVE_LAST4 = "7250";
 const AVIATOR_RESERVE_LIMIT = 20000;
 const MILES_PER_DOLLAR_REDEMPTION = 25;
 const CARD_MILES_MULTIPLIER = 3;
+const PASSPORT_RENEWAL_COST = 85;
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
 
@@ -6666,9 +6706,41 @@ function showRenewPassportPopup() {
   passportActionPopup.classList.remove("active");
   renewPassportPopup.classList.add("active");
 
-  renewBalanceDisplay.textContent = `${currentMilesBalance.toLocaleString("en-US")} mi`;
+  if (renewPayWithMilesToggle) {
+    renewPayWithMilesToggle.checked = false;
+  }
 
-  const hasEnough = currentMilesBalance >= 1000;
+  updateRenewPassportPaymentUI();
+}
+
+function updateRenewPassportPaymentUI() {
+  const payingWithMiles = renewPayWithMilesToggle?.checked === true;
+  const requiredMiles = dollarsToMiles(PASSPORT_RENEWAL_COST);
+  const availableCredit = getAvailableCredit();
+  const hasEnough = payingWithMiles
+    ? currentMilesBalance >= requiredMiles
+    : availableCredit >= PASSPORT_RENEWAL_COST;
+
+  renewPassportSubtitle.textContent = payingWithMiles
+    ? `Renewing your passport costs ${requiredMiles.toLocaleString("en-US")} miles.`
+    : `Renewing your passport costs ${formatMoney(PASSPORT_RENEWAL_COST)}.`;
+  renewCostDisplay.textContent = payingWithMiles
+    ? `${requiredMiles.toLocaleString("en-US")} mi`
+    : formatMoney(PASSPORT_RENEWAL_COST);
+
+  renewPaymentIcon.classList.toggle("miles", payingWithMiles);
+  renewPaymentName.textContent = payingWithMiles ? "Miles" : getPaymentMethodLabel("card");
+  renewPaymentSubtitle.textContent = payingWithMiles
+    ? `Available miles: ${currentMilesBalance.toLocaleString("en-US")} mi`
+    : `Available credit: ${formatMoney(availableCredit)}`;
+
+  if (renewPaymentCardImage) {
+    renewPaymentCardImage.style.display = payingWithMiles ? "none" : "block";
+  }
+
+  passportInsufficientText.textContent = payingWithMiles
+    ? "Insufficient miles"
+    : "Insufficient available credit";
   passportInsufficientText.classList.toggle("active", !hasEnough);
   confirmRenewPassportButton.disabled = !hasEnough;
 }
@@ -10172,6 +10244,9 @@ createdAt: serverTimestamp()
 
   currentMilesBalance = balance;
   milesBalanceDisplay.textContent = balance.toLocaleString("en-US");
+  if (renewPassportPopup.classList.contains("active")) {
+    updateRenewPassportPaymentUI();
+  }
 }, (error) => {
   console.error("Error loading miles balance:", error);
 });
@@ -10179,6 +10254,9 @@ createdAt: serverTimestamp()
       onSnapshot(doc(db, "cardAccount", "aviatorReserve"), (snapshot) => {
   const data = snapshot.exists() ? snapshot.data() : {};
   currentCardBalance = Number(data.currentBalance || 0);
+  if (renewPassportPopup.classList.contains("active")) {
+    updateRenewPassportPaymentUI();
+  }
 }, (error) => {
   console.error("Error loading Aviator Reserve account:", error);
 });
@@ -11260,6 +11338,7 @@ passportCard.addEventListener("click", () => {
 });
 
 openRenewPassportButton.addEventListener("click", showRenewPassportPopup);
+renewPayWithMilesToggle.addEventListener("change", updateRenewPassportPaymentUI);
 
 confirmCreatePassportButton.addEventListener("click", async () => {
   const fullName = passportFullNameInput.value.trim();
@@ -11294,7 +11373,14 @@ confirmCreatePassportButton.addEventListener("click", async () => {
 });
 
 confirmRenewPassportButton.addEventListener("click", async () => {
-  if (currentMilesBalance < 1000 || !currentPassport) return;
+  if (!currentPassport) return;
+
+  const payingWithMiles = renewPayWithMilesToggle?.checked === true;
+  const requiredMiles = dollarsToMiles(PASSPORT_RENEWAL_COST);
+  const availableCredit = getAvailableCredit();
+
+  if (payingWithMiles && currentMilesBalance < requiredMiles) return;
+  if (!payingWithMiles && availableCredit < PASSPORT_RENEWAL_COST) return;
 
   confirmRenewPassportButton.disabled = true;
 
@@ -11311,22 +11397,54 @@ confirmRenewPassportButton.addEventListener("click", async () => {
       { merge: true }
     );
 
-    batch.set(
-      doc(db, "miles", "balance"),
-      {
-        balance: increment(-1000),
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
+    if (payingWithMiles) {
+      batch.set(
+        doc(db, "miles", "balance"),
+        {
+          balance: increment(-requiredMiles),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
 
-    batch.set(doc(collection(db, "mileTransactions")), {
-      type: "spent",
-      title: "Passport Renewal",
-      amount: 1000,
-      airline: "cbp",
-      createdAt: serverTimestamp()
-    });
+      batch.set(doc(collection(db, "mileTransactions")), {
+        type: "spent",
+        title: "Passport Renewal",
+        amount: requiredMiles,
+        airline: "cbp",
+        createdAt: serverTimestamp()
+      });
+    } else {
+      const cardTransactionRef = doc(collection(db, "cardTransactions"));
+      const earnedMiles = Math.floor(PASSPORT_RENEWAL_COST * CARD_MILES_MULTIPLIER);
+
+      batch.set(cardTransactionRef, {
+        type: "passport_renewal",
+        status: "approved",
+        amount: PASSPORT_RENEWAL_COST,
+        milesEarned: earnedMiles,
+        cardName: "Aviator Reserve",
+        cardLast4: AVIATOR_RESERVE_LAST4,
+        airline: "cbp",
+        airlineName: "CBP",
+        title: "Passport Renewal",
+        createdAt: serverTimestamp(),
+        postedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      batch.set(
+        doc(db, "cardAccount", "aviatorReserve"),
+        {
+          currentBalance: increment(PASSPORT_RENEWAL_COST),
+          rewardsMiles: increment(earnedMiles),
+          creditLimit: AVIATOR_RESERVE_LIMIT,
+          last4: AVIATOR_RESERVE_LAST4,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
 
     await batch.commit();
 
@@ -11337,6 +11455,7 @@ confirmRenewPassportButton.addEventListener("click", async () => {
     alert("Passport could not be renewed. Check Firestore rules.");
   } finally {
     confirmRenewPassportButton.disabled = false;
+    updateRenewPassportPaymentUI();
   }
 });
 
