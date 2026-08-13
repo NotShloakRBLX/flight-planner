@@ -8154,6 +8154,12 @@ function getPaymentMethodLabel(method) {
   return method === "miles" ? "Miles" : `Aviator Reserve (...${AVIATOR_RESERVE_LAST4})`;
 }
 
+function formatPaymentAmountForReview(review, amount) {
+  return review.paymentMethod === "miles"
+    ? `${dollarsToMiles(amount).toLocaleString("en-US")} mi`
+    : formatMoney(amount);
+}
+
 function buildTransactionReview({
   flight,
   cabin,
@@ -8217,11 +8223,12 @@ function showTransactionReview(review) {
   transactionReviewLogo.style.display = "";
 
   transactionReviewRoute.textContent = route;
-  transactionBaseFare.textContent = formatMoney(review.baseFare);
-  transactionSeatCost.textContent = formatMoney(review.seatCost);
+  transactionBaseFare.textContent = formatPaymentAmountForReview(review, review.baseFare);
+  transactionSeatCost.textContent = formatPaymentAmountForReview(review, review.seatCost);
   transactionSeatNumber.textContent = review.seat || "--";
   transactionBoardingGroup.textContent = review.boardingGroup ? `Group ${review.boardingGroup}` : "Group --";
-  transactionTotalUsd.textContent = formatMoney(review.totalFare);
+  transactionTotalUsd.previousElementSibling.textContent = review.paymentMethod === "miles" ? "Total miles:" : "Total USD:";
+  transactionTotalUsd.textContent = formatPaymentAmountForReview(review, review.totalFare);
 
   transactionPaymentIcon.classList.toggle("miles", review.paymentMethod === "miles");
   const cardImage = document.getElementById("transactionPaymentCardImage");
@@ -8252,7 +8259,7 @@ function showPaymentConfirmation(review) {
   paymentConfirmationRoute.textContent = `${review.flight.departureAirport || "DEP"} to ${review.flight.arrivalAirport || "ARR"}`;
   paymentConfirmationSeat.textContent = review.seat || "--";
   paymentConfirmationGroup.textContent = review.boardingGroup ? `Group ${review.boardingGroup}` : "Group --";
-  paymentConfirmationTotal.textContent = formatMoney(review.totalFare);
+  paymentConfirmationTotal.textContent = formatPaymentAmountForReview(review, review.totalFare);
   paymentConfirmationMethod.textContent = getPaymentMethodLabel(review.paymentMethod);
 
   if (review.paymentMethod === "card") {
@@ -8602,6 +8609,8 @@ economyStartRow,
 economyLastRow,
 hasMilesStatus: currentMilesBalance >= 35000,
 returnUrl: MAIN_SITE_RETURN_URL,
+    paymentMethod: pendingFlightToAdd.payWithMiles === true ? "miles" : "card",
+    payWithMiles: pendingFlightToAdd.payWithMiles === true,
     selectedSeat: "",
     selectedCabin: "",
     paidMiles: 0,
