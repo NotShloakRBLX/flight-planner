@@ -6198,12 +6198,32 @@ function hideAuthGate() {
   if (gate) gate.style.display = "none";
 }
 
-async function ensureOwnerAuthFresh() {
-  const user = auth.currentUser;
+function waitForOwnerAuthUser(timeoutMs = 9000) {
+  if (auth.currentUser) return Promise.resolve(auth.currentUser);
 
-  if (!user) {
-    throw new Error("No signed-in user.");
-  }
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let unsubscribe = () => {};
+
+    const timeout = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      unsubscribe();
+      reject(new Error("Signed-in user was not restored in time."));
+    }, timeoutMs);
+
+    unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user || settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
+async function ensureOwnerAuthFresh(timeoutMs = 9000) {
+  const user = await waitForOwnerAuthUser(timeoutMs);
 
   if (OWNER_UID && user.uid !== OWNER_UID) {
     throw new Error("Signed-in user is not the owner.");
@@ -6217,7 +6237,11 @@ function requireOwnerAuth(startApp) {
   setPersistence(auth, browserLocalPersistence).finally(() => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        showAuthGate();
+        window.setTimeout(() => {
+          if (!auth.currentUser && !ownerAuthStarted && !ownerAuthStarting) {
+            showAuthGate();
+          }
+        }, 1400);
         return;
       }
 
@@ -6238,7 +6262,9 @@ function requireOwnerAuth(startApp) {
         startApp(user);
       } catch (error) {
         console.error("Auth token refresh failed:", error);
-        showAuthGate();
+        if (String(error?.message || "").includes("not the owner")) {
+          showAuthGate("Access denied", "This account is not allowed to access this flight system.");
+        }
       } finally {
         ownerAuthStarting = false;
       }
@@ -6531,6 +6557,7 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let activeTransaction = null;
     let currentMilesBalance = 0;
 let currentCardBalance = 0;
+let currentPendingCardHold = 0;
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
@@ -8244,7 +8271,7 @@ function showExternalSeatConfirmPopup() {
 }
 
 function getAvailableCredit() {
-  return Math.max(0, AVIATOR_RESERVE_LIMIT - currentCardBalance);
+  return Math.max(0, AVIATOR_RESERVE_LIMIT - currentCardBalance - currentPendingCardHold);
 }
 
 function getPaymentMethodLabel(method) {
@@ -8627,10 +8654,10 @@ showTransactionReview(review);
       console.error("Error watching seat selection session:", error);
 
       if (allowRetry && error?.code === "permission-denied") {
-        ensureOwnerAuthFresh()
+        ensureOwnerAuthFresh(12000)
           .then(() => watchActiveSeatSelectionSession(sessionId, false))
           .catch((refreshError) => {
-            console.error("Seat selection auth retry failed:", refreshError);
+            console.warn("Seat selection auth retry is still waiting for the restored sign-in:", refreshError);
           });
       }
     }
@@ -10295,6 +10322,25 @@ createdAt: serverTimestamp()
   }
 }, (error) => {
   console.error("Error loading Aviator Reserve account:", error);
+});
+
+const pendingCardHoldQuery = query(collection(db, "cardTransactions"), where("status", "==", "pending"));
+onSnapshot(pendingCardHoldQuery, (snapshot) => {
+  currentPendingCardHold = snapshot.docs.reduce((sum, transactionDoc) => {
+    const transaction = transactionDoc.data();
+    const amount = Number(transaction.amount || 0);
+    return amount > 0 ? sum + amount : sum;
+  }, 0);
+
+  if (renewPassportPopup.classList.contains("active")) {
+    updateRenewPassportPaymentUI();
+  }
+
+  if (pendingTransactionReview && transactionReviewPopup.classList.contains("active")) {
+    showTransactionReview(pendingTransactionReview);
+  }
+}, (error) => {
+  console.error("Error loading Aviator Reserve pending holds:", error);
 });
     const arrivalsQuery = query(collection(db, "cbpArrivals"), orderBy("createdAt", "desc"));
 
