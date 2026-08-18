@@ -8378,6 +8378,34 @@ if (cardImage) {
   transactionReviewPopup.classList.add("active");
 }
 
+function isPremiumCabinName(cabin) {
+  return cabin === "First/Business" || cabin === "Premium Economy";
+}
+
+function isPremiumCabinFlight(flight) {
+  return (
+    flight?.premiumSeat === true ||
+    flight?.premiumEconomySeat === true ||
+    isPremiumCabinName(flight?.seatCabin)
+  );
+}
+
+function calculateCardMilesForReview(review) {
+  if (!review || review.paymentMethod !== "card" || isPremiumCabinName(review.cabin)) {
+    return 0;
+  }
+
+  return Math.floor(Number(review.totalFare || 0) * CARD_MILES_MULTIPLIER);
+}
+
+function calculateFallbackCardMilesForFlight(flight) {
+  if (isPremiumCabinFlight(flight)) {
+    return 0;
+  }
+
+  return Math.floor(Number(flight?.totalFare || 0) * CARD_MILES_MULTIPLIER);
+}
+
 function showPaymentConfirmation(review) {
   transactionReviewPopup.classList.remove("active");
   paymentConfirmationRoute.textContent = `${review.flight.departureAirport || "DEP"} to ${review.flight.arrivalAirport || "ARR"}`;
@@ -8388,7 +8416,7 @@ function showPaymentConfirmation(review) {
 
   if (review.paymentMethod === "card") {
     paymentConfirmationSubtitle.textContent = "Your Aviator Reserve transaction is pending.";
-    paymentConfirmationMiles.textContent = `${Math.floor(review.totalFare * CARD_MILES_MULTIPLIER).toLocaleString("en-US")} mi`;
+    paymentConfirmationMiles.textContent = `${calculateCardMilesForReview(review).toLocaleString("en-US")} mi`;
     paymentConfirmationMilesRow.style.display = "flex";
   } else {
     paymentConfirmationSubtitle.textContent = "Your miles payment has been completed.";
@@ -8467,7 +8495,7 @@ const flightToSave = {
       amount: review.totalFare,
       baseFare: review.baseFare,
       seatCost: review.seatCost,
-      milesEarned: Math.floor(review.totalFare * CARD_MILES_MULTIPLIER),
+      milesEarned: calculateCardMilesForReview(review),
       cardName: "Aviator Reserve",
       cardLast4: AVIATOR_RESERVE_LAST4,
       airline: flightToSave.airline || "",
@@ -11245,7 +11273,7 @@ if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransacti
   const cardTransactionSnap = await getDoc(cardTransactionRef);
   const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
 
-  awardedMiles = Math.floor(Number(cardTransaction?.milesEarned || completedFlight.totalFare * CARD_MILES_MULTIPLIER || 0));
+  awardedMiles = Math.floor(Number(cardTransaction?.milesEarned ?? calculateFallbackCardMilesForFlight(completedFlight)));
 
   batch.set(
     cardTransactionRef,
