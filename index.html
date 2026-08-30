@@ -10827,7 +10827,7 @@ if (phase === "boarding") {
   markGateInput.style.display = "block";
   markTerminalInput.style.display = "block";
   markGateInput.placeholder = "Arrival gate C12";
-  markTerminalInput.placeholder = "Arrival terminal 1";
+  markTerminalInput.placeholder = "Arrival terminal (optional)";
 } else {
   markTimeInput.style.display = "block";
   markGateInput.style.display = "none";
@@ -11110,7 +11110,6 @@ if (pendingMarkPhase === "gateDeparture" && !hasCompletedPreDepartureDocuments(a
 if (pendingMarkPhase !== "boarding" && !markTimeInput.value) return;
 
 if (pendingMarkPhase === "gateArrival" && !markGateInput.value.trim()) return;
-if (pendingMarkPhase === "gateArrival" && !markTerminalInput.value.trim()) return;
 
 const time = markTimeInput.value;
 const gate = markGateInput.value.trim();
