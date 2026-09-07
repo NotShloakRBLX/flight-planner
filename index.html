@@ -7937,18 +7937,19 @@ function assignEconomySeatFromFlight(flight) {
   const economyStartRow = flight.premiumEconomyEnabled === true
     ? premiumEconomyLastRow + 1
     : firstBusinessLastRow + 1;
+  const standardEconomyStartRow = economyStartRow + 15;
 
   if (
     !Number.isFinite(firstBusinessLastRow) ||
     !Number.isFinite(economyLastRow) ||
     economyLastRow <= 0 ||
-    economyStartRow > economyLastRow ||
+    standardEconomyStartRow > economyLastRow ||
     letters.length === 0
   ) {
     return "";
   }
 
-  const row = getRandomInteger(economyStartRow, economyLastRow);
+  const row = getRandomInteger(standardEconomyStartRow, economyLastRow);
   const letter = letters[Math.floor(Math.random() * letters.length)];
 
   return `${row}${letter}`;
