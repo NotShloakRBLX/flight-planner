@@ -2351,6 +2351,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   font-weight: 650;
 }
 
+.seat-cabin.main-extra {
+  color: #ffb347;
+}
+
+.seat-cabin.preferred {
+  color: #36d98a;
+}
+
 .premium-badge {
   width: 38px;
   height: 38px;
@@ -9219,11 +9227,35 @@ function updateDetailBoardingPassCard(flight) {
 
   detailBoardingPassCard.classList.toggle("hidden", !showBoardingPassCard);
 }
+
+function getSeatCabinDisplay(flight) {
+  const seatType = String(flight?.seatType || "").trim();
+
+  if (seatType === "Main Cabin Extra") {
+    return {
+      label: "Main Cabin Extra",
+      className: "main-extra"
+    };
+  }
+
+  if (seatType === "Preferred Seating" || seatType === "Preferred") {
+    return {
+      label: "Preferred",
+      className: "preferred"
+    };
+  }
+
+  return {
+    label: flight?.seatCabin || "Economy",
+    className: ""
+  };
+}
     
     function updateSeatCard(flight) {
   if (!flight.assignedSeat) {
     seatCard.classList.add("hidden");
     seatCard.classList.remove("premium", "premium-economy");
+    seatCabin.classList.remove("main-extra", "preferred");
     seatValue.textContent = "--";
     seatCabin.textContent = "--";
     return;
@@ -9233,8 +9265,14 @@ function updateDetailBoardingPassCard(flight) {
   seatCard.classList.toggle("premium", flight.premiumSeat === true && flight.premiumEconomySeat !== true);
   seatCard.classList.toggle("premium-economy", flight.premiumEconomySeat === true);
 
+  const cabinDisplay = getSeatCabinDisplay(flight);
+
   seatValue.textContent = flight.assignedSeat;
-  seatCabin.textContent = flight.seatCabin || "Economy";
+  seatCabin.textContent = cabinDisplay.label;
+  seatCabin.classList.remove("main-extra", "preferred");
+  if (cabinDisplay.className) {
+    seatCabin.classList.add(cabinDisplay.className);
+  }
 }
     
     function getFlightPhase(flight) {
