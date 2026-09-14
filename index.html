@@ -6556,8 +6556,10 @@ const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     let pendingMarkPhase = null;
     let activeTransaction = null;
     let currentMilesBalance = 0;
+let currentCardAccount = {};
 let currentCardBalance = 0;
 let currentPendingCardHold = 0;
+let currentCardTransactions = [];
 let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
@@ -8271,8 +8273,163 @@ function showExternalSeatConfirmPopup() {
   externalSeatConfirmPopup.classList.add("active");
 }
 
+function toCardDate(value) {
+  if (!value) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function addCardDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
+function isCardPending(transaction) {
+  return transaction.status === "pending";
+}
+
+function isCardPayment(transaction) {
+  return transaction.type === "payment" || Number(transaction.amount || 0) < 0;
+}
+
+function getCardTransactionDate(transaction) {
+  return toCardDate(transaction.postedAt) || toCardDate(transaction.createdAt) || new Date(0);
+}
+
+function getFirstCardTransactionDate() {
+  if (!currentCardTransactions.length) return null;
+  return currentCardTransactions
+    .map(getCardTransactionDate)
+    .filter(date => date && date.getTime() > 0)
+    .sort((a, b) => a - b)[0] || null;
+}
+
+function getFirstCardCycleStartDate() {
+  const first = getFirstCardTransactionDate();
+  if (!first) return null;
+
+  const start = new Date(first);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function getCardCycleCloseDate(cycleStart) {
+  const closeDate = addCardDays(cycleStart, 13);
+  closeDate.setHours(0, 0, 0, 0);
+  return closeDate;
+}
+
+function calculateCardCarriedBalanceInterest(startingBalance, payments, cycleStart, cycleEnd) {
+  let balance = Math.max(0, Number(startingBalance || 0));
+  let cursor = new Date(cycleStart);
+  let interest = 0;
+  const dailyRate = 0.1949 / 365;
+
+  payments
+    .map(transaction => ({
+      date: getCardTransactionDate(transaction),
+      amount: Math.abs(Number(transaction.amount || 0))
+    }))
+    .filter(payment => payment.date >= cycleStart && payment.date < cycleEnd && payment.amount > 0)
+    .sort((a, b) => a.date - b.date)
+    .forEach(payment => {
+      const paymentDay = new Date(payment.date);
+      paymentDay.setHours(0, 0, 0, 0);
+      const days = Math.max(0, Math.floor((paymentDay - cursor) / 86400000));
+
+      interest += balance * dailyRate * days;
+      balance = Math.max(0, balance - payment.amount);
+      cursor = paymentDay;
+    });
+
+  const closingDay = new Date(cycleEnd);
+  closingDay.setHours(0, 0, 0, 0);
+  const remainingDays = Math.max(0, Math.floor((closingDay - cursor) / 86400000));
+  interest += balance * dailyRate * remainingDays;
+
+  return Math.max(0, interest);
+}
+
+function buildCardStatementsForCredit() {
+  const start = getFirstCardCycleStartDate();
+  if (!start) return [];
+
+  const now = new Date();
+  const cycles = [];
+  let cycleStart = start;
+  let carriedStatementBalance = 0;
+
+  while (cycleStart <= now) {
+    const cycleEnd = getCardCycleCloseDate(cycleStart);
+
+    const cycleTransactions = currentCardTransactions
+      .filter(transaction => !isCardPending(transaction))
+      .filter(transaction => {
+        const date = getCardTransactionDate(transaction);
+        return date >= cycleStart && date < cycleEnd;
+      });
+
+    const purchases = cycleTransactions
+      .filter(transaction => Number(transaction.amount || 0) > 0)
+      .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+
+    const credits = cycleTransactions
+      .filter(transaction => Number(transaction.amount || 0) < 0)
+      .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+
+    const remainingStatementBalance = Math.max(0, carriedStatementBalance);
+    const interestAccrued = calculateCardCarriedBalanceInterest(
+      remainingStatementBalance,
+      cycleTransactions.filter(isCardPayment),
+      cycleStart,
+      cycleEnd
+    );
+    const balance = Math.max(0, remainingStatementBalance + purchases + interestAccrued - credits);
+
+    if (cycleEnd <= now && (cycleTransactions.length || remainingStatementBalance > 0 || interestAccrued > 0)) {
+      cycles.push({
+        id: `${cycleStart.toISOString().slice(0, 10)}_${cycleEnd.toISOString().slice(0, 10)}`,
+        start: new Date(cycleStart),
+        end: new Date(cycleEnd),
+        balance
+      });
+      carriedStatementBalance = balance;
+    }
+
+    cycleStart = new Date(cycleEnd);
+    cycleStart.setHours(0, 0, 0, 0);
+  }
+
+  return cycles.sort((a, b) => b.start - a.start);
+}
+
+function getCardActiveInterestAdjustment(latestStatement) {
+  if (!latestStatement || currentCardAccount.statementInterestCycleId !== latestStatement.id) return 0;
+  return Number(currentCardAccount.statementInterestAdjustment || 0);
+}
+
+function getCurrentCardBalanceForCredit() {
+  const statements = buildCardStatementsForCredit();
+  const latestStatement = statements[0] || null;
+
+  if (latestStatement) {
+    const postStatementActivity = currentCardTransactions
+      .filter(transaction => !isCardPending(transaction))
+      .filter(transaction => getCardTransactionDate(transaction) >= latestStatement.end)
+      .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+
+    return Math.max(0, Number(latestStatement.balance || 0) + postStatementActivity + getCardActiveInterestAdjustment(latestStatement));
+  }
+
+  return Math.max(0, currentCardTransactions
+    .filter(transaction => !isCardPending(transaction))
+    .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0));
+}
+
 function getAvailableCredit() {
-  return Math.max(0, AVIATOR_RESERVE_LIMIT - currentCardBalance - currentPendingCardHold);
+  return Math.max(0, AVIATOR_RESERVE_LIMIT - getCurrentCardBalanceForCredit() - currentPendingCardHold);
 }
 
 function getPaymentMethodLabel(method) {
@@ -10345,21 +10502,32 @@ createdAt: serverTimestamp()
 
       onSnapshot(doc(db, "cardAccount", "aviatorReserve"), (snapshot) => {
   const data = snapshot.exists() ? snapshot.data() : {};
+  currentCardAccount = data;
   currentCardBalance = Number(data.currentBalance || 0);
   if (renewPassportPopup.classList.contains("active")) {
     updateRenewPassportPaymentUI();
+  }
+
+  if (pendingTransactionReview && transactionReviewPopup.classList.contains("active")) {
+    showTransactionReview(pendingTransactionReview);
   }
 }, (error) => {
   console.error("Error loading Aviator Reserve account:", error);
 });
 
-const pendingCardHoldQuery = query(collection(db, "cardTransactions"), where("status", "==", "pending"));
-onSnapshot(pendingCardHoldQuery, (snapshot) => {
-  currentPendingCardHold = snapshot.docs.reduce((sum, transactionDoc) => {
-    const transaction = transactionDoc.data();
-    const amount = Number(transaction.amount || 0);
-    return amount > 0 ? sum + amount : sum;
-  }, 0);
+const cardTransactionsQuery = query(collection(db, "cardTransactions"), orderBy("createdAt", "desc"));
+onSnapshot(cardTransactionsQuery, (snapshot) => {
+  currentCardTransactions = snapshot.docs.map(transactionDoc => ({
+    id: transactionDoc.id,
+    ...transactionDoc.data()
+  }));
+
+  currentPendingCardHold = currentCardTransactions
+    .filter(isCardPending)
+    .reduce((sum, transaction) => {
+      const amount = Number(transaction.amount || 0);
+      return amount > 0 ? sum + amount : sum;
+    }, 0);
 
   if (renewPassportPopup.classList.contains("active")) {
     updateRenewPassportPaymentUI();
@@ -10369,7 +10537,7 @@ onSnapshot(pendingCardHoldQuery, (snapshot) => {
     showTransactionReview(pendingTransactionReview);
   }
 }, (error) => {
-  console.error("Error loading Aviator Reserve pending holds:", error);
+  console.error("Error loading Aviator Reserve transactions:", error);
 });
     const arrivalsQuery = query(collection(db, "cbpArrivals"), orderBy("createdAt", "desc"));
 
