@@ -6572,6 +6572,7 @@ let pendingFlightToAdd = null;
 let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
 let pendingTransactionReview = null;
+const randomSeatLocks = new Map();
     let pendingAssignedBoardingGroup = "";
 let pendingDocumentFlightId = "";
     let currentPassport = null;
@@ -7965,6 +7966,28 @@ function assignEconomySeatFromFlight(flight) {
   return `${row}${letter}`;
 }
 
+function getRandomSeatLockKey(flight) {
+  return [
+    flight?.airline || "",
+    flight?.airlineName || "",
+    flight?.flightNumber || "",
+    flight?.departureAirport || "",
+    flight?.arrivalAirport || "",
+    flight?.flightDateRaw || flight?.flightDate || "",
+    flight?.scheduledDeparture || "",
+    flight?.scheduledArrival || "",
+    flight?.premiumRows || "",
+    flight?.premiumLetters || "",
+    flight?.premiumEconomyEnabled === true ? "premium-economy" : "no-premium-economy",
+    flight?.premiumEconomyLastRow || "",
+    flight?.premiumEconomyLetters || "",
+    flight?.economyRows || "",
+    flight?.economyLetters || "",
+    flight?.routeDistance || "",
+    flight?.payWithMiles === true ? "miles" : "card"
+  ].map(value => String(value).trim().toUpperCase()).join("|");
+}
+
     function assignPremiumEconomySeatFromFlight(flight) {
   if (flight.premiumEconomyEnabled !== true) {
     return "";
@@ -8074,6 +8097,10 @@ function assignBoardingGroupForFlight({
   }
 
   if (currentMilesBalance >= 35000) {
+    return 7;
+  }
+
+  if (assignmentMode === "group7Upgrade") {
     return 7;
   }
 
@@ -8864,7 +8891,7 @@ pendingSeatAssignment = {
   premiumEconomy: returnedCabin === "Premium Economy",
   seatType: session.selectedSeatType || returnedCabin,
   boardingGroup: Number(session.selectedBoardingGroup || 0),
-  assignmentMode: "seatMap"
+  assignmentMode: session.group7UpgradeSelected === true ? "group7Upgrade" : "seatMap"
 };
 
 pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
@@ -9068,7 +9095,7 @@ pendingSeatAssignment = {
   premiumEconomy: returnedCabin === "Premium Economy",
   seatType: session.selectedSeatType || returnedCabin,
   boardingGroup: Number(session.selectedBoardingGroup || 0),
-  assignmentMode: "seatMap"
+  assignmentMode: session.group7UpgradeSelected === true ? "group7Upgrade" : "seatMap"
 };
 
 pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
@@ -11875,7 +11902,15 @@ chooseEconomyButton.addEventListener("click", () => {
 chooseEconomyRandomButton.addEventListener("click", () => {
   if (!pendingFlightToAdd) return;
 
-  const seat = assignEconomySeatFromFlight(pendingFlightToAdd);
+  const lockKey = getRandomSeatLockKey(pendingFlightToAdd);
+  let seat = randomSeatLocks.get(lockKey) || "";
+
+  if (!seat) {
+    seat = assignEconomySeatFromFlight(pendingFlightToAdd);
+    if (seat) {
+      randomSeatLocks.set(lockKey, seat);
+    }
+  }
 
   if (!seat) {
     alert("Economy seat could not be assigned. Check Economy Rows and Economy Window Letters.");
