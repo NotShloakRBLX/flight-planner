@@ -8013,15 +8013,42 @@ function getEconomyPriorityBoundaryRow(flight) {
   return Number(flight.premiumRows || 0);
 }
 
-function getRandomEconomyBoardingGroup() {
-  return getRandomInteger(8, 9);
+function getEconomyStartRowForFlight(flight) {
+  if (flight?.premiumEconomyEnabled === true) {
+    return Number(flight.premiumEconomyLastRow || 0) + 1;
+  }
+
+  return Number(flight?.premiumRows || 0) + 1;
+}
+
+function getEconomySeatZoneForFlight(flight, seat) {
+  const seatRow = getSeatRowNumber(seat);
+  const economyStartRow = getEconomyStartRowForFlight(flight);
+
+  if (!seatRow || !economyStartRow) return "standard";
+
+  const offset = seatRow - economyStartRow + 1;
+
+  if (offset >= 1 && offset <= 7) return "main-extra";
+  if (offset >= 8 && offset <= 15) return "preferred";
+
+  return "standard";
+}
+
+function isInLastFiveEconomyRows(flight, seat) {
+  const seatRow = getSeatRowNumber(seat);
+  const economyLastRow = Number(flight?.economyRows || 0);
+
+  return seatRow > 0 && economyLastRow > 0 && seatRow >= Math.max(1, economyLastRow - 4);
 }
 
 function assignBoardingGroupForFlight({
   flight,
   seat,
   isPremium,
-  isPremiumEconomy
+  isPremiumEconomy,
+  seatType = "",
+  assignmentMode = ""
 }) {
   if (isPremiumEconomy === true) {
     return 4;
@@ -8031,18 +8058,30 @@ function assignBoardingGroupForFlight({
     return 1;
   }
 
-  const seatRow = getSeatRowNumber(seat);
-  const boundaryRow = getEconomyPriorityBoundaryRow(flight);
+  const normalizedSeatType = String(seatType || "").trim();
+  const zone = normalizedSeatType === "Main Cabin Extra"
+    ? "main-extra"
+    : normalizedSeatType === "Preferred Seating" || normalizedSeatType === "Preferred"
+      ? "preferred"
+      : getEconomySeatZoneForFlight(flight, seat);
 
-  if (seatRow > 0 && boundaryRow > 0 && seatRow <= boundaryRow + 7) {
+  if (zone === "main-extra") {
     return 5;
   }
 
-  if (currentMilesBalance >= 35000) {
-  return 7;
-}
+  if (zone === "preferred") {
+    return 6;
+  }
 
-  return getRandomEconomyBoardingGroup();
+  if (currentMilesBalance >= 35000) {
+    return 7;
+  }
+
+  if (assignmentMode === "random") {
+    return isInLastFiveEconomyRows(flight, seat) ? 9 : 8;
+  }
+
+  return 8;
 }
   function getBoardingGroupForExistingFlight(flight) {
   if (!flight || !flight.assignedSeat) {
@@ -8053,7 +8092,9 @@ function assignBoardingGroupForFlight({
     flight,
     seat: flight.assignedSeat,
     isPremium: flight.premiumSeat === true,
-    isPremiumEconomy: flight.premiumEconomySeat === true
+    isPremiumEconomy: flight.premiumEconomySeat === true,
+    seatType: flight.seatType || flight.seatCabin || "",
+    assignmentMode: flight.seatAssignmentMode || ""
   });
 }  
 
@@ -8457,16 +8498,19 @@ function buildTransactionReview({
   isPremium,
   isPremiumEconomy = false,
   seatCost = 0,
-  seatType = ""
+  seatType = "",
+  assignmentMode = ""
 }) {
   const baseFare = calculateFlightBaseFare(flight);
   const totalFare = Math.round((baseFare + Number(seatCost || 0)) * 100) / 100;
   const paymentMethod = flight.payWithMiles === true ? "miles" : "card";
-  const boardingGroup = Number(pendingSeatAssignment?.boardingGroup || 0) || assignBoardingGroupForFlight({
+  const boardingGroup = assignBoardingGroupForFlight({
   flight,
   seat,
   isPremium,
-  isPremiumEconomy
+  isPremiumEconomy,
+  seatType,
+  assignmentMode
 });
 
   return {
@@ -8476,6 +8520,7 @@ function buildTransactionReview({
     isPremium,
     isPremiumEconomy,
     seatType,
+    assignmentMode,
     baseFare,
     seatCost: Number(seatCost || 0),
     totalFare,
@@ -8625,6 +8670,7 @@ const flightToSave = {
   assignedSeat: review.seat,
   seatCabin: review.cabin,
   seatType: savedSeatType,
+  seatAssignmentMode: review.assignmentMode || "",
   premiumSeat: savedFirstBusiness,
   premiumEconomySeat: savedPremiumEconomy,
     premiumSeatCost: 0,
@@ -8817,7 +8863,8 @@ pendingSeatAssignment = {
   premium: returnedCabin === "First/Business" || returnedCabin === "Premium Economy",
   premiumEconomy: returnedCabin === "Premium Economy",
   seatType: session.selectedSeatType || returnedCabin,
-  boardingGroup: Number(session.selectedBoardingGroup || 0)
+  boardingGroup: Number(session.selectedBoardingGroup || 0),
+  assignmentMode: "seatMap"
 };
 
 pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
@@ -8833,7 +8880,8 @@ pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.pai
   isPremium: pendingSeatAssignment.premium === true,
   isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
   seatCost: pendingPremiumCost,
-  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
+  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin,
+  assignmentMode: pendingSeatAssignment.assignmentMode || "seatMap"
 });
 
 review.seatSelectionSessionId = activeSeatSelectionSessionId;
@@ -9019,7 +9067,8 @@ pendingSeatAssignment = {
   premium: returnedCabin === "First/Business" || returnedCabin === "Premium Economy",
   premiumEconomy: returnedCabin === "Premium Economy",
   seatType: session.selectedSeatType || returnedCabin,
-  boardingGroup: Number(session.selectedBoardingGroup || 0)
+  boardingGroup: Number(session.selectedBoardingGroup || 0),
+  assignmentMode: "seatMap"
 };
 
 pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.paidMiles || 0) / MILES_PER_DOLLAR_REDEMPTION));
@@ -9035,7 +9084,8 @@ pendingPremiumCost = Number(session.paidDollars || Math.round(Number(session.pai
   isPremium: pendingSeatAssignment.premium === true,
   isPremiumEconomy: pendingSeatAssignment.premiumEconomy === true,
   seatCost: pendingPremiumCost,
-  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin
+  seatType: pendingSeatAssignment.seatType || pendingSeatAssignment.cabin,
+  assignmentMode: pendingSeatAssignment.assignmentMode || "seatMap"
 });
 
 review.seatSelectionSessionId = activeSeatSelectionSessionId;
@@ -11840,7 +11890,9 @@ chooseEconomyRandomButton.addEventListener("click", () => {
     seat,
     cabin: "Economy",
     premium: false,
-    premiumEconomy: false
+    premiumEconomy: false,
+    seatType: "Standard Economy",
+    assignmentMode: "random"
   };
 
   const review = buildTransactionReview({
@@ -11850,7 +11902,8 @@ chooseEconomyRandomButton.addEventListener("click", () => {
     isPremium: false,
     isPremiumEconomy: false,
     seatCost: 0,
-    seatType: "Standard Economy"
+    seatType: "Standard Economy",
+    assignmentMode: "random"
   });
 
   showTransactionReview(review);
