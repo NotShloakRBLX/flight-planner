@@ -2859,6 +2859,80 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       flex: 0 0 auto;
     }
 
+    .aircraft-info-card {
+      position: relative;
+      min-height: 156px;
+      margin-top: 16px;
+      padding: 22px 20px;
+      border-radius: 26px;
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      background:
+        radial-gradient(circle at 22% 10%, rgba(255, 255, 255, 0.09), transparent 34%),
+        radial-gradient(circle at 88% 20%, rgba(56, 189, 248, 0.12), transparent 35%),
+        linear-gradient(145deg, #11131a 0%, #050608 52%, #15161a 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 34px rgba(0, 0, 0, 0.26);
+      overflow: hidden;
+    }
+
+    .aircraft-info-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(110deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, transparent 48%, rgba(0, 0, 0, 0.36));
+      pointer-events: none;
+    }
+
+    .aircraft-info-bg-logo {
+      position: absolute;
+      right: -42px;
+      bottom: -46px;
+      width: 215px;
+      height: 215px;
+      object-fit: contain;
+      opacity: 0.13;
+      filter: grayscale(1) contrast(1.08);
+      transform: rotate(-9deg) scale(1.08);
+      pointer-events: none;
+    }
+
+    .aircraft-info-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .aircraft-info-label {
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.48);
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .aircraft-info-title {
+      max-width: min(78%, 430px);
+      color: white;
+      font-size: clamp(28px, 8.2vw, 46px);
+      font-weight: 950;
+      letter-spacing: 0;
+      line-height: 0.98;
+      text-wrap: balance;
+    }
+
+    .aircraft-info-title.long {
+      max-width: min(82%, 450px);
+      font-size: clamp(25px, 7vw, 39px);
+    }
+
+    .aircraft-info-title.extra-long {
+      max-width: min(86%, 470px);
+      font-size: clamp(22px, 6.1vw, 34px);
+    }
+
     .timetable-sheet-overlay {
       position: fixed;
       inset: 0;
@@ -6098,6 +6172,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </svg>
         </button>
 
+        <section class="aircraft-info-card hidden" id="aircraftInfoCard">
+          <img class="aircraft-info-bg-logo" id="aircraftInfoLogo" alt="" />
+          <div class="aircraft-info-content">
+            <div class="aircraft-info-label">Aircraft</div>
+            <div class="aircraft-info-title" id="aircraftInfoTitle"></div>
+          </div>
+        </section>
+
         <section class="detail-action-stack">
           <button class="detail-action-button" id="openEditFlightButton">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -6947,6 +7029,9 @@ const timetableSheetOverlay = document.getElementById("timetableSheetOverlay");
 const timetableSheet = document.getElementById("timetableSheet");
 const closeTimetableButton = document.getElementById("closeTimetableButton");
 const timetableSheetBody = document.getElementById("timetableSheetBody");
+const aircraftInfoCard = document.getElementById("aircraftInfoCard");
+const aircraftInfoLogo = document.getElementById("aircraftInfoLogo");
+const aircraftInfoTitle = document.getElementById("aircraftInfoTitle");
 
     const airlineInput = document.getElementById("airline");
 const airlineNameInput = document.getElementById("airlineName");
@@ -7026,6 +7111,16 @@ let selectedAircraftType = "";
 
 const checkInOpenWriteLocks = new Set();
 const AIRCRAFT_OPTIONS = ["A319", "A320", "A321", "A350-900", "A350-1000", "B777-300ER", "B737-800", "B787-9"];
+const AIRCRAFT_DISPLAY_NAMES = {
+  "A319": "Airbus A319",
+  "A320": "Airbus A320",
+  "A321": "Airbus A321",
+  "A350-900": "Airbus A350-900",
+  "A350-1000": "Airbus A350-1000",
+  "B777-300ER": "Boeing 777-300ER",
+  "B737-800": "Boeing 737-800",
+  "B787-9": "Boeing 787-9 Dreamliner"
+};
     
     const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
@@ -7540,6 +7635,36 @@ function closeTransactionEditor() {
   }
 
   return `./${code}.png`;
+}
+
+function getAircraftDisplayName(aircraftType) {
+  const code = String(aircraftType || "").trim();
+  return AIRCRAFT_DISPLAY_NAMES[code] || "";
+}
+
+function updateAircraftInfoCard(flight) {
+  if (!aircraftInfoCard || !aircraftInfoTitle || !aircraftInfoLogo) return;
+
+  const displayName = getAircraftDisplayName(flight?.aircraftType);
+
+  if (!displayName) {
+    aircraftInfoCard.classList.add("hidden");
+    return;
+  }
+
+  const logoPath = getAirlineLogoPath(flight?.airline);
+
+  aircraftInfoCard.classList.remove("hidden");
+  aircraftInfoTitle.textContent = displayName;
+  aircraftInfoTitle.classList.toggle("long", displayName.length > 17);
+  aircraftInfoTitle.classList.toggle("extra-long", displayName.length > 24);
+
+  aircraftInfoLogo.src = logoPath;
+  aircraftInfoLogo.alt = `${flight?.airline || "Airline"} logo`;
+  aircraftInfoLogo.style.display = logoPath ? "block" : "none";
+  aircraftInfoLogo.onerror = function () {
+    this.style.display = "none";
+  };
 }
     function formatDisplayDate(dateValue) {
       if (!dateValue) return "";
@@ -11165,6 +11290,7 @@ updateSeatCard(flight);
 updateDetailBoardingPassCard(flight);
 updateTimezoneBox(flight);
 updateCBPInfoCard(flight);
+updateAircraftInfoCard(flight);
 updateDetailCountdowns();
 updateCompleteFlightButton(flight);
       
@@ -11177,6 +11303,7 @@ updateCompleteFlightButton(flight);
 updateSeatCard(latest);
 updateTimezoneBox(latest);
 updateCBPInfoCard(latest);
+updateAircraftInfoCard(latest);
 updateDetailCountdowns();
 updateCompleteFlightButton(latest);
         }
