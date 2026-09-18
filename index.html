@@ -2955,7 +2955,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .timeline-line {
       position: absolute;
       top: 28px;
-      bottom: -36px;
+      bottom: -17px;
       width: 5px;
       border-radius: 999px;
       background: #657187;
@@ -3114,7 +3114,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
       .timeline-line {
         top: 26px;
-        bottom: -34px;
+        bottom: -16px;
         width: 4px;
       }
 
@@ -8065,6 +8065,13 @@ function startPreclearanceLockWatcher() {
       const actuals = getActualTimes(flight);
       const phase = getFlightPhase(flight);
       const hasBoarding = flight.enableBoarding === true;
+      const completedDeparturePhases = ["boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"];
+      const boardingStarted = hasBoarding
+        && flight.boardingStartMs
+        && flight.actualBoardingMinutes === undefined
+        && !completedDeparturePhases.includes(phase);
+      const boardingActive = phase === "boarding" || boardingStarted;
+      const boardingComplete = completedDeparturePhases.includes(phase);
       const scheduledDepartureTaxi = formatDurationFromMinutes(schedule.departureTaxiMinutes);
       const scheduledArrivalTaxi = formatDurationFromMinutes(schedule.arrivalTaxiMinutes);
       const scheduledAirTime = flight.airTime || formatDurationFromMinutes(diffMinutes(schedule.land, schedule.takeoff));
@@ -8081,8 +8088,8 @@ function startPreclearanceLockWatcher() {
           actualValue: flight.actualBoardingMinutes !== undefined ? formatDurationFromMinutes(flight.actualBoardingMinutes) : "",
           actualGood: Number(flight.actualBoardingMinutes || 0) <= schedule.boardingDurationMinutes,
           icon: "boarding",
-          state: phase === "boarding" ? "active" : ["boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank",
-          lineState: phase === "boarding" ? "active" : ["boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank"
+          state: boardingActive ? "active" : boardingComplete ? "complete" : "blank",
+          lineState: boardingActive ? "active" : boardingComplete ? "complete" : "blank"
         }));
       }
 
@@ -11788,6 +11795,7 @@ markPopupOverlay.classList.add("active");
   return;
 }
 
+    activeFlight = completedPhaseFlight;
     editFlightPage.classList.remove("active");
     detailPage.classList.remove("active");
 
