@@ -8294,9 +8294,13 @@ function startPreclearanceLockWatcher() {
     }
 
     function openTimetableSheet() {
-      if (!activeTimetableFlight) return;
+      const timetableFlight = activeFlight
+        ? allFlights.get(activeFlight.id) || activeFlight
+        : activeTimetableFlight;
 
-      updateTimetable(activeTimetableFlight);
+      if (!timetableFlight) return;
+
+      updateTimetable(timetableFlight);
       timetableSheetOverlay.classList.add("active");
       timetableSheet.classList.add("active");
       timetableSheet.classList.remove("animate");
@@ -10739,6 +10743,7 @@ checkInStatusPanel.addEventListener("keydown", (event) => {
       const schedule = getScheduleTimes(flight);
       const actuals = getActualTimes(flight);
       updateCheckInStatusPanel(flight);
+      updateTimetable(flight);
 
       const originalDeparture = getOriginalDepartureDateTime(flight);
 const originalArrival = getOriginalArrivalDateTime(flight);
@@ -10817,7 +10822,6 @@ if (phase === "boardingComplete") {
         setStatusPanel(!arrivalDiff.good, "Arrived at Gate", arrivalDiff.text);
       }
 
-      updateTimetable(flight);
     }
 
     function updateDetailAirportGateDisplay(section, gatePill, terminalEl, gate, terminal, directionIcon) {
