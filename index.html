@@ -2721,6 +2721,345 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       color: transparent;
     }
 
+    .timetable-summary-card {
+      width: 100%;
+      min-height: 86px;
+      padding: 18px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.24s ease, border-color 0.24s ease, background 0.24s ease;
+    }
+
+    .timetable-summary-card:active {
+      transform: scale(0.985);
+    }
+
+    .timetable-summary-chevron {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.48);
+      stroke-width: 2.3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: 0 0 auto;
+    }
+
+    .timetable-sheet-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+
+    .timetable-sheet-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .timetable-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 121;
+      width: min(100%, 620px);
+      height: min(91vh, 920px);
+      transform: translate(-50%, 102%);
+      border-radius: 30px 30px 0 0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-bottom: none;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(84, 154, 255, 0.14), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
+        #0d1320;
+      box-shadow: 0 -28px 90px rgba(0, 0, 0, 0.58);
+      overflow: hidden;
+      pointer-events: none;
+      transition: transform 0.42s cubic-bezier(.2,.85,.2,1);
+    }
+
+    .timetable-sheet.active {
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+
+    .timetable-sheet-grabber {
+      width: 74px;
+      height: 6px;
+      border-radius: 999px;
+      margin: 14px auto 0;
+      background: rgba(255, 255, 255, 0.44);
+    }
+
+    .timetable-sheet-header {
+      padding: 24px 24px 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .timetable-sheet-title {
+      color: #fff;
+      font-size: 31px;
+      line-height: 1.05;
+      font-weight: 950;
+      letter-spacing: -0.85px;
+    }
+
+    .timetable-sheet-subtitle {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 15px;
+      line-height: 1.25;
+      font-weight: 760;
+    }
+
+    .timetable-sheet-close {
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .timetable-sheet-close svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .timetable-sheet-body {
+      height: calc(100% - 112px);
+      padding: 0 22px 28px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .timeline-section {
+      margin-top: 16px;
+      padding: 18px 16px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        rgba(7, 12, 22, 0.70);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .timeline-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .timeline-section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 15px;
+      font-weight: 940;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .timeline-section-title svg {
+      width: 23px;
+      height: 23px;
+      fill: currentColor;
+    }
+
+    .timeline-section-route {
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 52px 54px minmax(0, 1fr) 78px 78px;
+      gap: 10px;
+      min-height: 76px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .timetable-sheet.animate .timeline-row {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: calc(var(--row-index, 0) * 70ms);
+    }
+
+    .timeline-rail {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      padding-top: 6px;
+    }
+
+    .timeline-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 5px solid #657187;
+      background: #101827;
+      color: transparent;
+      display: grid;
+      place-items: center;
+      z-index: 1;
+      transition: border-color 0.32s ease, background 0.32s ease, color 0.32s ease;
+    }
+
+    .timeline-dot svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .timeline-row.complete .timeline-dot {
+      border-color: #20d987;
+      background: #20d987;
+      color: #07100b;
+    }
+
+    .timeline-row.active .timeline-dot {
+      border-color: #ffd22f;
+      background: #ffd22f;
+      color: #111827;
+    }
+
+    .timeline-line {
+      position: absolute;
+      top: 34px;
+      bottom: -42px;
+      width: 6px;
+      border-radius: 999px;
+      background: #657187;
+      transition: background 0.32s ease;
+    }
+
+    .timeline-row.line-complete .timeline-line {
+      background: #20d987;
+    }
+
+    .timeline-row.line-active .timeline-line {
+      background: #ffd22f;
+    }
+
+    .timeline-row:last-child .timeline-line {
+      display: none;
+    }
+
+    .timeline-icon {
+      width: 48px;
+      height: 48px;
+      margin-top: -4px;
+      border-radius: 17px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .timeline-icon svg {
+      width: 25px;
+      height: 25px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .timeline-main-title {
+      color: #fff;
+      font-size: 16px;
+      line-height: 1.12;
+      font-weight: 920;
+      letter-spacing: -0.25px;
+    }
+
+    .timeline-main-subtitle {
+      margin-top: 5px;
+      color: rgba(255, 255, 255, 0.48);
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .timeline-time-label {
+      color: rgba(255, 255, 255, 0.46);
+      font-size: 12px;
+      font-weight: 820;
+    }
+
+    .timeline-time-value {
+      margin-top: 5px;
+      color: #fff;
+      font-size: 15px;
+      line-height: 1.1;
+      font-weight: 930;
+      letter-spacing: -0.2px;
+    }
+
+    .timeline-time-value.empty {
+      color: rgba(255, 255, 255, 0.44);
+    }
+
+    .timeline-time-value.good {
+      color: #20d987;
+    }
+
+    .timeline-time-value.bad {
+      color: #ff5b64;
+    }
+
+    .timeline-time-value.progress {
+      color: #ffd22f;
+    }
+
+    .timeline-total-row {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) 78px 78px;
+      gap: 10px;
+      align-items: center;
+      min-height: 66px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .timetable-sheet.animate .timeline-total-row {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: calc(var(--row-index, 0) * 70ms);
+    }
+
     .detail-action-stack {
       margin-top: 18px;
       display: grid;
@@ -5542,131 +5881,15 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <div class="cbp-info-title">US Customs &amp; Border Protection</div>
 </section>
 
-        <section class="timetable-card">
-          <div class="timetable-header">
-            <div class="timetable-title">Detailed Timetable</div>
-            <div class="timetable-subtitle">Scheduled, Estimated, Predicted, and Actual</div>
+        <button class="timetable-card timetable-summary-card" id="openTimetableButton" type="button">
+          <div>
+            <div class="timetable-title">Detailed timetable</div>
+            <div class="timetable-subtitle">Scheduled and actual times</div>
           </div>
-
-          <div class="timetable-section">
-            <div class="timetable-section-label">Depart</div>
-            <div class="timetable-row boarding-row hidden" id="ttBoardingRow">
-  <div class="timetable-row-name">Boarding</div>
-  <div>
-    <div class="timetable-column-label">Scheduled</div>
-    <div class="timetable-value" id="ttScheduledBoarding">--</div>
-  </div>
-  <div>
-    <div class="timetable-column-label">Actual</div>
-    <div class="timetable-value actual-empty" id="ttActualBoarding">--</div>
-  </div>
-</div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Gate Departure</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledGateDeparture">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualGateDeparture">--</div>
-              </div>
-            </div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Taxi</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledDepartureTaxi">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualDepartureTaxi">--</div>
-              </div>
-            </div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Take Off</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledTakeoff">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualTakeoff">--</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="timetable-section">
-            <div class="timetable-section-label">Arrive</div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Land</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledLand">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualLand">--</div>
-              </div>
-            </div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Taxi</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledArrivalTaxi">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualArrivalTaxi">--</div>
-              </div>
-            </div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Gate Arrival</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledGateArrival">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualGateArrival">--</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="timetable-section">
-            <div class="timetable-section-label">Totals</div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Air Time</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledAirTime">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualAirTime">--</div>
-              </div>
-            </div>
-
-            <div class="timetable-row">
-              <div class="timetable-row-name">Total Time</div>
-              <div>
-                <div class="timetable-column-label">Scheduled</div>
-                <div class="timetable-value" id="ttScheduledTotalTime">--</div>
-              </div>
-              <div>
-                <div class="timetable-column-label">Actual</div>
-                <div class="timetable-value actual-empty" id="ttActualTotalTime">--</div>
-              </div>
-            </div>
-          </div>
-        </section>
+          <svg class="timetable-summary-chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
 
         <section class="detail-action-stack">
           <button class="detail-action-button" id="openEditFlightButton">
@@ -5691,6 +5914,23 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         </section>
       </main>
     </div>
+  </section>
+
+  <div class="timetable-sheet-overlay" id="timetableSheetOverlay"></div>
+  <section class="timetable-sheet" id="timetableSheet" aria-hidden="true">
+    <div class="timetable-sheet-grabber"></div>
+    <div class="timetable-sheet-header">
+      <div>
+        <div class="timetable-sheet-title">Detailed timetable</div>
+        <div class="timetable-sheet-subtitle">Scheduled and actual times</div>
+      </div>
+      <button class="timetable-sheet-close" id="closeTimetableButton" type="button" aria-label="Close timetable">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6.7 5.3 5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.42 12l5.3 5.3a1 1 0 0 1-1.42 1.4L12 13.42l-5.3 5.3a1 1 0 0 1-1.4-1.42l5.3-5.3-5.3-5.3a1 1 0 0 1 1.4-1.4Z" />
+        </svg>
+      </button>
+    </div>
+    <div class="timetable-sheet-body" id="timetableSheetBody"></div>
   </section>
 
   <section class="edit-flight-page" id="editFlightPage">
@@ -6495,25 +6735,11 @@ const saveScheduleButton = document.getElementById("saveScheduleButton");
     const cancelMarkButton = document.getElementById("cancelMarkButton");
     const confirmMarkButton = document.getElementById("confirmMarkButton");
 
-    const ttBoardingRow = document.getElementById("ttBoardingRow");
-const ttScheduledBoarding = document.getElementById("ttScheduledBoarding");
-const ttActualBoarding = document.getElementById("ttActualBoarding");
-    const ttScheduledGateDeparture = document.getElementById("ttScheduledGateDeparture");
-    const ttActualGateDeparture = document.getElementById("ttActualGateDeparture");
-    const ttScheduledDepartureTaxi = document.getElementById("ttScheduledDepartureTaxi");
-    const ttActualDepartureTaxi = document.getElementById("ttActualDepartureTaxi");
-    const ttScheduledTakeoff = document.getElementById("ttScheduledTakeoff");
-    const ttActualTakeoff = document.getElementById("ttActualTakeoff");
-    const ttScheduledLand = document.getElementById("ttScheduledLand");
-    const ttActualLand = document.getElementById("ttActualLand");
-    const ttScheduledArrivalTaxi = document.getElementById("ttScheduledArrivalTaxi");
-    const ttActualArrivalTaxi = document.getElementById("ttActualArrivalTaxi");
-    const ttScheduledGateArrival = document.getElementById("ttScheduledGateArrival");
-    const ttActualGateArrival = document.getElementById("ttActualGateArrival");
-    const ttScheduledAirTime = document.getElementById("ttScheduledAirTime");
-    const ttActualAirTime = document.getElementById("ttActualAirTime");
-    const ttScheduledTotalTime = document.getElementById("ttScheduledTotalTime");
-    const ttActualTotalTime = document.getElementById("ttActualTotalTime");
+    const openTimetableButton = document.getElementById("openTimetableButton");
+const timetableSheetOverlay = document.getElementById("timetableSheetOverlay");
+const timetableSheet = document.getElementById("timetableSheet");
+const closeTimetableButton = document.getElementById("closeTimetableButton");
+const timetableSheetBody = document.getElementById("timetableSheetBody");
 
     const airlineInput = document.getElementById("airline");
 const airlineNameInput = document.getElementById("airlineName");
@@ -6573,6 +6799,7 @@ let pendingSeatAssignment = null;
 let pendingPremiumCost = 0;
 let pendingTransactionReview = null;
 const randomSeatLocks = new Map();
+let activeTimetableFlight = null;
     let pendingAssignedBoardingGroup = "";
 let pendingDocumentFlightId = "";
     let currentPassport = null;
@@ -7639,17 +7866,6 @@ function startPreclearanceLockWatcher() {
   }, 15000);
 }
 
-    function setActualValue(element, value, isGood) {
-      if (!value) {
-        element.textContent = "--";
-        element.className = "timetable-value actual-empty";
-        return;
-      }
-
-      element.textContent = value;
-      element.className = `timetable-value ${isGood ? "actual-good" : "actual-bad"}`;
-    }
-
     function getScheduleTimes(flight) {
   const gateDeparture = getDepartureDateTime(flight);
   const gateArrival = getArrivalDateTime(flight);
@@ -7700,84 +7916,312 @@ function startPreclearanceLockWatcher() {
       };
     }
 
-    function updateTimetable(flight) {
+    function timelineIcon(name) {
+      const icons = {
+        sectionDepart: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.2 10l6.2 3.1v2.1l-5.6-1.45 1.3 5.05-1.8 1.2L12 15.5 9.7 20l-1.8-1.2 1.3-5.05-5.6 1.45v-2.1L9.8 10 12 3.5Z"/></svg>`,
+        sectionArrive: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4.4 16.7 14.7 3.1.4-1.9-5.3-2.1 2.6-4.8-2-.4-3.8 4-4.1-.9 1.2-3.4-1.7-.4-2.8 3.1-2.2-.5-.4 1.9 3.4 2.3Z"/></svg>`,
+        sectionTotals: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2Zm1 5a1 1 0 1 0-2 0v5c0 .33.16.64.43.83l3.4 2.38a1 1 0 0 0 1.14-1.64L13 11.5V7Z"/></svg>`,
+        boarding: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.5 19.5c0-3.05 2.2-5.5 5-5.5s5 2.45 5 5.5v.5h-10v-.5Zm10.2.5h6.8v-.45c0-2.66-1.9-4.8-4.35-4.8-1.05 0-2.02.4-2.78 1.08.52.98.83 2.15.83 3.42V20Z"/></svg>`,
+        gate: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 13.6 20 8.4l.8 2.2-6.25 3.15 2.45 5.45-2.15.7-4.1-4.65-4.95 1.55-2.3-3.2Zm4.2-5.85 3.75 2.05-2.3.72-3.55-1.15.65-1.62Z"/></svg>`,
+        taxi: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14.5h12.3l4.2-3.5h1.9l-2.7 5.3H5.2L3 14.5Zm4.2-4.1h5.9l2.1 2.05H5.9l1.3-2.05Zm1.2 8.3h8.8v1.8H8.4v-1.8Z"/></svg>`,
+        takeoff: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.2 17.3 17.6-9.6 1.1 2-6.1 5.15 3.75 4.35-1.9 1.2-5.65-3.05-5.35 2.9-3.45-2.95Zm3.2-8 4.35.95-2.25 1.22-3.2-.35 1.1-1.82Z"/></svg>`,
+        land: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.7 10.2 16.9 7.2-.85 2.1-7.1-1.35-1.75 5.45-2.15-.75.05-6.1-5.9-1.1.8-5.45Zm6.95-6.05 2.75 3.5-2.25.15-2.25-2.25 1.75-1.4Z"/></svg>`,
+        clock: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2Zm1 5a1 1 0 1 0-2 0v5c0 .33.16.64.43.83l3.4 2.38a1 1 0 0 0 1.14-1.64L13 11.5V7Z"/></svg>`,
+        check: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.55 16.2 5.8 12.45a1 1 0 1 1 1.4-1.42l2.35 2.35 7.25-7.25a1 1 0 0 1 1.42 1.42L9.55 16.2Z"/></svg>`,
+        activePlane: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.2 10l6.2 3.1v2.1l-5.6-1.45 1.3 5.05-1.8 1.2L12 15.5 9.7 20l-1.8-1.2 1.3-5.05-5.6 1.45v-2.1L9.8 10 12 3.5Z"/></svg>`
+      };
+
+      return icons[name] || icons.clock;
+    }
+
+    function getTimelineValueClass(value, isGood, state) {
+      if (state === "active") return "progress";
+      if (!value) return "empty";
+      return isGood ? "good" : "bad";
+    }
+
+    function getTimelineActual(value, isGood, state) {
+      if (state === "active") {
+        return { text: "In Progress", className: "progress" };
+      }
+
+      return {
+        text: value || "--",
+        className: getTimelineValueClass(value, isGood, state)
+      };
+    }
+
+    function makeTimelineRow({
+      key,
+      label,
+      description,
+      scheduled,
+      actualValue = "",
+      actualGood = true,
+      icon,
+      state = "blank",
+      lineState = "blank"
+    }) {
+      const actual = getTimelineActual(actualValue, actualGood, state);
+
+      return {
+        key,
+        label,
+        description,
+        scheduled,
+        actual,
+        icon,
+        state,
+        lineState
+      };
+    }
+
+    function getDetailedTimetableState(flight) {
       const schedule = getScheduleTimes(flight);
       const actuals = getActualTimes(flight);
-
+      const phase = getFlightPhase(flight);
       const hasBoarding = flight.enableBoarding === true;
-
-ttBoardingRow.classList.toggle("hidden", !hasBoarding);
-
-if (hasBoarding) {
-  ttScheduledBoarding.textContent = formatDurationFromMinutes(schedule.boardingDurationMinutes);
-
-  setActualValue(
-    ttActualBoarding,
-    flight.actualBoardingMinutes !== undefined ? formatDurationFromMinutes(flight.actualBoardingMinutes) : "",
-    Number(flight.actualBoardingMinutes || 0) <= schedule.boardingDurationMinutes
-  );
-}
       const scheduledDepartureTaxi = formatDurationFromMinutes(schedule.departureTaxiMinutes);
       const scheduledArrivalTaxi = formatDurationFromMinutes(schedule.arrivalTaxiMinutes);
       const scheduledAirTime = flight.airTime || formatDurationFromMinutes(diffMinutes(schedule.land, schedule.takeoff));
       const scheduledTotalTime = flight.flightTime || formatDurationFromMinutes(diffMinutes(schedule.gateArrival, schedule.gateDeparture));
 
-      ttScheduledGateDeparture.textContent = formatDateTime12Hour(schedule.gateDeparture);
-      ttScheduledDepartureTaxi.textContent = scheduledDepartureTaxi;
-      ttScheduledTakeoff.textContent = formatDateTime12Hour(schedule.takeoff);
-      ttScheduledLand.textContent = formatDateTime12Hour(schedule.land);
-      ttScheduledArrivalTaxi.textContent = scheduledArrivalTaxi;
-      ttScheduledGateArrival.textContent = formatDateTime12Hour(schedule.gateArrival);
-      ttScheduledAirTime.textContent = scheduledAirTime;
-      ttScheduledTotalTime.textContent = scheduledTotalTime;
+      const depRows = [];
 
-      setActualValue(
-        ttActualGateDeparture,
-        flight.actualGateDeparture ? formatTime12Hour(flight.actualGateDeparture) : "",
-        actuals.actualGateDeparture <= schedule.gateDeparture
-      );
+      if (hasBoarding) {
+        depRows.push(makeTimelineRow({
+          key: "boarding",
+          label: "Boarding",
+          description: "Passengers on board",
+          scheduled: formatDurationFromMinutes(schedule.boardingDurationMinutes),
+          actualValue: flight.actualBoardingMinutes !== undefined ? formatDurationFromMinutes(flight.actualBoardingMinutes) : "",
+          actualGood: Number(flight.actualBoardingMinutes || 0) <= schedule.boardingDurationMinutes,
+          icon: "boarding",
+          state: phase === "boarding" ? "active" : ["boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank",
+          lineState: phase === "boarding" ? "active" : ["boardingComplete", "gateDeparture", "taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank"
+        }));
+      }
 
-      setActualValue(
-        ttActualDepartureTaxi,
-        flight.actualDepartureTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualDepartureTaxiMinutes) : "",
-        Number(flight.actualDepartureTaxiMinutes || 0) <= schedule.departureTaxiMinutes
-      );
+      depRows.push(makeTimelineRow({
+        key: "gateDeparture",
+        label: "Gate Departure",
+        description: "Pushback from gate",
+        scheduled: formatDateTime12Hour(schedule.gateDeparture),
+        actualValue: flight.actualGateDeparture ? formatTime12Hour(flight.actualGateDeparture) : "",
+        actualGood: actuals.actualGateDeparture <= schedule.gateDeparture,
+        icon: "gate",
+        state: phase === "boardingComplete" ? "active" : ["gateDeparture", "taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank",
+        lineState: phase === "gateDeparture" ? "active" : ["taxi", "takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank"
+      }));
 
-      setActualValue(
-        ttActualTakeoff,
-        flight.actualTakeoff ? formatTime12Hour(flight.actualTakeoff) : "",
-        actuals.actualTakeoff <= schedule.takeoff
-      );
+      depRows.push(makeTimelineRow({
+        key: "departureTaxi",
+        label: "Taxi",
+        description: "Taxi to runway",
+        scheduled: scheduledDepartureTaxi,
+        actualValue: flight.actualDepartureTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualDepartureTaxiMinutes) : "",
+        actualGood: Number(flight.actualDepartureTaxiMinutes || 0) <= schedule.departureTaxiMinutes,
+        icon: "taxi",
+        state: phase === "taxi" ? "active" : ["takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank",
+        lineState: phase === "taxi" ? "active" : ["takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank"
+      }));
 
-      setActualValue(
-        ttActualLand,
-        flight.actualLand ? formatTime12Hour(flight.actualLand) : "",
-        actuals.actualLand <= schedule.land
-      );
+      depRows.push(makeTimelineRow({
+        key: "takeoff",
+        label: "Take Off",
+        description: "Departed runway",
+        scheduled: formatDateTime12Hour(schedule.takeoff),
+        actualValue: flight.actualTakeoff ? formatTime12Hour(flight.actualTakeoff) : "",
+        actualGood: actuals.actualTakeoff <= schedule.takeoff,
+        icon: "takeoff",
+        state: ["takeoff", "land", "gateArrival"].includes(phase) ? "complete" : "blank",
+        lineState: "blank"
+      }));
 
-      setActualValue(
-        ttActualArrivalTaxi,
-        flight.actualArrivalTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualArrivalTaxiMinutes) : "",
-        Number(flight.actualArrivalTaxiMinutes || 0) <= schedule.arrivalTaxiMinutes
-      );
+      const arriveRows = [
+        makeTimelineRow({
+          key: "land",
+          label: "Land",
+          description: `Touchdown at ${flight.arrivalAirport || "ARR"}`,
+          scheduled: formatDateTime12Hour(schedule.land),
+          actualValue: flight.actualLand ? formatTime12Hour(flight.actualLand) : "",
+          actualGood: actuals.actualLand <= schedule.land,
+          icon: "land",
+          state: ["land", "gateArrival"].includes(phase) ? "complete" : "blank",
+          lineState: ["land", "gateArrival"].includes(phase) ? "complete" : "blank"
+        }),
+        makeTimelineRow({
+          key: "arrivalTaxi",
+          label: "Taxi",
+          description: "Taxi to gate",
+          scheduled: scheduledArrivalTaxi,
+          actualValue: flight.actualArrivalTaxiMinutes !== undefined ? formatDurationFromMinutes(flight.actualArrivalTaxiMinutes) : "",
+          actualGood: Number(flight.actualArrivalTaxiMinutes || 0) <= schedule.arrivalTaxiMinutes,
+          icon: "taxi",
+          state: phase === "land" ? "active" : phase === "gateArrival" ? "complete" : "blank",
+          lineState: phase === "land" ? "active" : phase === "gateArrival" ? "complete" : "blank"
+        }),
+        makeTimelineRow({
+          key: "gateArrival",
+          label: "Gate Arrival",
+          description: "Arrive at gate",
+          scheduled: formatDateTime12Hour(schedule.gateArrival),
+          actualValue: flight.actualGateArrival ? formatTime12Hour(flight.actualGateArrival) : "",
+          actualGood: actuals.actualGateArrival <= schedule.gateArrival,
+          icon: "gate",
+          state: phase === "gateArrival" ? "complete" : "blank",
+          lineState: "blank"
+        })
+      ];
 
-      setActualValue(
-        ttActualGateArrival,
-        flight.actualGateArrival ? formatTime12Hour(flight.actualGateArrival) : "",
-        actuals.actualGateArrival <= schedule.gateArrival
-      );
+      const totalRows = [
+        {
+          key: "airTime",
+          label: "Air Time",
+          description: "",
+          scheduled: scheduledAirTime,
+          actual: getTimelineActual(
+            flight.actualAirTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualAirTimeMinutes) : "",
+            Number(flight.actualAirTimeMinutes || 0) <= parseDurationToMinutes(scheduledAirTime),
+            "blank"
+          ),
+          icon: "sectionDepart"
+        },
+        {
+          key: "totalTime",
+          label: "Total Time",
+          description: "",
+          scheduled: scheduledTotalTime,
+          actual: getTimelineActual(
+            flight.actualTotalTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualTotalTimeMinutes) : "",
+            Number(flight.actualTotalTimeMinutes || 0) <= parseDurationToMinutes(scheduledTotalTime),
+            "blank"
+          ),
+          icon: "clock"
+        }
+      ];
 
-      setActualValue(
-        ttActualAirTime,
-        flight.actualAirTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualAirTimeMinutes) : "",
-        Number(flight.actualAirTimeMinutes || 0) <= parseDurationToMinutes(scheduledAirTime)
-      );
+      return {
+        depart: depRows,
+        arrive: arriveRows,
+        totals: totalRows
+      };
+    }
 
-      setActualValue(
-        ttActualTotalTime,
-        flight.actualTotalTimeMinutes !== undefined ? formatDurationFromMinutes(flight.actualTotalTimeMinutes) : "",
-        Number(flight.actualTotalTimeMinutes || 0) <= parseDurationToMinutes(scheduledTotalTime)
-      );
+    function renderTimelineSection({ title, route, icon, rows, startIndex }) {
+      const rowMarkup = rows.map((row, index) => {
+        const dotIcon = row.state === "complete"
+          ? timelineIcon("check")
+          : row.state === "active"
+            ? timelineIcon("activePlane")
+            : "";
+        const lineClass = row.lineState === "complete"
+          ? "line-complete"
+          : row.lineState === "active"
+            ? "line-active"
+            : "";
+
+        return `
+          <div class="timeline-row ${row.state} ${lineClass}" style="--row-index:${startIndex + index}">
+            <div class="timeline-rail">
+              <div class="timeline-dot">${dotIcon}</div>
+              <div class="timeline-line"></div>
+            </div>
+            <div class="timeline-icon">${timelineIcon(row.icon)}</div>
+            <div>
+              <div class="timeline-main-title">${escapeHTML(row.label)}</div>
+              <div class="timeline-main-subtitle">${escapeHTML(row.description)}</div>
+            </div>
+            <div>
+              <div class="timeline-time-label">Scheduled</div>
+              <div class="timeline-time-value">${escapeHTML(row.scheduled || "--")}</div>
+            </div>
+            <div>
+              <div class="timeline-time-label">Actual</div>
+              <div class="timeline-time-value ${row.actual.className}">${escapeHTML(row.actual.text)}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <section class="timeline-section">
+          <div class="timeline-section-head">
+            <div class="timeline-section-title">${timelineIcon(icon)}<span>${escapeHTML(title)}</span></div>
+            <div class="timeline-section-route">${escapeHTML(route)}</div>
+          </div>
+          ${rowMarkup}
+        </section>
+      `;
+    }
+
+    function renderTotalsSection({ rows, route, startIndex }) {
+      const rowMarkup = rows.map((row, index) => `
+        <div class="timeline-total-row" style="--row-index:${startIndex + index}">
+          <div class="timeline-icon">${timelineIcon(row.icon)}</div>
+          <div>
+            <div class="timeline-main-title">${escapeHTML(row.label)}</div>
+          </div>
+          <div>
+            <div class="timeline-time-label">Scheduled</div>
+            <div class="timeline-time-value">${escapeHTML(row.scheduled || "--")}</div>
+          </div>
+          <div>
+            <div class="timeline-time-label">Actual</div>
+            <div class="timeline-time-value ${row.actual.className}">${escapeHTML(row.actual.text)}</div>
+          </div>
+        </div>
+      `).join("");
+
+      return `
+        <section class="timeline-section">
+          <div class="timeline-section-head">
+            <div class="timeline-section-title">${timelineIcon("sectionTotals")}<span>Totals</span></div>
+            <div class="timeline-section-route">${escapeHTML(route)}</div>
+          </div>
+          ${rowMarkup}
+        </section>
+      `;
+    }
+
+    function updateTimetable(flight) {
+      activeTimetableFlight = flight;
+      if (!timetableSheetBody) return;
+
+      const state = getDetailedTimetableState(flight);
+      const departRoute = `${flight.departureAirport || "DEP"} • Departure`;
+      const arriveRoute = `${flight.arrivalAirport || "ARR"} • Arrival`;
+      const totalRoute = `${flight.departureAirport || "DEP"} → ${flight.arrivalAirport || "ARR"}`;
+      const arriveStart = state.depart.length;
+      const totalStart = state.depart.length + state.arrive.length;
+
+      timetableSheetBody.innerHTML = `
+        ${renderTimelineSection({ title: "Depart", route: departRoute, icon: "sectionDepart", rows: state.depart, startIndex: 0 })}
+        ${renderTimelineSection({ title: "Arrive", route: arriveRoute, icon: "sectionArrive", rows: state.arrive, startIndex: arriveStart })}
+        ${renderTotalsSection({ rows: state.totals, route: totalRoute, startIndex: totalStart })}
+      `;
+    }
+
+    function openTimetableSheet() {
+      if (!activeTimetableFlight) return;
+
+      updateTimetable(activeTimetableFlight);
+      timetableSheetOverlay.classList.add("active");
+      timetableSheet.classList.add("active");
+      timetableSheet.classList.remove("animate");
+      timetableSheet.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      window.setTimeout(() => {
+        timetableSheet.classList.add("animate");
+      }, 430);
+    }
+
+    function closeTimetableSheet() {
+      timetableSheetOverlay.classList.remove("active");
+      timetableSheet.classList.remove("active", "animate");
+      timetableSheet.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = detailPage.classList.contains("active") ? "hidden" : "";
     }
 
     function setAirportRowText(element, text) {
@@ -10444,6 +10888,7 @@ document.body.style.overflow = "hidden";
     }
 
     function closeFlightDetails() {
+  closeTimetableSheet();
   detailPage.classList.remove("active");
   boardingPassPage.classList.remove("active");
   flightsPage.classList.remove("hidden");
@@ -10470,6 +10915,16 @@ detailBoardingPassCard.addEventListener("keydown", (event) => {
 
   if (!activeFlight || !isFlightCheckedIn(activeFlight)) return;
   openBoardingPassPage(activeFlight, "detail");
+});
+
+openTimetableButton.addEventListener("click", openTimetableSheet);
+closeTimetableButton.addEventListener("click", closeTimetableSheet);
+timetableSheetOverlay.addEventListener("click", closeTimetableSheet);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && timetableSheet.classList.contains("active")) {
+    closeTimetableSheet();
+  }
 });
     
     detailCloseButton.addEventListener("click", closeFlightDetails);
