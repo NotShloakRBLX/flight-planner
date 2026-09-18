@@ -498,6 +498,116 @@
   box-shadow: none;
   transform: none;
 }
+
+    .aircraft-select-button {
+      width: 100%;
+      height: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      outline: none;
+      padding: 0 13px 0 14px;
+      background: rgba(5, 10, 24, 0.58);
+      color: white;
+      font-size: 14px;
+      font-weight: 650;
+      letter-spacing: 0.1px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .aircraft-select-button:hover,
+    .aircraft-select-button.open {
+      background: rgba(8, 15, 34, 0.72);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .aircraft-select-button.open {
+      border-color: rgba(120, 155, 255, 0.95);
+      background: rgba(8, 15, 34, 0.86);
+      box-shadow:
+        0 0 0 1px rgba(0, 194, 255, 0.42),
+        0 0 0 5px rgba(91, 95, 255, 0.16),
+        0 16px 38px rgba(0, 0, 0, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .aircraft-select-value.placeholder {
+      color: rgba(255, 255, 255, 0.34);
+      font-weight: 600;
+    }
+
+    .aircraft-select-arrow {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: currentColor;
+      opacity: 0.72;
+      transition: transform 0.25s ease;
+    }
+
+    .aircraft-select-button.open .aircraft-select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .aircraft-dropdown {
+      position: fixed;
+      z-index: 90;
+      min-width: 220px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.055)),
+        rgba(8, 14, 31, 0.96);
+      box-shadow:
+        0 22px 62px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px) scale(0.98);
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .aircraft-dropdown.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .aircraft-option {
+      width: 100%;
+      min-height: 42px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.86);
+      padding: 0 12px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .aircraft-option:hover,
+    .aircraft-option.selected {
+      background: rgba(120, 155, 255, 0.14);
+      color: #fff;
+    }
+
+    .aircraft-option:active {
+      transform: scale(0.98);
+    }
     .toggle-field {
   min-height: 50px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -5472,6 +5582,8 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </section>
   </div>
 </section>
+
+<div class="aircraft-dropdown" id="aircraftDropdown" role="listbox" aria-label="Aircraft selector"></div>
   
   <section class="add-flight-page" id="addFlightPage">
     <div class="add-flight-container">
@@ -5573,6 +5685,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 <div class="form-field">
   <label for="arrivalTaxiTime">Arrival taxi time</label>
   <input id="arrivalTaxiTime" type="text" placeholder="9m" />
+</div>
+
+<div class="form-field">
+  <label for="aircraftSelectorButton">Aircraft selector</label>
+  <button class="aircraft-select-button" id="aircraftSelectorButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+    <span class="aircraft-select-value placeholder" id="aircraftSelectorValue">Select aircraft</span>
+    <svg class="aircraft-select-arrow" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6 1.4-1.4Z" />
+    </svg>
+  </button>
+  <input id="aircraftSelectorInput" type="hidden" required />
 </div>
 
 <div class="form-section-heading">Seats</div>
@@ -6866,6 +6989,10 @@ const boardingGateInput = document.getElementById("boardingGate");
 const boardingTerminalInput = document.getElementById("boardingTerminal");
 const departureTaxiTimeInput = document.getElementById("departureTaxiTime");
     const arrivalTaxiTimeInput = document.getElementById("arrivalTaxiTime");
+const aircraftSelectorButton = document.getElementById("aircraftSelectorButton");
+const aircraftSelectorValue = document.getElementById("aircraftSelectorValue");
+const aircraftSelectorInput = document.getElementById("aircraftSelectorInput");
+const aircraftDropdown = document.getElementById("aircraftDropdown");
     const airTimeInput = document.getElementById("airTime");
 
     let allFlights = new Map();
@@ -6895,8 +7022,10 @@ let preclearanceCheckTimer = null;
     let activeSeatSelectionSessionId = "";
 let activeSeatSelectionWindow = null;
     let activeSeatSelectionUnsubscribe = null;
+let selectedAircraftType = "";
 
 const checkInOpenWriteLocks = new Set();
+const AIRCRAFT_OPTIONS = ["A319", "A320", "A321", "A350-900", "A350-1000", "B777-300ER", "B737-800", "B787-9"];
     
     const SEAT_MAP_SITE_URL = "https://notshloakrblx.github.io/msfs-seat-map/";
 const MAIN_SITE_RETURN_URL = `${window.location.origin}${window.location.pathname}`;
@@ -6946,12 +7075,87 @@ intlUSDepartureToggle.addEventListener("change", () => {
   }
 });
 
+function renderAircraftOptions() {
+  aircraftDropdown.innerHTML = AIRCRAFT_OPTIONS.map((aircraft) => `
+    <button class="aircraft-option ${selectedAircraftType === aircraft ? "selected" : ""}" type="button" role="option" data-aircraft="${aircraft}">
+      ${aircraft}
+    </button>
+  `).join("");
+
+  aircraftDropdown.querySelectorAll("[data-aircraft]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setAircraftSelection(button.dataset.aircraft);
+      closeAircraftDropdown();
+    });
+  });
+}
+
+function positionAircraftDropdown() {
+  if (!aircraftDropdown.classList.contains("open")) return;
+
+  const rect = aircraftSelectorButton.getBoundingClientRect();
+  aircraftDropdown.style.left = `${rect.left}px`;
+  aircraftDropdown.style.top = `${rect.bottom + 8}px`;
+  aircraftDropdown.style.width = `${rect.width}px`;
+}
+
+function openAircraftDropdown() {
+  renderAircraftOptions();
+  aircraftSelectorButton.classList.add("open");
+  aircraftSelectorButton.setAttribute("aria-expanded", "true");
+  aircraftDropdown.classList.add("open");
+  positionAircraftDropdown();
+}
+
+function closeAircraftDropdown() {
+  aircraftSelectorButton.classList.remove("open");
+  aircraftSelectorButton.setAttribute("aria-expanded", "false");
+  aircraftDropdown.classList.remove("open");
+}
+
+function setAircraftSelection(aircraft) {
+  selectedAircraftType = aircraft || "";
+  aircraftSelectorInput.value = selectedAircraftType;
+  aircraftSelectorValue.textContent = selectedAircraftType || "Select aircraft";
+  aircraftSelectorValue.classList.toggle("placeholder", !selectedAircraftType);
+}
+
+function resetAircraftSelection() {
+  setAircraftSelection("");
+  closeAircraftDropdown();
+}
+
+aircraftSelectorButton.addEventListener("click", (event) => {
+  event.stopPropagation();
+
+  if (aircraftDropdown.classList.contains("open")) {
+    closeAircraftDropdown();
+    return;
+  }
+
+  openAircraftDropdown();
+});
+
+document.addEventListener("click", (event) => {
+  if (
+    aircraftDropdown.classList.contains("open") &&
+    !aircraftDropdown.contains(event.target) &&
+    !aircraftSelectorButton.contains(event.target)
+  ) {
+    closeAircraftDropdown();
+  }
+});
+
+window.addEventListener("resize", positionAircraftDropdown);
+addFlightPage.addEventListener("scroll", positionAircraftDropdown);
+
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
       addFlightPage.classList.add("active");
     });
 
     backButton.addEventListener("click", () => {
+      closeAircraftDropdown();
       addFlightPage.classList.remove("active");
       flightsPage.classList.remove("hidden");
     });
@@ -9205,6 +9409,7 @@ function showPaymentConfirmation(review) {
 
 function resetAddFlightAfterPayment() {
   flightForm.reset();
+  resetAircraftSelection();
 
   intlUSArrivalToggle.checked = false;
   intlUSDepartureToggle.checked = false;
@@ -9791,6 +9996,7 @@ documentsStatus: "active"
     }
 
     flightForm.reset();
+    resetAircraftSelection();
 
     intlUSArrivalToggle.checked = false;
 intlUSDepartureToggle.checked = false;
@@ -11032,10 +11238,17 @@ document.addEventListener("keydown", (event) => {
     }
 
     addFlightButton.addEventListener("click", () => {
+  if (!selectedAircraftType) {
+    showNotification("Select an aircraft!");
+    openAircraftDropdown();
+    return;
+  }
+
   const flight = {
     airline: airlineInput.value.trim().toUpperCase() || "AA",
 airlineName: airlineNameInput.value.trim() || airlineInput.value.trim().toUpperCase() || "Airline",
 flightNumber: flightNumberInput.value.trim() || "0000",
+    aircraftType: selectedAircraftType,
     departureAirport: departureAirportInput.value.trim().toUpperCase() || "DEP",
     arrivalAirport: arrivalAirportInput.value.trim().toUpperCase() || "ARR",
     departureAirportName: departureAirportNameInput.value.trim() || "",
