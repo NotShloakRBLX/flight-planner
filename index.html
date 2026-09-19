@@ -4317,6 +4317,186 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 16px 34px rgba(255, 79, 94, 0.2);
     }
 
+    .management-mini-toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(38px + env(safe-area-inset-bottom));
+      z-index: 140;
+      width: min(calc(100% - 52px), 390px);
+      min-height: 64px;
+      border: 1px solid rgba(111, 255, 183, 0.34);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(36, 204, 125, 0.28), rgba(17, 104, 71, 0.88)),
+        rgba(13, 72, 52, 0.94);
+      color: #e8fff3;
+      display: grid;
+      grid-template-columns: 31px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      box-shadow: 0 26px 70px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06) inset;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 130px) scale(0.96);
+      transition: opacity 0.26s ease, transform 0.42s cubic-bezier(.2,.9,.18,1);
+    }
+
+    .management-mini-toast.active {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .management-mini-toast.leaving {
+      opacity: 0;
+      transform: translate(-50%, 120px) scale(0.98);
+      transition: opacity 0.22s ease, transform 0.34s cubic-bezier(.45,0,.8,.2);
+    }
+
+    .management-mini-toast-icon {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      color: #d8ffe9;
+    }
+
+    .management-mini-toast-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-mini-toast-text {
+      color: #eafff3;
+      font-size: 16px;
+      line-height: 1.15;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .management-modal-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 135;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background: rgba(0,0,0,0.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .management-modal-layer.active {
+      display: grid;
+      animation: fadeIn 0.2s ease both;
+    }
+
+    .management-modal-layer.closing {
+      display: grid;
+      pointer-events: none;
+      animation: fadeOut 0.22s ease both;
+    }
+
+    .management-modal-card {
+      width: min(100%, 420px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 30px;
+      background:
+        linear-gradient(145deg, rgba(38, 64, 96, 0.46), rgba(14, 23, 38, 0.94)),
+        rgba(14, 23, 38, 0.98);
+      padding: 28px 22px 22px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.1);
+      animation: modalIn 0.28s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .management-modal-layer.closing .management-modal-card {
+      animation: modalOut 0.22s ease both;
+    }
+
+    .management-modal-title {
+      margin: 0;
+      color: white;
+      text-align: center;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .management-modal-text {
+      margin: 10px 0 20px;
+      color: rgba(255,255,255,0.56);
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.35;
+      font-weight: 780;
+    }
+
+    .management-mark-form {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    .management-field-label {
+      color: rgba(255,255,255,0.52);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 7px;
+    }
+
+    .management-mark-input {
+      width: 100%;
+      height: 56px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      background: rgba(5, 10, 18, 0.46);
+      color: #fff;
+      padding: 0 16px;
+      font: inherit;
+      font-size: 18px;
+      font-weight: 900;
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+
+    .management-mark-input:focus {
+      border-color: rgba(37, 223, 131, 0.66);
+      box-shadow: 0 0 0 4px rgba(37, 223, 131, 0.1), inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+
+    .management-modal-actions {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 10px;
+    }
+
+    .management-modal-button {
+      width: 100%;
+      min-height: 54px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #2ce98c, #12bd68);
+      color: #06130c;
+      font-size: 17px;
+      font-weight: 950;
+    }
+
+    .management-modal-button.secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
     .timetable-sheet-overlay {
       position: fixed;
       inset: 0;
@@ -7620,6 +7800,32 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </main>
   </section>
 
+  <div class="management-mini-toast" id="managementMiniToast" aria-live="polite" aria-atomic="true">
+    <div class="management-mini-toast-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
+    </div>
+    <div class="management-mini-toast-text" id="managementMiniToastText">Updated</div>
+  </div>
+
+  <div class="management-modal-layer" id="managementScheduleModal" role="dialog" aria-modal="true" aria-labelledby="managementScheduleModalTitle">
+    <section class="management-modal-card">
+      <h2 class="management-modal-title" id="managementScheduleModalTitle">Change time</h2>
+      <p class="management-modal-text" id="managementScheduleModalText">Update the current schedule time.</p>
+
+      <div class="management-mark-form">
+        <label>
+          <div class="management-field-label">Updated time</div>
+          <input class="management-mark-input" id="managementScheduleTimeInput" type="time" />
+        </label>
+      </div>
+
+      <div class="management-modal-actions">
+        <button class="management-modal-button secondary" id="cancelManagementScheduleButton" type="button">Cancel</button>
+        <button class="management-modal-button" id="confirmManagementScheduleButton" type="button">Update time</button>
+      </div>
+    </section>
+  </div>
+
   <div class="timetable-sheet-overlay" id="timetableSheetOverlay"></div>
   <section class="timetable-sheet" id="timetableSheet" aria-hidden="true">
     <div class="timetable-sheet-grabber"></div>
@@ -8483,7 +8689,17 @@ const managementChecklistSubtitle = document.getElementById("managementChecklist
 const managementChecklistStatus = document.getElementById("managementChecklistStatus");
 const managementChecklistSurface = document.getElementById("managementChecklistSurface");
 const managementChecklistNav = document.getElementById("managementChecklistNav");
+const managementMiniToast = document.getElementById("managementMiniToast");
+const managementMiniToastText = document.getElementById("managementMiniToastText");
+const managementScheduleModal = document.getElementById("managementScheduleModal");
+const managementScheduleModalTitle = document.getElementById("managementScheduleModalTitle");
+const managementScheduleModalText = document.getElementById("managementScheduleModalText");
+const managementScheduleTimeInput = document.getElementById("managementScheduleTimeInput");
+const cancelManagementScheduleButton = document.getElementById("cancelManagementScheduleButton");
+const confirmManagementScheduleButton = document.getElementById("confirmManagementScheduleButton");
 let returnToManagementAfterMark = false;
+let pendingManagementScheduleKey = "";
+let managementMiniToastTimer = null;
 
     const airlineInput = document.getElementById("airline");
 const airlineNameInput = document.getElementById("airlineName");
@@ -13276,7 +13492,7 @@ document.body.style.overflow = "hidden";
       await saveManagementChecklist(nextState);
       renderManagementChecklistSummary();
       renderManagementPage();
-      showNotification(lastSection ? "Checklist complete!" : "Checklist section complete!");
+      showManagementMiniToast(lastSection ? "Checklist has been completed!" : "Checklist section complete!");
     }
 
     async function beginManagementAction() {
@@ -13289,7 +13505,7 @@ document.body.style.overflow = "hidden";
 
       if (phase.key === "boarding" && !stateInfo.inProgress) {
         if (requiresCheckInBeforePhase(activeFlight)) {
-          showNotification("Check in required!");
+          showManagementMiniToast("Check in required!");
           return;
         }
 
@@ -13305,7 +13521,7 @@ document.body.style.overflow = "hidden";
           await createBoardingSessionForFlight({ ...activeFlight, ...updates });
           activeFlight = { ...activeFlight, ...updates };
           renderManagementPage();
-          showNotification("Boarding started!");
+          showManagementMiniToast("Boarding started!");
         } catch (error) {
           console.error("Error starting boarding:", error);
           alert("Boarding could not be started.");
@@ -13335,7 +13551,7 @@ document.body.style.overflow = "hidden";
           );
           activeFlight = { ...activeFlight, phase: "boardingComplete", actualBoardingMinutes };
           renderManagementPage();
-          showNotification("Boarding completed!");
+          showManagementMiniToast("Boarding has been completed!");
         } catch (error) {
           console.error("Error completing boarding:", error);
           alert("Boarding could not be completed.");
@@ -13345,7 +13561,7 @@ document.body.style.overflow = "hidden";
 
       if (phase.key === "gateDeparture") {
         if (!hasCompletedPreDepartureDocuments(activeFlight)) {
-          showNotification("Documents required!");
+          showManagementMiniToast("Documents required!");
           return;
         }
 
@@ -13368,7 +13584,7 @@ document.body.style.overflow = "hidden";
           await updateDoc(getFlightRef(activeFlight.id), updates);
           activeFlight = { ...activeFlight, ...updates };
           renderManagementPage();
-          showNotification("Taxi started!");
+          showManagementMiniToast("Taxi started!");
         } catch (error) {
           console.error("Error starting taxi:", error);
           alert("Taxi phase could not be started.");
@@ -13411,7 +13627,41 @@ document.body.style.overflow = "hidden";
       managementAircraftControl.setAttribute("aria-expanded", String(isOpen));
     }
 
-    async function changeManagementScheduleTime(kind) {
+    function showManagementMiniToast(message) {
+      window.clearTimeout(managementMiniToastTimer);
+      managementMiniToastText.textContent = message;
+      managementMiniToast.classList.remove("leaving");
+      managementMiniToast.classList.add("active");
+
+      managementMiniToastTimer = window.setTimeout(() => {
+        managementMiniToast.classList.add("leaving");
+        managementMiniToast.classList.remove("active");
+
+        window.setTimeout(() => {
+          managementMiniToast.classList.remove("leaving");
+        }, 360);
+      }, 2400);
+    }
+
+    function openManagementModal(modal) {
+      modal.classList.remove("closing");
+      modal.classList.add("active");
+    }
+
+    function closeManagementModal(modal, afterClose) {
+      if (!modal.classList.contains("active")) {
+        if (afterClose) afterClose();
+        return;
+      }
+
+      modal.classList.add("closing");
+      window.setTimeout(() => {
+        modal.classList.remove("active", "closing");
+        if (afterClose) afterClose();
+      }, 220);
+    }
+
+    function openManagementScheduleModal(kind) {
       if (!activeFlight) return;
 
       const locked = kind === "departure"
@@ -13421,7 +13671,31 @@ document.body.style.overflow = "hidden";
       if (locked) return;
 
       const currentValue = kind === "departure" ? activeFlight.scheduledDeparture : activeFlight.scheduledArrival;
-      const nextValue = prompt(`Enter ${kind} time as HH:MM`, currentValue || "");
+      pendingManagementScheduleKey = kind;
+      managementScheduleModalTitle.textContent = kind === "departure" ? "Change departure time" : "Change arrival time";
+      managementScheduleModalText.textContent = kind === "departure"
+        ? "Update the expected gate departure time."
+        : "Update the expected gate arrival time.";
+      managementScheduleTimeInput.value = currentValue || "";
+      openManagementModal(managementScheduleModal);
+
+      window.setTimeout(() => {
+        managementScheduleTimeInput.focus();
+        managementScheduleTimeInput.select();
+      }, 120);
+    }
+
+    function closeManagementScheduleModal() {
+      closeManagementModal(managementScheduleModal, () => {
+        pendingManagementScheduleKey = "";
+      });
+    }
+
+    async function confirmManagementScheduleUpdate() {
+      const kind = pendingManagementScheduleKey;
+      if (!activeFlight || !kind) return;
+
+      const nextValue = managementScheduleTimeInput.value;
 
       if (!nextValue || !/^\d{2}:\d{2}$/.test(nextValue)) return;
 
@@ -13438,13 +13712,19 @@ document.body.style.overflow = "hidden";
       }
 
       try {
+        confirmManagementScheduleButton.disabled = true;
+        confirmManagementScheduleButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
         await updateDoc(getFlightRef(activeFlight.id), updates);
         activeFlight = { ...activeFlight, ...updates };
+        closeManagementScheduleModal();
         renderManagementPage();
-        showNotification("Status updated!");
+        showManagementMiniToast("Status has been updated!");
       } catch (error) {
         console.error("Error updating management schedule:", error);
         alert("Status could not be updated.");
+      } finally {
+        confirmManagementScheduleButton.disabled = false;
+        confirmManagementScheduleButton.textContent = "Update time";
       }
     }
 
@@ -13463,6 +13743,9 @@ document.body.style.overflow = "hidden";
     function closeFlightManagementPage() {
       managementEmbedPage.classList.remove("active");
       managementEmbedPage.setAttribute("aria-hidden", "true");
+      managementMiniToast.classList.remove("active", "leaving");
+      window.clearTimeout(managementMiniToastTimer);
+      closeManagementScheduleModal();
 
       if (activeFlight) {
         detailPage.classList.add("active");
@@ -13511,10 +13794,17 @@ timetableSheetOverlay.addEventListener("click", closeTimetableSheet);
 openFlightManagementButton.addEventListener("click", openFlightManagementPage);
 managementEmbedBackButton.addEventListener("click", closeFlightManagementPage);
 managementPhaseActionButton.addEventListener("click", beginManagementAction);
-managementEditDepartureButton.addEventListener("click", () => changeManagementScheduleTime("departure"));
-managementEditArrivalButton.addEventListener("click", () => changeManagementScheduleTime("arrival"));
+managementEditDepartureButton.addEventListener("click", () => openManagementScheduleModal("departure"));
+managementEditArrivalButton.addEventListener("click", () => openManagementScheduleModal("arrival"));
 managementChecklistSurface.addEventListener("click", handleManagementChecklistClick);
 managementChecklistNav.addEventListener("click", handleManagementChecklistClick);
+cancelManagementScheduleButton.addEventListener("click", closeManagementScheduleModal);
+confirmManagementScheduleButton.addEventListener("click", confirmManagementScheduleUpdate);
+managementScheduleModal.addEventListener("click", (event) => {
+  if (event.target === managementScheduleModal) {
+    closeManagementScheduleModal();
+  }
+});
 managementAircraftControl.addEventListener("click", (event) => {
   event.stopPropagation();
   setManagementAircraftMenuOpen(!managementAircraftPanel.classList.contains("open"));
@@ -13544,7 +13834,7 @@ managementAircraftMenu.addEventListener("click", async (event) => {
     updateAircraftInfoCard(activeFlight);
     renderManagementPage();
     setManagementAircraftMenuOpen(false);
-    showNotification("Aircraft updated!");
+    showManagementMiniToast("Aircraft has been updated!");
   } catch (error) {
     console.error("Error updating aircraft:", error);
     alert("Aircraft could not be updated.");
@@ -13557,6 +13847,11 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && managementScheduleModal.classList.contains("active")) {
+    closeManagementScheduleModal();
+    return;
+  }
+
   if (event.key === "Escape" && managementEmbedPage.classList.contains("active")) {
     closeFlightManagementPage();
     return;
