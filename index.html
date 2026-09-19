@@ -3328,82 +3328,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       }
     }
 
-    .detail-action-stack {
-      margin-top: 18px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .detail-action-button {
-      width: 100%;
-      height: 50px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
-        rgba(255, 255, 255, 0.04);
-      color: white;
-      font-size: 15px;
-      font-weight: 720;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: transform 0.25s ease, filter 0.25s ease, border-color 0.25s ease;
-    }
-
-    .detail-action-button:hover {
-      transform: translateY(-1px);
-      border-color: rgba(255, 255, 255, 0.24);
-    }
-
-    .detail-action-button:active {
-      transform: scale(0.98);
-    }
-
-    .detail-action-button svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
-
-    .complete-flight-button {
-  border: 1px solid rgba(64, 156, 255, 0.55);
-  background:
-    linear-gradient(135deg, rgba(64, 156, 255, 0.95), rgba(55, 92, 255, 0.95)),
-    rgba(64, 156, 255, 0.12);
-  box-shadow:
-    0 18px 42px rgba(64, 156, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-.complete-flight-button.disabled {
-  border-color: rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
-    rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.35);
-  box-shadow: none;
-  cursor: not-allowed;
-  opacity: 0.68;
-}
-
-.complete-flight-button.disabled:hover {
-  transform: none;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-    
-    .delete-button {
-      border: 1px solid rgba(255, 75, 75, 0.5);
-      background:
-        linear-gradient(135deg, rgba(255, 75, 75, 0.94), rgba(155, 18, 18, 0.95)),
-        rgba(255, 75, 75, 0.12);
-      box-shadow:
-        0 18px 42px rgba(255, 75, 75, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-
     .phase-title {
       font-size: 24px;
       font-weight: 850;
@@ -6180,27 +6104,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           </div>
         </section>
 
-        <section class="detail-action-stack">
-          <button class="detail-action-button" id="openEditFlightButton">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M16.86 3.49a1.75 1.75 0 0 1 2.48 0l1.17 1.17a1.75 1.75 0 0 1 0 2.48L9.62 18.03a2.25 2.25 0 0 1-.93.56l-4.05 1.16a.9.9 0 0 1-1.11-1.11l1.16-4.05c.1-.35.29-.67.56-.93L16.86 3.49Zm1.41 1.41L6.66 16.51l-.55 1.93 1.93-.55L19.65 6.28 18.27 4.9Z" />
-            </svg>
-            Edit
-          </button>
-
-          <button class="detail-action-button complete-flight-button disabled" id="completeFlightButton" disabled>
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M9.55 17.55a1.25 1.25 0 0 1-1.77 0l-4.1-4.1a1.25 1.25 0 0 1 1.77-1.77l3.21 3.22 9.89-9.9a1.25 1.25 0 0 1 1.77 1.77L9.55 17.55Z" />
-  </svg>
-  Complete Flight
-</button>
-          <button class="detail-action-button delete-button" id="deleteFlightButton">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 3.25A2.25 2.25 0 0 1 11.25 1h1.5A2.25 2.25 0 0 1 15 3.25V4h4.25a1 1 0 1 1 0 2H18.6l-.86 13.02A3.25 3.25 0 0 1 14.5 22h-5a3.25 3.25 0 0 1-3.24-2.98L5.4 6h-.65a1 1 0 0 1 0-2H9v-.75ZM11 4h2v-.75a.25.25 0 0 0-.25-.25h-1.5a.25.25 0 0 0-.25.25V4Zm-3.6 2 .85 12.89A1.25 1.25 0 0 0 9.5 20h5a1.25 1.25 0 0 0 1.25-1.11L16.6 6H7.4Zm3.1 3.25a1 1 0 0 1 1 1v5.5a1 1 0 1 1-2 0v-5.5a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v5.5a1 1 0 1 1-2 0v-5.5a1 1 0 0 1 1-1Z" />
-            </svg>
-            Delete flight
-          </button>
-        </section>
       </main>
     </div>
   </section>
@@ -11825,7 +11728,7 @@ editBoardingTime.disabled = !canEditBoarding;
       }
     }
 
-    openEditFlightButton.addEventListener("click", openEditFlightPage);
+    openEditFlightButton?.addEventListener("click", openEditFlightPage);
     editBackButton.addEventListener("click", closeEditFlightPage);
 
     saveScheduleButton.addEventListener("click", async () => {
@@ -12425,7 +12328,7 @@ if (
       }
     });
 
-    completeFlightButton.addEventListener("click", async () => {
+    completeFlightButton?.addEventListener("click", async () => {
   if (!activeFlight || getFlightPhase(activeFlight) !== "gateArrival") {
     return;
   }
@@ -12996,7 +12899,7 @@ transactionDeleteButton.addEventListener("click", async () => {
     
     processReturnedSeatSelection();
     
-    deleteFlightButton.addEventListener("click", async () => {
+    deleteFlightButton?.addEventListener("click", async () => {
       if (!activeFlight) return;
 
       const shouldDelete = confirm("Delete this flight completely?");
