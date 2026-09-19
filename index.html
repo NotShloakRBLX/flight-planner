@@ -13572,11 +13572,13 @@ document.body.style.overflow = "hidden";
       const section = sections[checklistState.index] || sections[0];
       const checks = { ...checklistState.checks };
       const currentChecks = new Set(checks[section.key] || []);
+      const requiredCount = Number(section.requiredCount || section.items.length);
+      const isSectionLocked = checklistState.lockedSections.includes(section.key);
 
       if (itemButton) {
         const itemIndex = Number(itemButton.dataset.checklistIndex);
 
-        if (checklistState.lockedSections.includes(section.key) || checklistState.complete) return;
+        if (isSectionLocked || checklistState.complete) return;
 
         if (currentChecks.has(itemIndex)) {
           currentChecks.delete(itemIndex);
@@ -13584,10 +13586,23 @@ document.body.style.overflow = "hidden";
           currentChecks.add(itemIndex);
         }
 
+        const itemChecked = currentChecks.has(itemIndex);
+        itemButton.classList.toggle("done", itemChecked);
+        const circle = itemButton.querySelector(".check-circle");
+        if (circle) {
+          circle.innerHTML = itemChecked ? managementIcon("check") : "";
+        }
+
         checks[section.key] = Array.from(currentChecks);
+        const requiredComplete = section.items.slice(0, requiredCount).every((_, index) => currentChecks.has(index));
+        const nextButton = managementChecklistNav.querySelector('[data-checklist-nav="next"]');
+        if (nextButton) {
+          nextButton.disabled = !requiredComplete;
+          nextButton.classList.toggle("ready", requiredComplete);
+        }
+
         const nextState = { ...checklistState, checks };
         await saveManagementChecklist(nextState);
-        renderManagementChecklistSummary();
         return;
       }
 
@@ -13601,10 +13616,20 @@ document.body.style.overflow = "hidden";
         return;
       }
 
-      const requiredCount = Number(section.requiredCount || section.items.length);
       const requiredComplete = section.items.slice(0, requiredCount).every((_, index) => currentChecks.has(index));
 
       if (!requiredComplete) return;
+
+      if (isSectionLocked) {
+        const nextState = {
+          ...checklistState,
+          checks,
+          index: Math.min(sections.length - 1, checklistState.index + 1)
+        };
+        await saveManagementChecklist(nextState);
+        renderManagementChecklistSummary("next");
+        return;
+      }
 
       const lockedSections = Array.from(new Set([...checklistState.lockedSections, section.key]));
       const lastSection = checklistState.index >= sections.length - 1;
