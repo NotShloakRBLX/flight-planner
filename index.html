@@ -12696,6 +12696,33 @@ function renderHomeFlights() {
     }
   });
 }
+
+function patchFlightCache(flightId, updates) {
+  if (!flightId || !updates) return null;
+
+  const cachedFlight = allFlights.get(flightId) || (activeFlight?.id === flightId ? activeFlight : null);
+  if (!cachedFlight) return null;
+
+  const updatedFlight = {
+    ...cachedFlight,
+    ...updates
+  };
+
+  allFlights.set(flightId, updatedFlight);
+  latestFlightsCache = latestFlightsCache.map((flight) => (
+    flight.id === flightId ? { ...flight, ...updates } : flight
+  ));
+
+  if (activeFlight?.id === flightId) {
+    activeFlight = {
+      ...activeFlight,
+      ...updates
+    };
+  }
+
+  renderHomeFlights();
+  return updatedFlight;
+}
     
     function createFlightCard(flight) {
       const card = document.createElement("button");
@@ -13671,7 +13698,7 @@ document.body.style.overflow = "hidden";
         try {
           await updateDoc(getFlightRef(activeFlight.id), updates);
           await createBoardingSessionForFlight({ ...activeFlight, ...updates });
-          activeFlight = { ...activeFlight, ...updates };
+          patchFlightCache(activeFlight.id, updates);
           renderManagementPage();
           showManagementMiniToast("Boarding started!");
         } catch (error) {
@@ -13687,21 +13714,33 @@ document.body.style.overflow = "hidden";
           : parseDurationToMinutes(activeFlight.boardingDuration);
 
         try {
-          await updateDoc(getFlightRef(activeFlight.id), {
+          const persistedUpdates = {
             phase: "boardingComplete",
-            actualBoardingMinutes
-          });
+            actualBoardingMinutes,
+            boardingVerified: true,
+            boardingVerifiedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          };
+          const localUpdates = {
+            phase: "boardingComplete",
+            actualBoardingMinutes,
+            boardingVerified: true,
+            boardingVerifiedAt: Date.now()
+          };
+
+          await updateDoc(getFlightRef(activeFlight.id), persistedUpdates);
           await setDoc(
             doc(db, "boardingSessions", activeFlight.boardingSessionId || activeFlight.id),
             {
-              active: true,
+              active: false,
+              verified: true,
               boardingComplete: true,
               endedAt: serverTimestamp(),
               updatedAt: serverTimestamp()
             },
             { merge: true }
           );
-          activeFlight = { ...activeFlight, phase: "boardingComplete", actualBoardingMinutes };
+          patchFlightCache(activeFlight.id, localUpdates);
           renderManagementPage();
           showManagementMiniToast("Boarding has been completed!");
         } catch (error) {
