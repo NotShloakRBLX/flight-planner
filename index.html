@@ -4209,6 +4209,40 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       transform: scaleX(1);
     }
 
+    .management-embed-page .checklist-surface.slide-next .checklist-section-title,
+    .management-embed-page .checklist-surface.slide-next .checklist-items {
+      animation: checklistSlideNext 0.34s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .management-embed-page .checklist-surface.slide-back .checklist-section-title,
+    .management-embed-page .checklist-surface.slide-back .checklist-items {
+      animation: checklistSlideBack 0.34s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    @keyframes checklistSlideNext {
+      from {
+        opacity: 0;
+        transform: translateX(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes checklistSlideBack {
+      from {
+        opacity: 0;
+        transform: translateX(-24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
     .management-embed-page .checklist-nav {
       display: flex;
       justify-content: flex-end;
@@ -4420,6 +4454,40 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       animation: modalOut 0.22s ease both;
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes modalOut {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(14px) scale(0.96);
+      }
+    }
+
     .management-modal-title {
       margin: 0;
       color: white;
@@ -4495,6 +4563,39 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       background: rgba(255,255,255,0.1);
       color: #fff;
       border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .management-modal-card.delete-card .management-modal-icon {
+      background: rgba(255, 79, 94, 0.16);
+      color: #ff8d98;
+      border: 1px solid rgba(255, 79, 94, 0.34);
+    }
+
+    .management-modal-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #07100b;
+      display: grid;
+      place-items: center;
+    }
+
+    .management-modal-icon svg {
+      width: 34px;
+      height: 34px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-modal-button.delete-confirm {
+      background: linear-gradient(180deg, #ff6471, #d8293d);
+      color: #fff;
+      box-shadow: 0 18px 42px rgba(255,79,94,0.17);
     }
 
     .timetable-sheet-overlay {
@@ -7826,6 +7927,21 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </section>
   </div>
 
+  <div class="management-modal-layer" id="managementDeleteModal" role="dialog" aria-modal="true" aria-labelledby="managementDeleteModalTitle">
+    <section class="management-modal-card delete-card">
+      <div class="management-modal-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12M10 11v6m4-6v6M9 7V4h6v3m-8 0 1 13h8l1-13"></path></svg>
+      </div>
+      <h2 class="management-modal-title" id="managementDeleteModalTitle">Delete flight?</h2>
+      <p class="management-modal-text" id="managementDeleteModalText">This removes the flight from Flight Management, the main site, documents, Aviator Reserve, and connected records.</p>
+
+      <div class="management-modal-actions">
+        <button class="management-modal-button secondary" id="cancelManagementDeleteButton" type="button">Cancel</button>
+        <button class="management-modal-button delete-confirm" id="confirmManagementDeleteButton" type="button">Delete flight</button>
+      </div>
+    </section>
+  </div>
+
   <div class="timetable-sheet-overlay" id="timetableSheetOverlay"></div>
   <section class="timetable-sheet" id="timetableSheet" aria-hidden="true">
     <div class="timetable-sheet-grabber"></div>
@@ -8697,9 +8813,14 @@ const managementScheduleModalText = document.getElementById("managementScheduleM
 const managementScheduleTimeInput = document.getElementById("managementScheduleTimeInput");
 const cancelManagementScheduleButton = document.getElementById("cancelManagementScheduleButton");
 const confirmManagementScheduleButton = document.getElementById("confirmManagementScheduleButton");
+const managementDeleteModal = document.getElementById("managementDeleteModal");
+const managementDeleteModalText = document.getElementById("managementDeleteModalText");
+const cancelManagementDeleteButton = document.getElementById("cancelManagementDeleteButton");
+const confirmManagementDeleteButton = document.getElementById("confirmManagementDeleteButton");
 let returnToManagementAfterMark = false;
 let pendingManagementScheduleKey = "";
 let managementMiniToastTimer = null;
+let isManagementDeletingFlight = false;
 
     const airlineInput = document.getElementById("airline");
 const airlineNameInput = document.getElementById("airlineName");
@@ -13369,7 +13490,7 @@ document.body.style.overflow = "hidden";
       };
     }
 
-    function renderManagementChecklistSummary() {
+    function renderManagementChecklistSummary(direction = "") {
       const { available, unlock } = isManagementChecklistAvailable();
       const sections = getManagementChecklistSections(activeFlight);
       const checklistState = getManagementChecklistState(activeFlight);
@@ -13384,7 +13505,7 @@ document.body.style.overflow = "hidden";
       managementChecklistSubtitle.textContent = available
         ? `${getAircraftDisplayName(activeFlight.aircraftType) || activeFlight.aircraftType || "Aircraft"} checklist`
         : `Available at ${unlock.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
-      managementChecklistSurface.classList.remove("completed", "unavailable");
+      managementChecklistSurface.classList.remove("completed", "unavailable", "slide-next", "slide-back");
       managementChecklistNav.innerHTML = "";
 
       if (!available) {
@@ -13432,6 +13553,12 @@ document.body.style.overflow = "hidden";
         <button class="checklist-nav-button" type="button" data-checklist-nav="back" ${checklistState.index === 0 ? "disabled" : ""}>Back</button>
         <button class="checklist-nav-button checklist-next ${requiredComplete ? "ready" : ""}" type="button" data-checklist-nav="next" ${requiredComplete ? "" : "disabled"}>${checklistState.index === sections.length - 1 ? "Complete" : "Next"}</button>
       `;
+
+      if (direction) {
+        requestAnimationFrame(() => {
+          managementChecklistSurface.classList.add(direction === "back" ? "slide-back" : "slide-next");
+        });
+      }
     }
 
     async function handleManagementChecklistClick(event) {
@@ -13470,7 +13597,7 @@ document.body.style.overflow = "hidden";
           index: Math.max(0, checklistState.index - 1)
         };
         await saveManagementChecklist(nextState);
-        renderManagementChecklistSummary();
+        renderManagementChecklistSummary("back");
         return;
       }
 
@@ -13490,8 +13617,8 @@ document.body.style.overflow = "hidden";
       };
 
       await saveManagementChecklist(nextState);
-      renderManagementChecklistSummary();
-      renderManagementPage();
+      renderManagementChecklistSummary(lastSection ? "" : "next");
+      updateCompleteFlightButton(activeFlight);
       showManagementMiniToast(lastSection ? "Checklist has been completed!" : "Checklist section complete!");
     }
 
@@ -13691,6 +13818,31 @@ document.body.style.overflow = "hidden";
       });
     }
 
+    function openManagementDeleteModal() {
+      if (!activeFlight || isManagementDeletingFlight) return;
+
+      const flightLabel = `${activeFlight.airline || "AA"}${activeFlight.flightNumber || ""}`;
+      managementDeleteModalText.textContent = `This removes ${flightLabel} from Flight Management, the main site, documents, Aviator Reserve, and connected records.`;
+      openManagementModal(managementDeleteModal);
+    }
+
+    function closeManagementDeleteModal() {
+      if (isManagementDeletingFlight) return;
+      closeManagementModal(managementDeleteModal);
+    }
+
+    function updateManagementDeleteButton() {
+      deleteFlightButton.disabled = isManagementDeletingFlight;
+      confirmManagementDeleteButton.disabled = isManagementDeletingFlight;
+      cancelManagementDeleteButton.disabled = isManagementDeletingFlight;
+      confirmManagementDeleteButton.innerHTML = isManagementDeletingFlight
+        ? '<span class="button-spinner" aria-hidden="true"></span>'
+        : "Delete flight";
+      deleteFlightButton.innerHTML = isManagementDeletingFlight
+        ? '<span class="button-spinner" aria-hidden="true"></span>'
+        : "Delete flight";
+    }
+
     async function confirmManagementScheduleUpdate() {
       const kind = pendingManagementScheduleKey;
       if (!activeFlight || !kind) return;
@@ -13716,9 +13868,11 @@ document.body.style.overflow = "hidden";
         confirmManagementScheduleButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
         await updateDoc(getFlightRef(activeFlight.id), updates);
         activeFlight = { ...activeFlight, ...updates };
-        closeManagementScheduleModal();
-        renderManagementPage();
-        showManagementMiniToast("Status has been updated!");
+        closeManagementModal(managementScheduleModal, () => {
+          pendingManagementScheduleKey = "";
+          renderManagementPage();
+          showManagementMiniToast("Status has been updated!");
+        });
       } catch (error) {
         console.error("Error updating management schedule:", error);
         alert("Status could not be updated.");
@@ -13746,6 +13900,7 @@ document.body.style.overflow = "hidden";
       managementMiniToast.classList.remove("active", "leaving");
       window.clearTimeout(managementMiniToastTimer);
       closeManagementScheduleModal();
+      closeManagementDeleteModal();
 
       if (activeFlight) {
         detailPage.classList.add("active");
@@ -13849,6 +14004,11 @@ document.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && managementScheduleModal.classList.contains("active")) {
     closeManagementScheduleModal();
+    return;
+  }
+
+  if (event.key === "Escape" && managementDeleteModal.classList.contains("active")) {
+    closeManagementDeleteModal();
     return;
   }
 
@@ -15513,81 +15673,97 @@ transactionDeleteButton.addEventListener("click", async () => {
     
     processReturnedSeatSelection();
     
-    deleteFlightButton?.addEventListener("click", async () => {
-      if (!activeFlight) return;
+    deleteFlightButton?.addEventListener("click", openManagementDeleteModal);
+    cancelManagementDeleteButton.addEventListener("click", closeManagementDeleteModal);
+    managementDeleteModal.addEventListener("click", (event) => {
+      if (event.target === managementDeleteModal) {
+        closeManagementDeleteModal();
+      }
+    });
+    confirmManagementDeleteButton.addEventListener("click", async () => {
+      if (!activeFlight || isManagementDeletingFlight) return;
 
-      const shouldDelete = confirm("Delete this flight completely?");
-
-      if (!shouldDelete) return;
+      isManagementDeletingFlight = true;
+      updateManagementDeleteButton();
 
       try {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
         const deletingId = activeFlight.id;
+        const deletingFlight = activeFlight;
+        const batch = writeBatch(db);
 
-const deletingFlight = activeFlight;
-const batch = writeBatch(db);
+        batch.delete(getFlightRef(deletingId));
+        batch.delete(doc(db, "documentPackets", deletingId));
 
-batch.delete(getFlightRef(deletingId));
-batch.delete(doc(db, "documentPackets", deletingId));
+        if (deletingFlight.boardingSessionId || deletingFlight.id) {
+          batch.delete(doc(db, "boardingSessions", deletingFlight.boardingSessionId || deletingFlight.id));
+        }
 
-if (deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId) {
-  const cardTransactionRef = doc(db, "cardTransactions", deletingFlight.paymentTransactionId);
-  const cardTransactionSnap = await getDoc(cardTransactionRef);
-  const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
-  const shouldReverseCardBalance = cardTransaction && cardTransaction.status !== "pending";
+        if (deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId) {
+          const cardTransactionRef = doc(db, "cardTransactions", deletingFlight.paymentTransactionId);
+          const cardTransactionSnap = await getDoc(cardTransactionRef);
+          const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
+          const shouldReverseCardBalance = cardTransaction && cardTransaction.status !== "pending";
 
-  batch.delete(cardTransactionRef);
+          batch.delete(cardTransactionRef);
 
-  if (shouldReverseCardBalance) {
-    batch.set(
-      doc(db, "cardAccount", "aviatorReserve"),
-      {
-        currentBalance: increment(-Number(cardTransaction.amount || deletingFlight.totalFare || 0)),
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
-  }
-}
+          if (shouldReverseCardBalance) {
+            batch.set(
+              doc(db, "cardAccount", "aviatorReserve"),
+              {
+                currentBalance: increment(-Number(cardTransaction.amount || deletingFlight.totalFare || 0)),
+                updatedAt: serverTimestamp()
+              },
+              { merge: true }
+            );
+          }
+        }
 
-if (deletingFlight.paymentMethod === "miles") {
-  const refundMiles = dollarsToMiles(Number(deletingFlight.totalFare || 0));
+        if (deletingFlight.paymentMethod === "miles") {
+          const refundMiles = dollarsToMiles(Number(deletingFlight.totalFare || 0));
 
-  if (refundMiles > 0) {
-    batch.set(
-      doc(db, "miles", "balance"),
-      {
-        balance: increment(refundMiles),
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
+          if (refundMiles > 0) {
+            batch.set(
+              doc(db, "miles", "balance"),
+              {
+                balance: increment(refundMiles),
+                updatedAt: serverTimestamp()
+              },
+              { merge: true }
+            );
 
-    batch.set(doc(collection(db, "mileTransactions")), {
-      type: "earned",
-      title: "Flight Purchase Refund",
-      amount: refundMiles,
-      airline: deletingFlight.airline || "",
-      airlineName: deletingFlight.airlineName || deletingFlight.airline || "Airline",
-      flightNumber: deletingFlight.flightNumber || "",
-      departureAirport: deletingFlight.departureAirport || "",
-      arrivalAirport: deletingFlight.arrivalAirport || "",
-      createdAt: serverTimestamp()
-    });
-  }
+            batch.set(doc(collection(db, "mileTransactions")), {
+              type: "earned",
+              title: "Flight Purchase Refund",
+              amount: refundMiles,
+              airline: deletingFlight.airline || "",
+              airlineName: deletingFlight.airlineName || deletingFlight.airline || "Airline",
+              flightNumber: deletingFlight.flightNumber || "",
+              departureAirport: deletingFlight.departureAirport || "",
+              arrivalAirport: deletingFlight.arrivalAirport || "",
+              createdAt: serverTimestamp()
+            });
+          }
 
-  if (deletingFlight.paymentTransactionId) {
-    batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
-  }
-}
+          if (deletingFlight.paymentTransactionId) {
+            batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
+          }
+        }
 
-await batch.commit();
+        await batch.commit();
 
-        closeFlightDetails();
         allFlights.delete(deletingId);
-        showNotification("Flight deleted!");
+        isManagementDeletingFlight = false;
+        updateManagementDeleteButton();
+        closeManagementModal(managementDeleteModal, () => {
+          closeFlightDetails();
+        });
       } catch (error) {
         console.error("Error deleting flight:", error);
         alert("Flight could not be deleted. Check your Firestore rules.");
+        isManagementDeletingFlight = false;
+        updateManagementDeleteButton();
       }
     });
   </script>
