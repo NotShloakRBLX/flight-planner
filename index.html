@@ -3744,6 +3744,35 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       transition: transform 0.24s cubic-bezier(.2,.8,.2,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.28s ease;
     }
 
+    .button-spinner {
+      display: inline-block;
+      width: 21px;
+      height: 21px;
+      border: 3px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      vertical-align: middle;
+      animation: buttonSpin 0.72s linear infinite;
+    }
+
+    .complete-flight-button.loading,
+    .management-modal-button.loading {
+      display: inline-grid;
+      place-items: center;
+      color: #06130c;
+      opacity: 0.78;
+    }
+
+    .management-modal-button.delete-confirm.loading {
+      color: #fff;
+    }
+
+    @keyframes buttonSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .management-embed-page .complete-flight-button:disabled {
       cursor: not-allowed;
       opacity: 0.48;
@@ -10572,6 +10601,8 @@ const checklistClear = flight?.checklistComplete === true;
 
 const canComplete = arrivedAtGate && cbpClear && documentsClear && checklistClear;
 
+  completeFlightButton.classList.remove("loading");
+  completeFlightButton.textContent = "Complete flight";
   completeFlightButton.disabled = !canComplete;
   completeFlightButton.classList.toggle("disabled", !canComplete);
 }
@@ -13899,6 +13930,8 @@ document.body.style.overflow = "hidden";
       deleteFlightButton.disabled = isManagementDeletingFlight;
       confirmManagementDeleteButton.disabled = isManagementDeletingFlight;
       cancelManagementDeleteButton.disabled = isManagementDeletingFlight;
+      confirmManagementDeleteButton.classList.toggle("loading", isManagementDeletingFlight);
+      deleteFlightButton.classList.toggle("loading", isManagementDeletingFlight);
       confirmManagementDeleteButton.innerHTML = isManagementDeletingFlight
         ? '<span class="button-spinner" aria-hidden="true"></span>'
         : "Delete flight";
@@ -15176,6 +15209,8 @@ if (
 
 completeFlightButton.disabled = true;
 completeFlightButton.classList.add("disabled");
+completeFlightButton.classList.add("loading");
+completeFlightButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
 
   try {
     const batch = writeBatch(db);
@@ -15237,6 +15272,8 @@ batch.delete(flightRef);
   } catch (error) {
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
+    completeFlightButton.classList.remove("loading");
+    completeFlightButton.textContent = "Complete flight";
     updateCompleteFlightButton(activeFlight);
   }
 });
