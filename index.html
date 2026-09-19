@@ -12760,7 +12760,7 @@ updateAircraftInfoCard(latest);
 updateDetailCountdowns();
 updateCompleteFlightButton(latest);
 if (managementEmbedPage.classList.contains("active")) {
-  renderManagementPage();
+  updateManagementTimer();
 }
         }
       }, 1000);
@@ -13066,6 +13066,30 @@ document.body.style.overflow = "hidden";
 
       updateCompleteFlightButton(activeFlight);
       renderManagementChecklistSummary();
+    }
+
+    function updateManagementTimer() {
+      if (!activeFlight || !managementEmbedPage.classList.contains("active")) return;
+
+      const stateInfo = getManagementPhaseState(activeFlight);
+      const phase = stateInfo.activePhase;
+
+      if (!stateInfo.inProgress || !phase) {
+        managementPhaseTimer.classList.add("hidden");
+        managementPhaseTimer.style.display = "none";
+        return;
+      }
+
+      const startMs = phase.key === "boarding"
+        ? activeFlight.boardingStartMs
+        : phase.key === "taxi"
+          ? activeFlight.departureTaxiStartMs
+          : activeFlight.arrivalTaxiStartMs;
+      const seconds = Math.max(0, Math.floor((Date.now() - Number(startMs || Date.now())) / 1000));
+
+      managementPhaseTimer.classList.remove("hidden");
+      managementPhaseTimer.style.display = "inline-flex";
+      managementTimerText.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
     }
 
     function getManagementChecklistProfileKey(flight = activeFlight) {
