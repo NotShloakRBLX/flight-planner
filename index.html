@@ -3436,6 +3436,872 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       color: #ffb4b4;
     }
 
+    .management-embed-page {
+      --line: rgba(255, 255, 255, 0.13);
+      --muted: rgba(255, 255, 255, 0.56);
+      --green: #25df83;
+      --red: #ff4f5e;
+      --yellow: #ffd143;
+      --blue: #6bb7ff;
+    }
+
+    .management-embed-page .management-integrated-body {
+      padding: 18px 18px calc(36px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 10% 0%, rgba(43, 107, 255, 0.25), transparent 32%),
+        radial-gradient(circle at 88% 12%, rgba(37, 223, 131, 0.14), transparent 30%),
+        linear-gradient(180deg, #070b16 0%, #06121c 100%);
+    }
+
+    .management-embed-page .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .management-embed-page .management-panel,
+    .management-embed-page .status-panel,
+    .management-embed-page .aircraft-panel,
+    .management-embed-page .checklist-panel {
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 22px 80px rgba(0,0,0,0.28);
+    }
+
+    .management-embed-page .management-panel {
+      border-radius: 31px;
+      background:
+        linear-gradient(145deg, rgba(48, 76, 112, 0.32), rgba(255,255,255,0.045) 48%, rgba(5, 10, 18, 0.4)),
+        rgba(17, 25, 39, 0.88);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .management-embed-page .phase-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .management-embed-page .phase-kicker,
+    .management-embed-page .aircraft-label,
+    .management-embed-page .status-row-label {
+      color: rgba(255,255,255,0.48);
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .management-embed-page .phase-name-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .management-embed-page .phase-name {
+      font-size: clamp(33px, 9vw, 54px);
+      line-height: 0.95;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    .management-embed-page .timer-pill {
+      min-width: 96px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 999px;
+      background: rgba(5, 10, 18, 0.42);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 950;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .management-embed-page .timer-pill svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--yellow);
+      fill: none;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-embed-page .status-pill,
+    .management-embed-page .flight-status-pill {
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(37, 223, 131, 0.13);
+      border: 1px solid rgba(37, 223, 131, 0.34);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .management-embed-page .status-pill.active {
+      background: rgba(255, 209, 67, 0.12);
+      border-color: rgba(255, 209, 67, 0.36);
+      color: var(--yellow);
+    }
+
+    .management-embed-page .phase-help {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.35;
+      font-weight: 780;
+    }
+
+    .management-embed-page .phase-button {
+      width: 100%;
+      min-height: 58px;
+      border-radius: 999px;
+      border: 2px solid rgba(37, 223, 131, 0.78);
+      background: rgba(37, 223, 131, 0.08);
+      color: #fff;
+      font-size: 19px;
+      font-weight: 950;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform 0.24s cubic-bezier(.2,.8,.2,1), background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, opacity 0.2s ease;
+    }
+
+    .management-embed-page .phase-button:active {
+      transform: scale(0.972);
+    }
+
+    .management-embed-page .phase-button.danger {
+      border-color: rgba(255, 79, 94, 0.8);
+      background: rgba(255, 79, 94, 0.09);
+    }
+
+    .management-embed-page .phase-button.solid {
+      border-color: transparent;
+      background: linear-gradient(180deg, #2ce98c, #11bd68);
+      color: #03140b;
+      box-shadow: 0 16px 34px rgba(18, 220, 121, 0.18);
+    }
+
+    .management-embed-page .phase-progress {
+      position: relative;
+      display: grid;
+      gap: 0;
+      margin-top: 22px;
+      padding: 6px 0 0;
+    }
+
+    .management-embed-page .phase-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 35px 44px 1fr;
+      gap: 12px;
+      min-height: 64px;
+      align-items: flex-start;
+      animation: phaseRowIn 0.32s cubic-bezier(.2,.8,.2,1) both;
+      animation-delay: calc(var(--step-index, 0) * 28ms);
+    }
+
+    @keyframes phaseRowIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .management-embed-page .phase-rail {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      padding-top: 8px;
+    }
+
+    .management-embed-page .phase-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 4px solid #657187;
+      background: #101827;
+      display: grid;
+      place-items: center;
+      color: transparent;
+      z-index: 1;
+    }
+
+    .management-embed-page .phase-dot svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: currentColor;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-embed-page .phase-line {
+      position: absolute;
+      top: 30px;
+      height: 42px;
+      width: 5px;
+      border-radius: 999px;
+      background: #657187;
+    }
+
+    .management-embed-page .phase-step:last-child .phase-line {
+      display: none;
+    }
+
+    .management-embed-page .phase-step.complete .phase-dot {
+      border-color: var(--green);
+      background: var(--green);
+      color: #07100b;
+    }
+
+    .management-embed-page .phase-step.current .phase-dot {
+      border-color: var(--yellow);
+      background: var(--yellow);
+      color: #151515;
+    }
+
+    .management-embed-page .phase-step.line-complete .phase-line {
+      background: var(--green);
+    }
+
+    .management-embed-page .phase-step.line-current .phase-line {
+      background: var(--yellow);
+    }
+
+    .management-embed-page .step-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.035));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .management-embed-page .step-icon svg {
+      width: 21px;
+      height: 21px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-embed-page .step-title {
+      color: #fff;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .management-embed-page .step-subtitle {
+      margin-top: 5px;
+      color: rgba(255,255,255,0.48);
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 780;
+    }
+
+    .management-embed-page .complete-flight-button {
+      width: 100%;
+      min-height: 58px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #2ce98c, #12bd68);
+      color: #06130c;
+      font-size: 18px;
+      font-weight: 950;
+      box-shadow: 0 18px 40px rgba(18, 220, 121, 0.18);
+      transition: transform 0.24s cubic-bezier(.2,.8,.2,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.28s ease;
+    }
+
+    .management-embed-page .complete-flight-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+      filter: grayscale(0.8);
+      box-shadow: none;
+    }
+
+    .management-embed-page .status-panel {
+      margin-top: 18px;
+      border-radius: 31px;
+      background:
+        linear-gradient(145deg, rgba(37, 223, 131, 0.12), rgba(255,255,255,0.045) 42%, rgba(107,183,255,0.12)),
+        rgba(17, 25, 39, 0.88);
+      padding: 20px;
+    }
+
+    .management-embed-page .status-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .management-embed-page .status-title,
+    .management-embed-page .checklist-title {
+      margin: 0;
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.055em;
+    }
+
+    .management-embed-page .status-subtitle,
+    .management-embed-page .checklist-subtitle {
+      margin-top: 7px;
+      color: rgba(255,255,255,0.52);
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .management-embed-page .flight-status-pill.early,
+    .management-embed-page .variance-pill.early {
+      background: rgba(107, 183, 255, 0.13);
+      border-color: rgba(107, 183, 255, 0.38);
+      color: var(--blue);
+    }
+
+    .management-embed-page .flight-status-pill.delayed,
+    .management-embed-page .variance-pill.delayed {
+      background: rgba(255, 79, 94, 0.12);
+      border-color: rgba(255, 79, 94, 0.36);
+      color: var(--red);
+    }
+
+    .management-embed-page .status-rows {
+      display: grid;
+      gap: 12px;
+    }
+
+    .management-embed-page .status-time-row {
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 23px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)),
+        rgba(5, 10, 18, 0.34);
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .management-embed-page .status-time-row.locked {
+      border-color: rgba(37, 223, 131, 0.28);
+      background:
+        linear-gradient(135deg, rgba(37,223,131,0.12), rgba(255,255,255,0.025)),
+        rgba(5, 10, 18, 0.38);
+    }
+
+    .management-embed-page .status-time-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 9px;
+    }
+
+    .management-embed-page .status-time-value {
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .management-embed-page .variance-pill {
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: rgba(37, 223, 131, 0.12);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .management-embed-page .status-row-subtitle {
+      margin-top: 7px;
+      color: rgba(255,255,255,0.48);
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 760;
+    }
+
+    .management-embed-page .status-edit-button {
+      min-width: 94px;
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 950;
+      transition: transform 0.24s cubic-bezier(.2,.8,.2,1), opacity 0.18s ease, background 0.22s ease, border-color 0.22s ease;
+    }
+
+    .management-embed-page .status-edit-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+
+    .management-embed-page .aircraft-panel {
+      position: relative;
+      margin-top: 18px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(107,183,255,0.2), transparent 38%),
+        radial-gradient(circle at 92% 12%, rgba(37,223,131,0.11), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)),
+        rgba(14, 21, 34, 0.92);
+      padding: 16px;
+      overflow: visible;
+    }
+
+    .management-embed-page .aircraft-control {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 13px;
+      align-items: center;
+      padding: 0;
+      text-align: left;
+    }
+
+    .management-embed-page .aircraft-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(145deg, rgba(107,183,255,0.22), rgba(37,223,131,0.12)),
+        rgba(255,255,255,0.07);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .management-embed-page .aircraft-mark svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .management-embed-page .aircraft-value {
+      color: #fff;
+      font-size: clamp(21px, 6vw, 30px);
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.045em;
+    }
+
+    .management-embed-page .aircraft-subtitle {
+      margin-top: 6px;
+      color: rgba(255,255,255,0.52);
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .management-embed-page .aircraft-chevron {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.78);
+      transition: transform 0.26s cubic-bezier(.2,.8,.2,1), background 0.22s ease;
+    }
+
+    .management-embed-page .aircraft-chevron svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-embed-page .aircraft-panel.open .aircraft-chevron {
+      transform: rotate(180deg);
+      background: rgba(107,183,255,0.16);
+    }
+
+    .management-embed-page .aircraft-panel.locked .aircraft-control {
+      cursor: not-allowed;
+    }
+
+    .management-embed-page .aircraft-menu {
+      position: absolute;
+      z-index: 10;
+      left: 14px;
+      right: 14px;
+      top: calc(100% + 8px);
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 23px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.035)),
+        rgba(6, 12, 22, 0.96);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.09);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px) scale(0.985);
+      transform-origin: top center;
+      transition: opacity 0.22s ease, transform 0.26s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .management-embed-page .aircraft-panel.open .aircraft-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .management-embed-page .aircraft-option {
+      min-height: 43px;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      background: transparent;
+      color: rgba(255,255,255,0.78);
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .management-embed-page .aircraft-option.selected {
+      color: #fff;
+      border-color: rgba(37,223,131,0.34);
+      background: rgba(37,223,131,0.12);
+    }
+
+    .management-embed-page .aircraft-option-code {
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .management-embed-page .checklist-panel {
+      margin-top: 18px;
+      border-radius: 31px;
+      background:
+        linear-gradient(145deg, rgba(107, 183, 255, 0.14), rgba(255,255,255,0.045) 44%, rgba(37, 223, 131, 0.1)),
+        rgba(17, 25, 39, 0.88);
+      padding: 20px;
+    }
+
+    .management-embed-page .checklist-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .management-embed-page .checklist-progress-pill {
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(107, 183, 255, 0.13);
+      border: 1px solid rgba(107, 183, 255, 0.38);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .management-embed-page .checklist-progress-pill.complete {
+      background: rgba(37, 223, 131, 0.13);
+      border-color: rgba(37, 223, 131, 0.34);
+      color: var(--green);
+    }
+
+    .management-embed-page .checklist-surface {
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 25px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.065), rgba(255,255,255,0.02)),
+        rgba(5, 10, 18, 0.46);
+      min-height: 292px;
+      max-height: 348px;
+      padding: 17px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.28) transparent;
+    }
+
+    .management-embed-page .checklist-surface.completed {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-color: rgba(37, 223, 131, 0.32);
+      background:
+        radial-gradient(circle at 50% 20%, rgba(37,223,131,0.16), transparent 42%),
+        rgba(5, 10, 18, 0.48);
+    }
+
+    .management-embed-page .checklist-surface.unavailable {
+      position: relative;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      overflow: hidden;
+      border-color: rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.014)),
+        rgba(5, 10, 18, 0.34);
+    }
+
+    .management-embed-page .checklist-section-title {
+      margin: 0 0 16px;
+      color: #fff;
+      font-size: 23px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.045em;
+    }
+
+    .management-embed-page .checklist-items {
+      display: grid;
+      gap: 0;
+    }
+
+    .management-embed-page .checklist-item {
+      position: relative;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 0 0 17px;
+      margin-bottom: 14px;
+      text-align: left;
+      font: inherit;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 12px;
+      align-items: start;
+      min-height: 36px;
+      color: rgba(255,255,255,0.82);
+      cursor: pointer;
+    }
+
+    .management-embed-page .checklist-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .management-embed-page .checklist-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 5px;
+      bottom: 0;
+      height: 1px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(101,113,135,0.42), rgba(255,255,255,0.12));
+    }
+
+    .management-embed-page .checklist-item.locked {
+      opacity: 0.72;
+      cursor: default;
+    }
+
+    .management-embed-page .check-circle {
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      border: 4px solid #657187;
+      background: #101827;
+      color: transparent;
+      display: grid;
+      place-items: center;
+      transition: border-color 0.28s ease, background 0.28s ease, color 0.28s ease, transform 0.22s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .management-embed-page .check-circle svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+    }
+
+    .management-embed-page .checklist-item.done .check-circle {
+      border-color: var(--green);
+      background: var(--green);
+      color: #07100b;
+    }
+
+    .management-embed-page .checklist-item.locked.done .check-circle {
+      border-color: #16794f;
+      background: #16794f;
+      color: rgba(255,255,255,0.78);
+    }
+
+    .management-embed-page .check-text {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      color: #fff;
+      font-size: 16px;
+      line-height: 1.35;
+      font-weight: 850;
+      padding-bottom: 7px;
+    }
+
+    .management-embed-page .check-text::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--green);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.34s cubic-bezier(.2,.8,.2,1), background 0.24s ease;
+    }
+
+    .management-embed-page .checklist-item.done .check-text::after {
+      transform: scaleX(1);
+    }
+
+    .management-embed-page .checklist-nav {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .management-embed-page .checklist-nav-button {
+      min-width: 94px;
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.09);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .management-embed-page .checklist-nav-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.44;
+    }
+
+    .management-embed-page .checklist-next {
+      background: rgba(107, 183, 255, 0.13);
+      border-color: rgba(107, 183, 255, 0.44);
+      color: #d9edff;
+    }
+
+    .management-embed-page .checklist-next.ready {
+      border-color: rgba(37, 223, 131, 0.78);
+      box-shadow: 0 0 0 4px rgba(37, 223, 131, 0.08);
+    }
+
+    .management-embed-page .checklist-complete-state,
+    .management-embed-page .checklist-locked-state {
+      text-align: center;
+    }
+
+    .management-embed-page .checklist-complete-icon,
+    .management-embed-page .checklist-lock-icon {
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 15px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #07100b;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 42px rgba(37, 223, 131, 0.18);
+    }
+
+    .management-embed-page .checklist-lock-icon {
+      border-radius: 25px;
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.72);
+    }
+
+    .management-embed-page .checklist-complete-icon svg,
+    .management-embed-page .checklist-lock-icon svg {
+      width: 38px;
+      height: 38px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .management-embed-page .checklist-complete-title,
+    .management-embed-page .checklist-lock-title {
+      color: #fff;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .management-embed-page .checklist-lock-subtitle {
+      margin-top: 9px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .management-embed-page .danger-zone {
+      margin-top: 28px;
+      border: 1px solid rgba(255, 79, 94, 0.28);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(255, 79, 94, 0.13), rgba(255,255,255,0.025)),
+        rgba(31, 10, 18, 0.75);
+      padding: 18px;
+    }
+
+    .management-embed-page .delete-flight-button {
+      width: 100%;
+      min-height: 58px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff4055, #cf1f37);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 950;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 16px 34px rgba(255, 79, 94, 0.2);
+    }
+
     .timetable-sheet-overlay {
       position: fixed;
       inset: 0;
@@ -6646,66 +7512,96 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         </div>
       </section>
 
-      <section class="management-control-panel">
-        <div class="management-panel-head">
+      <section class="management-panel">
+        <div class="phase-top">
           <div>
-            <div class="management-kicker" id="managementPhaseKicker">Next phase</div>
-            <div class="management-phase-name" id="managementPhaseName">Gate departure</div>
-          </div>
-          <div class="management-pill" id="managementPhaseStatus">Ready</div>
-        </div>
-        <p class="management-help" id="managementPhaseHelp">Start the next operational phase for this flight.</p>
-        <button class="management-primary-button" id="managementPhaseActionButton" type="button">Begin phase</button>
-        <div class="management-progress" id="managementProgress"></div>
-        <button class="management-primary-button secondary" id="completeFlightButton" type="button" disabled>Complete flight</button>
-      </section>
-
-      <section class="management-status-panel">
-        <div class="management-panel-head">
-          <div>
-            <div class="management-kicker">Status</div>
-            <div class="management-help" style="margin: 4px 0 0;">Schedule control and timing variance</div>
-          </div>
-          <div class="management-pill" id="managementOverallStatus">On time</div>
-        </div>
-        <div class="management-status-grid">
-          <section class="management-status-row">
-            <div>
-              <div class="management-status-label">Departure</div>
-              <div class="management-status-time" id="managementDepartureTime">--</div>
+            <div class="phase-kicker" id="managementPhaseKicker">Next phase</div>
+            <div class="phase-name-row">
+              <div class="phase-name" id="managementPhaseName">Gate departure</div>
+              <div class="timer-pill hidden" id="managementPhaseTimer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                <span id="managementTimerText">00:00</span>
+              </div>
             </div>
-            <button class="management-small-button" id="managementEditDepartureButton" type="button">Change</button>
-          </section>
-          <section class="management-status-row">
-            <div>
-              <div class="management-status-label">Arrival</div>
-              <div class="management-status-time" id="managementArrivalTime">--</div>
-            </div>
-            <button class="management-small-button" id="managementEditArrivalButton" type="button">Change</button>
-          </section>
-        </div>
-      </section>
-
-      <section class="management-aircraft-panel">
-        <div class="management-aircraft-label">Aircraft</div>
-        <div class="management-aircraft-value" id="managementAircraftValue">--</div>
-        <select class="management-aircraft-select" id="managementAircraftSelect" aria-label="Aircraft selector"></select>
-      </section>
-
-      <section class="management-checklist-panel">
-        <div class="management-panel-head">
-          <div>
-            <div class="management-kicker">Checklist</div>
-            <div class="management-checklist-subtitle" id="managementChecklistSubtitle">Available 1 hour before departure</div>
           </div>
-          <div class="management-pill" id="managementChecklistStatus">Locked</div>
+          <div class="status-pill" id="managementPhaseStatus">Ready</div>
         </div>
-        <div class="management-checklist-surface" id="managementChecklistSurface">
+        <p class="phase-help" id="managementPhaseHelp">Start the next operational phase for this flight.</p>
+        <button class="phase-button" id="managementPhaseActionButton" type="button">Begin phase</button>
+        <div class="phase-progress" id="managementProgress"></div>
+        <button class="complete-flight-button" id="completeFlightButton" type="button" disabled>Complete flight</button>
+      </section>
+
+      <section class="status-panel">
+        <div class="status-panel-head">
+          <div>
+            <h2 class="status-title">Status</h2>
+            <div class="status-subtitle">Schedule control and timing variance</div>
+          </div>
+          <div class="flight-status-pill" id="managementOverallStatus">On time</div>
+        </div>
+        <div class="status-rows">
+          <section class="status-time-row" id="managementDepartureStatusRow">
+            <div>
+              <div class="status-row-label">Departure</div>
+              <div class="status-time-main">
+                <div class="status-time-value" id="managementDepartureTime">--</div>
+                <div class="variance-pill" id="managementDepartureVariance">On time</div>
+              </div>
+              <div class="status-row-subtitle" id="managementDepartureSubtitle">Scheduled --</div>
+            </div>
+            <button class="status-edit-button" id="managementEditDepartureButton" type="button">Change</button>
+          </section>
+          <section class="status-time-row" id="managementArrivalStatusRow">
+            <div>
+              <div class="status-row-label">Arrival</div>
+              <div class="status-time-main">
+                <div class="status-time-value" id="managementArrivalTime">--</div>
+                <div class="variance-pill" id="managementArrivalVariance">On time</div>
+              </div>
+              <div class="status-row-subtitle" id="managementArrivalSubtitle">Scheduled --</div>
+            </div>
+            <button class="status-edit-button" id="managementEditArrivalButton" type="button">Change</button>
+          </section>
+        </div>
+      </section>
+
+      <section class="aircraft-panel" id="managementAircraftPanel">
+        <button class="aircraft-control" id="managementAircraftControl" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <div class="aircraft-mark">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21.6 13.1c.43.22.43.84 0 1.06l-6.68 3.36a1.1 1.1 0 0 1-1.28-.22l-2.54-2.54-5.2 2.62a1 1 0 0 1-1.37-.48l-.28-.62a1 1 0 0 1 .44-1.28l4.18-2.19-2.72-2.72-3.02.86a.85.85 0 0 1-.97-.4l-.29-.51a.85.85 0 0 1 .28-1.14l3.45-2.11a1.55 1.55 0 0 1 1.9.22l4.17 4.18 4.87-2.54a3.1 3.1 0 0 1 2.82-.03l2.24 1.13Z" />
+            </svg>
+          </div>
+          <div>
+            <div class="aircraft-label">Aircraft</div>
+            <div class="aircraft-value" id="managementAircraftValue">--</div>
+            <div class="aircraft-subtitle" id="managementAircraftSubtitle">Controls checklist set for this flight</div>
+          </div>
+          <div class="aircraft-chevron">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </button>
+        <div class="aircraft-menu" id="managementAircraftMenu" role="listbox" aria-label="Aircraft selector"></div>
+      </section>
+
+      <section class="checklist-panel">
+        <div class="checklist-head">
+          <div>
+            <h2 class="checklist-title">Checklist</h2>
+            <div class="checklist-subtitle" id="managementChecklistSubtitle">Available 1 hour before departure</div>
+          </div>
+          <div class="checklist-progress-pill" id="managementChecklistStatus">Locked</div>
+        </div>
+        <div class="checklist-surface" id="managementChecklistSurface">
           Checklist controls will appear here once the flight is within the checklist window.
         </div>
+        <div class="checklist-nav" id="managementChecklistNav"></div>
       </section>
 
-      <button class="management-danger-button" id="deleteFlightButton" type="button">Delete flight</button>
+      <section class="danger-zone">
+        <button class="delete-flight-button" id="deleteFlightButton" type="button">Delete flight</button>
+      </section>
     </main>
   </section>
 
@@ -7549,17 +8445,29 @@ const managementPhaseName = document.getElementById("managementPhaseName");
 const managementPhaseStatus = document.getElementById("managementPhaseStatus");
 const managementPhaseHelp = document.getElementById("managementPhaseHelp");
 const managementPhaseActionButton = document.getElementById("managementPhaseActionButton");
+const managementPhaseTimer = document.getElementById("managementPhaseTimer");
+const managementTimerText = document.getElementById("managementTimerText");
 const managementProgress = document.getElementById("managementProgress");
 const managementOverallStatus = document.getElementById("managementOverallStatus");
 const managementDepartureTime = document.getElementById("managementDepartureTime");
 const managementArrivalTime = document.getElementById("managementArrivalTime");
+const managementDepartureStatusRow = document.getElementById("managementDepartureStatusRow");
+const managementArrivalStatusRow = document.getElementById("managementArrivalStatusRow");
+const managementDepartureVariance = document.getElementById("managementDepartureVariance");
+const managementArrivalVariance = document.getElementById("managementArrivalVariance");
+const managementDepartureSubtitle = document.getElementById("managementDepartureSubtitle");
+const managementArrivalSubtitle = document.getElementById("managementArrivalSubtitle");
 const managementEditDepartureButton = document.getElementById("managementEditDepartureButton");
 const managementEditArrivalButton = document.getElementById("managementEditArrivalButton");
+const managementAircraftPanel = document.getElementById("managementAircraftPanel");
+const managementAircraftControl = document.getElementById("managementAircraftControl");
 const managementAircraftValue = document.getElementById("managementAircraftValue");
-const managementAircraftSelect = document.getElementById("managementAircraftSelect");
+const managementAircraftSubtitle = document.getElementById("managementAircraftSubtitle");
+const managementAircraftMenu = document.getElementById("managementAircraftMenu");
 const managementChecklistSubtitle = document.getElementById("managementChecklistSubtitle");
 const managementChecklistStatus = document.getElementById("managementChecklistStatus");
 const managementChecklistSurface = document.getElementById("managementChecklistSurface");
+const managementChecklistNav = document.getElementById("managementChecklistNav");
 let returnToManagementAfterMark = false;
 
     const airlineInput = document.getElementById("airline");
@@ -11938,6 +12846,20 @@ document.body.style.overflow = "hidden";
       return ((currentHours || 0) * 60 + (currentMinutes || 0)) - ((originalHours || 0) * 60 + (originalMinutes || 0));
     }
 
+    function managementIcon(name) {
+      const icons = {
+        boarding: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.5 19.5c0-3.05 2.2-5.5 5-5.5s5 2.45 5 5.5v.5h-10v-.5Zm10.2.5h6.8v-.45c0-2.66-1.9-4.8-4.35-4.8-1.05 0-2.02.4-2.78 1.08.52.98.83 2.15.83 3.42V20Z"/></svg>',
+        gate: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 13.6 20 8.4l.8 2.2-6.25 3.15 2.45 5.45-2.15.7-4.1-4.65-4.95 1.55-2.3-3.2Zm4.2-5.85 3.75 2.05-2.3.72-3.55-1.15.65-1.62Z"/></svg>',
+        taxi: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14.5h12.3l4.2-3.5h1.9l-2.7 5.3H5.2L3 14.5Zm4.2-4.1h5.9l2.1 2.05H5.9l1.3-2.05Zm1.2 8.3h8.8v1.8H8.4v-1.8Z"/></svg>',
+        takeoff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.2 17.3 17.6-9.6 1.1 2-6.1 5.15 3.75 4.35-1.9 1.2-5.65-3.05-5.35 2.9-3.45-2.95Zm3.2-8 4.35.95-2.25 1.22-3.2-.35 1.1-1.82Z"/></svg>',
+        land: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.7 10.2 16.9 7.2-.85 2.1-7.1-1.35-1.75 5.45-2.15-.75.05-6.1-5.9-1.1.8-5.45Zm6.95-6.05 2.75 3.5-2.25.15-2.25-2.25 1.75-1.4Z"/></svg>',
+        check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.55 16.2 5.8 12.45a1 1 0 1 1 1.4-1.42l2.35 2.35 7.25-7.25a1 1 0 0 1 1.42 1.42L9.55 16.2Z"/></svg>',
+        active: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.2 10l6.2 3.1v2.1l-5.6-1.45 1.3 5.05-1.8 1.2L12 15.5 9.7 20l-1.8-1.2 1.3-5.05-5.6 1.45v-2.1L9.8 10 12 3.5Z"/></svg>'
+      };
+
+      return icons[name] || icons.gate;
+    }
+
     function getManagementPhaseState(flight = activeFlight) {
       const phases = getManagementPhases(flight);
       const phase = getFlightPhase(flight);
@@ -11993,24 +12915,41 @@ document.body.style.overflow = "hidden";
 
     function renderManagementProgress(stateInfo) {
       managementProgress.innerHTML = stateInfo.phases.map((phase) => {
-        const rowState = stateInfo.completed.has(phase.key)
-          ? "done"
-          : phase.key === stateInfo.activeKey
-            ? "active"
+        const complete = stateInfo.completed.has(phase.key);
+        const current = phase.key === stateInfo.activeKey && !stateInfo.done;
+        const stepClass = complete
+          ? "complete line-complete"
+          : current
+            ? stateInfo.inProgress ? "current line-current" : "current"
             : "";
-
-        const dot = stateInfo.completed.has(phase.key)
-          ? "✓"
-          : phase.key === stateInfo.activeKey && stateInfo.inProgress
-            ? "✈"
+        const dotIcon = complete
+          ? managementIcon("check")
+          : current && stateInfo.inProgress
+            ? managementIcon("active")
             : "";
+        const subtitle = complete
+          ? "Complete"
+          : current
+            ? stateInfo.inProgress ? "In progress" : phase.detail
+            : "Upcoming";
+        const iconName = phase.key === "land"
+          ? "land"
+          : phase.key === "gateDeparture" || phase.key === "gateArrival"
+            ? "gate"
+            : phase.key === "arrivalTaxi"
+              ? "taxi"
+              : phase.key;
 
         return `
-          <div class="management-progress-row ${rowState}">
-            <div class="management-dot">${dot}</div>
+          <div class="phase-step ${stepClass}" style="--step-index:${stateInfo.phases.indexOf(phase)}">
+            <div class="phase-rail">
+              <div class="phase-dot">${dotIcon}</div>
+              <div class="phase-line"></div>
+            </div>
+            <div class="step-icon">${managementIcon(iconName)}</div>
             <div>
-              <div class="management-progress-title">${phase.name}</div>
-              <div class="management-progress-subtitle">${phase.detail}</div>
+              <div class="step-title">${phase.name}</div>
+              <div class="step-subtitle">${subtitle}</div>
             </div>
           </div>
         `;
@@ -12037,6 +12976,16 @@ document.body.style.overflow = "hidden";
       managementPhaseName.textContent = stateInfo.done ? "Complete" : phase.name;
       managementPhaseStatus.textContent = stateInfo.done ? "Complete" : stateInfo.inProgress ? "In progress" : "Ready";
       managementPhaseStatus.classList.toggle("active", stateInfo.inProgress);
+      managementPhaseTimer.classList.toggle("hidden", !stateInfo.inProgress);
+      if (stateInfo.inProgress) {
+        const startMs = phase.key === "boarding"
+          ? activeFlight.boardingStartMs
+          : phase.key === "taxi"
+            ? activeFlight.departureTaxiStartMs
+            : activeFlight.arrivalTaxiStartMs;
+        const seconds = Math.max(0, Math.floor((Date.now() - Number(startMs || Date.now())) / 1000));
+        managementTimerText.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+      }
       managementPhaseHelp.textContent = stateInfo.done
         ? "All managed phases are complete. Complete the flight when all required forms and documents are done."
         : stateInfo.inProgress
@@ -12067,10 +13016,36 @@ document.body.style.overflow = "hidden";
       const delayed = departureDiff > 0 || arrivalDiff > 0;
       const early = departureDiff < 0 || arrivalDiff < 0;
       managementOverallStatus.textContent = delayed ? "Delayed" : early ? "Early" : "On time";
+      managementOverallStatus.className = `flight-status-pill ${delayed ? "delayed" : early ? "early" : ""}`;
+      managementDepartureVariance.textContent = departureDiff > 0 ? `Delayed ${departureDiff}m` : departureDiff < 0 ? `Early ${Math.abs(departureDiff)}m` : "On time";
+      managementArrivalVariance.textContent = arrivalDiff > 0 ? `Delayed ${arrivalDiff}m` : arrivalDiff < 0 ? `Early ${Math.abs(arrivalDiff)}m` : "On time";
+      managementDepartureVariance.className = `variance-pill ${departureDiff > 0 ? "delayed" : departureDiff < 0 ? "early" : ""}`;
+      managementArrivalVariance.className = `variance-pill ${arrivalDiff > 0 ? "delayed" : arrivalDiff < 0 ? "early" : ""}`;
+      managementDepartureSubtitle.textContent = activeFlight.actualGateDeparture
+        ? `Final gate departure recorded · Scheduled ${formatTime12Hour(departureOriginal)}`
+        : `Scheduled ${formatTime12Hour(departureOriginal)} · ${departureDiff === 0 ? "Matches scheduled time" : departureDiff < 0 ? `${Math.abs(departureDiff)} minutes earlier than scheduled` : `${departureDiff} minutes later than scheduled`}`;
+      managementArrivalSubtitle.textContent = activeFlight.actualGateArrival
+        ? `Final gate arrival recorded · Scheduled ${formatTime12Hour(arrivalOriginal)}`
+        : `Scheduled ${formatTime12Hour(arrivalOriginal)} · ${arrivalDiff === 0 ? "Matches scheduled time" : arrivalDiff < 0 ? `${Math.abs(arrivalDiff)} minutes earlier than scheduled` : `${arrivalDiff} minutes later than scheduled`}`;
+      managementDepartureStatusRow.classList.toggle("locked", Boolean(activeFlight.actualGateDeparture));
+      managementArrivalStatusRow.classList.toggle("locked", Boolean(activeFlight.actualGateArrival));
+      managementEditDepartureButton.textContent = activeFlight.actualGateDeparture ? "Locked" : "Change";
+      managementEditArrivalButton.textContent = activeFlight.actualGateArrival ? "Locked" : "Change";
 
       managementAircraftValue.textContent = aircraftName;
-      managementAircraftSelect.disabled = Boolean(activeFlight.actualGateDeparture) || getFlightPhase(activeFlight) === "boarding";
-      managementAircraftSelect.value = activeFlight.aircraftType || "";
+      const aircraftLocked = Boolean(activeFlight.actualGateDeparture) || getFlightPhase(activeFlight) === "boarding";
+      const checklistProfile = MANAGEMENT_CHECKLIST_KEYS[activeFlight.aircraftType || "A320"] || "a320Family";
+      const checklistProfileLabel = checklistProfile === "a320Family"
+        ? "A320 Family"
+        : checklistProfile === "a350"
+          ? "A350"
+          : activeFlight.aircraftType || "A320";
+      managementAircraftSubtitle.textContent = aircraftLocked
+        ? `Locked for active flight · ${checklistProfileLabel}`
+        : `Checklist profile · ${checklistProfileLabel}`;
+      managementAircraftPanel.classList.toggle("locked", aircraftLocked);
+      managementAircraftControl.disabled = aircraftLocked;
+      renderManagementAircraftMenu();
 
       updateCompleteFlightButton(activeFlight);
       renderManagementChecklistSummary();
@@ -12148,35 +13123,57 @@ document.body.style.overflow = "hidden";
       const isSectionLocked = checklistState.lockedSections.includes(section.key) || checklistState.complete;
 
       managementChecklistStatus.textContent = checklistState.complete ? "Complete" : available ? `${checklistState.index + 1}/${sections.length}` : "Locked";
+      managementChecklistStatus.classList.toggle("complete", checklistState.complete);
       managementChecklistSubtitle.textContent = available
         ? `${getAircraftDisplayName(activeFlight.aircraftType) || activeFlight.aircraftType || "Aircraft"} checklist`
         : `Available at ${unlock.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+      managementChecklistSurface.classList.remove("completed", "unavailable");
+      managementChecklistNav.innerHTML = "";
 
       if (!available) {
-        managementChecklistSurface.innerHTML = "Checklist is unavailable right now. It unlocks 1 hour before departure.";
+        managementChecklistSurface.classList.add("unavailable");
+        managementChecklistSurface.innerHTML = `
+          <div class="checklist-locked-state">
+            <div class="checklist-lock-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+              </svg>
+            </div>
+            <div class="checklist-lock-title">Unavailable right now</div>
+            <div class="checklist-lock-subtitle">Checklist unlocks 1 hour before departure.</div>
+          </div>
+        `;
         return;
       }
 
       if (checklistState.complete) {
+        managementChecklistSurface.classList.add("completed");
         managementChecklistSurface.innerHTML = `
-          <div class="management-checklist-section-title">Checklist complete</div>
-          <div>All required checklist sections have been completed for this flight.</div>
+          <div class="checklist-complete-state">
+            <div class="checklist-complete-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
+            </div>
+            <div class="checklist-complete-title">Checklist complete</div>
+          </div>
         `;
         return;
       }
 
       managementChecklistSurface.innerHTML = `
-        <div class="management-checklist-section-title">${section.title}</div>
+        <h3 class="checklist-section-title">${escapeHTML(section.title)}</h3>
+        <div class="checklist-items">
         ${section.items.map((item, index) => `
-          <button class="management-checklist-item ${checkedItems.has(index) ? "checked" : ""} ${isSectionLocked ? "locked" : ""}" type="button" data-checklist-index="${index}" ${isSectionLocked ? "disabled" : ""}>
-            <span class="management-checklist-check">${checkedItems.has(index) ? "✓" : ""}</span>
-            <span>${item}${index >= requiredCount ? " (optional)" : ""}</span>
+          <button class="checklist-item ${checkedItems.has(index) ? "done" : ""} ${isSectionLocked ? "locked" : ""}" type="button" data-checklist-index="${index}" ${isSectionLocked ? "disabled" : ""}>
+            <span class="check-circle">${checkedItems.has(index) ? managementIcon("check") : ""}</span>
+            <span class="check-text">${escapeHTML(item)}${index >= requiredCount ? " - Optional" : ""}</span>
           </button>
         `).join("")}
-        <div class="management-checklist-nav">
-          <button class="management-small-button" type="button" data-checklist-nav="back" ${checklistState.index === 0 ? "disabled" : ""}>Back</button>
-          <button class="management-small-button" type="button" data-checklist-nav="next" ${requiredComplete ? "" : "disabled"}>${checklistState.index === sections.length - 1 ? "Complete" : "Next"}</button>
         </div>
+      `;
+      managementChecklistNav.innerHTML = `
+        <button class="checklist-nav-button" type="button" data-checklist-nav="back" ${checklistState.index === 0 ? "disabled" : ""}>Back</button>
+        <button class="checklist-nav-button checklist-next ${requiredComplete ? "ready" : ""}" type="button" data-checklist-nav="next" ${requiredComplete ? "" : "disabled"}>${checklistState.index === sections.length - 1 ? "Complete" : "Next"}</button>
       `;
     }
 
@@ -12356,12 +13353,21 @@ document.body.style.overflow = "hidden";
       }
     }
 
-    function setupManagementAircraftOptions() {
-      if (managementAircraftSelect.options.length > 0) return;
+    function renderManagementAircraftMenu() {
+      const selected = activeFlight?.aircraftType || "A320";
 
-      managementAircraftSelect.innerHTML = AIRCRAFT_OPTIONS.map((aircraft) => `
-        <option value="${aircraft}">${getAircraftDisplayName(aircraft) || aircraft}</option>
+      managementAircraftMenu.innerHTML = AIRCRAFT_OPTIONS.map((aircraft) => `
+        <button class="aircraft-option ${aircraft === selected ? "selected" : ""}" type="button" role="option" aria-selected="${aircraft === selected}" data-aircraft-code="${aircraft}">
+          <span>${getAircraftDisplayName(aircraft) || aircraft}</span>
+          <span class="aircraft-option-code">${aircraft}</span>
+        </button>
       `).join("");
+    }
+
+    function setManagementAircraftMenuOpen(isOpen) {
+      if (isOpen && managementAircraftPanel.classList.contains("locked")) return;
+      managementAircraftPanel.classList.toggle("open", isOpen);
+      managementAircraftControl.setAttribute("aria-expanded", String(isOpen));
     }
 
     async function changeManagementScheduleTime(kind) {
@@ -12405,7 +13411,6 @@ document.body.style.overflow = "hidden";
       if (!activeFlight?.id) return;
 
       closeTimetableSheet();
-      setupManagementAircraftOptions();
       renderManagementPage();
 
       managementEmbedPage.classList.add("active");
@@ -12468,10 +13473,16 @@ managementPhaseActionButton.addEventListener("click", beginManagementAction);
 managementEditDepartureButton.addEventListener("click", () => changeManagementScheduleTime("departure"));
 managementEditArrivalButton.addEventListener("click", () => changeManagementScheduleTime("arrival"));
 managementChecklistSurface.addEventListener("click", handleManagementChecklistClick);
-managementAircraftSelect.addEventListener("change", async () => {
-  if (!activeFlight || managementAircraftSelect.disabled) return;
+managementChecklistNav.addEventListener("click", handleManagementChecklistClick);
+managementAircraftControl.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setManagementAircraftMenuOpen(!managementAircraftPanel.classList.contains("open"));
+});
+managementAircraftMenu.addEventListener("click", async (event) => {
+  const option = event.target.closest("[data-aircraft-code]");
+  if (!option || !activeFlight || managementAircraftPanel.classList.contains("locked")) return;
 
-  const aircraftType = managementAircraftSelect.value;
+  const aircraftType = option.dataset.aircraftCode;
 
   try {
     await updateDoc(getFlightRef(activeFlight.id), {
@@ -12491,10 +13502,16 @@ managementAircraftSelect.addEventListener("change", async () => {
     activeFlight = { ...activeFlight, aircraftType, checklistComplete: false, managementChecklist: null };
     updateAircraftInfoCard(activeFlight);
     renderManagementPage();
+    setManagementAircraftMenuOpen(false);
     showNotification("Aircraft updated!");
   } catch (error) {
     console.error("Error updating aircraft:", error);
     alert("Aircraft could not be updated.");
+  }
+});
+document.addEventListener("click", (event) => {
+  if (!managementAircraftPanel.contains(event.target)) {
+    setManagementAircraftMenuOpen(false);
   }
 });
 
