@@ -3477,6 +3477,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       overflow: hidden;
     }
 
+    .management-embed-page .management-identity-card {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .management-embed-page .management-identity-card + .management-panel {
+      margin-top: -1px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
     .management-embed-page .phase-top {
       display: flex;
       align-items: flex-start;
@@ -3524,6 +3535,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       font-size: 15px;
       font-weight: 950;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .management-embed-page .timer-pill.hidden {
+      display: none !important;
     }
 
     .management-embed-page .timer-pill svg {
@@ -12916,20 +12931,21 @@ document.body.style.overflow = "hidden";
     function renderManagementProgress(stateInfo) {
       managementProgress.innerHTML = stateInfo.phases.map((phase) => {
         const complete = stateInfo.completed.has(phase.key);
-        const current = phase.key === stateInfo.activeKey && !stateInfo.done;
+        const isNext = phase.key === stateInfo.activeKey && !stateInfo.done;
+        const current = isNext && stateInfo.inProgress;
         const stepClass = complete
           ? "complete line-complete"
           : current
-            ? stateInfo.inProgress ? "current line-current" : "current"
+            ? "current line-current"
             : "";
         const dotIcon = complete
           ? managementIcon("check")
-          : current && stateInfo.inProgress
+          : current
             ? managementIcon("active")
             : "";
         const subtitle = complete
           ? "Complete"
-          : current
+          : isNext
             ? stateInfo.inProgress ? "In progress" : phase.detail
             : "Upcoming";
         const iconName = phase.key === "land"
@@ -12977,6 +12993,7 @@ document.body.style.overflow = "hidden";
       managementPhaseStatus.textContent = stateInfo.done ? "Complete" : stateInfo.inProgress ? "In progress" : "Ready";
       managementPhaseStatus.classList.toggle("active", stateInfo.inProgress);
       managementPhaseTimer.classList.toggle("hidden", !stateInfo.inProgress);
+      managementPhaseTimer.style.display = stateInfo.inProgress ? "inline-flex" : "none";
       if (stateInfo.inProgress) {
         const startMs = phase.key === "boarding"
           ? activeFlight.boardingStartMs
