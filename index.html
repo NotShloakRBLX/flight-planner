@@ -7866,6 +7866,17 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           <div class="flight-status-pill" id="managementOverallStatus">On time</div>
         </div>
         <div class="status-rows">
+          <section class="status-time-row" id="managementBoardingStatusRow">
+            <div>
+              <div class="status-row-label">Boarding</div>
+              <div class="status-time-main">
+                <div class="status-time-value" id="managementBoardingTime">--</div>
+                <div class="variance-pill" id="managementBoardingVariance">Scheduled</div>
+              </div>
+              <div class="status-row-subtitle" id="managementBoardingSubtitle">Scheduled --</div>
+            </div>
+            <button class="status-edit-button" id="managementEditBoardingButton" type="button">Change</button>
+          </section>
           <section class="status-time-row" id="managementDepartureStatusRow">
             <div>
               <div class="status-row-label">Departure</div>
@@ -8815,14 +8826,19 @@ const managementPhaseTimer = document.getElementById("managementPhaseTimer");
 const managementTimerText = document.getElementById("managementTimerText");
 const managementProgress = document.getElementById("managementProgress");
 const managementOverallStatus = document.getElementById("managementOverallStatus");
+const managementBoardingTime = document.getElementById("managementBoardingTime");
 const managementDepartureTime = document.getElementById("managementDepartureTime");
 const managementArrivalTime = document.getElementById("managementArrivalTime");
+const managementBoardingStatusRow = document.getElementById("managementBoardingStatusRow");
 const managementDepartureStatusRow = document.getElementById("managementDepartureStatusRow");
 const managementArrivalStatusRow = document.getElementById("managementArrivalStatusRow");
+const managementBoardingVariance = document.getElementById("managementBoardingVariance");
 const managementDepartureVariance = document.getElementById("managementDepartureVariance");
 const managementArrivalVariance = document.getElementById("managementArrivalVariance");
+const managementBoardingSubtitle = document.getElementById("managementBoardingSubtitle");
 const managementDepartureSubtitle = document.getElementById("managementDepartureSubtitle");
 const managementArrivalSubtitle = document.getElementById("managementArrivalSubtitle");
+const managementEditBoardingButton = document.getElementById("managementEditBoardingButton");
 const managementEditDepartureButton = document.getElementById("managementEditDepartureButton");
 const managementEditArrivalButton = document.getElementById("managementEditArrivalButton");
 const managementAircraftPanel = document.getElementById("managementAircraftPanel");
@@ -13416,6 +13432,19 @@ document.body.style.overflow = "hidden";
 
       renderManagementProgress(stateInfo);
 
+      const hasBoardingStatus = activeFlight.enableBoarding === true;
+      const boardingLocked = hasBoardingStatus && getFlightPhase(activeFlight) !== "scheduled";
+      managementBoardingStatusRow.style.display = hasBoardingStatus ? "" : "none";
+      managementBoardingTime.textContent = hasBoardingStatus ? formatTime12Hour(activeFlight.boardingTime) : "--";
+      managementBoardingVariance.textContent = boardingLocked ? "Locked" : "Scheduled";
+      managementBoardingVariance.className = `variance-pill ${boardingLocked ? "" : ""}`;
+      managementBoardingSubtitle.textContent = boardingLocked
+        ? "Boarding has already started for this flight"
+        : `Scheduled ${formatTime12Hour(activeFlight.boardingTime)}`;
+      managementBoardingStatusRow.classList.toggle("locked", boardingLocked);
+      managementEditBoardingButton.disabled = !hasBoardingStatus || boardingLocked;
+      managementEditBoardingButton.textContent = boardingLocked ? "Locked" : "Change";
+
       managementDepartureTime.textContent = formatTime12Hour(activeFlight.scheduledDeparture);
       managementArrivalTime.textContent = formatTime12Hour(activeFlight.scheduledArrival);
       managementEditDepartureButton.disabled = Boolean(activeFlight.actualGateDeparture);
@@ -13886,18 +13915,30 @@ document.body.style.overflow = "hidden";
     function openManagementScheduleModal(kind) {
       if (!activeFlight) return;
 
-      const locked = kind === "departure"
+      const locked = kind === "boarding"
+        ? activeFlight.enableBoarding !== true || getFlightPhase(activeFlight) !== "scheduled"
+        : kind === "departure"
         ? Boolean(activeFlight.actualGateDeparture)
         : Boolean(activeFlight.actualGateArrival);
 
       if (locked) return;
 
-      const currentValue = kind === "departure" ? activeFlight.scheduledDeparture : activeFlight.scheduledArrival;
+      const currentValue = kind === "boarding"
+        ? activeFlight.boardingTime
+        : kind === "departure"
+          ? activeFlight.scheduledDeparture
+          : activeFlight.scheduledArrival;
       pendingManagementScheduleKey = kind;
-      managementScheduleModalTitle.textContent = kind === "departure" ? "Change departure time" : "Change arrival time";
-      managementScheduleModalText.textContent = kind === "departure"
-        ? "Update the expected gate departure time."
-        : "Update the expected gate arrival time.";
+      managementScheduleModalTitle.textContent = kind === "boarding"
+        ? "Change boarding time"
+        : kind === "departure"
+          ? "Change departure time"
+          : "Change arrival time";
+      managementScheduleModalText.textContent = kind === "boarding"
+        ? "Update when boarding should begin."
+        : kind === "departure"
+          ? "Update the expected gate departure time."
+          : "Update the expected gate arrival time.";
       managementScheduleTimeInput.value = currentValue || "";
       openManagementModal(managementScheduleModal);
 
@@ -13952,7 +13993,9 @@ document.body.style.overflow = "hidden";
         updatedAt: serverTimestamp()
       };
 
-      if (kind === "departure") {
+      if (kind === "boarding") {
+        updates.boardingTime = nextValue;
+      } else if (kind === "departure") {
         updates.scheduledDeparture = nextValue;
         updates.originalScheduledDeparture = activeFlight.originalScheduledDeparture || activeFlight.scheduledDeparture || nextValue;
       } else {
@@ -13964,7 +14007,7 @@ document.body.style.overflow = "hidden";
         confirmManagementScheduleButton.disabled = true;
         confirmManagementScheduleButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
         await updateDoc(getFlightRef(activeFlight.id), updates);
-        activeFlight = { ...activeFlight, ...updates };
+        patchFlightCache(activeFlight.id, updates);
         closeManagementModal(managementScheduleModal, () => {
           pendingManagementScheduleKey = "";
           renderManagementPage();
@@ -14046,6 +14089,7 @@ timetableSheetOverlay.addEventListener("click", closeTimetableSheet);
 openFlightManagementButton.addEventListener("click", openFlightManagementPage);
 managementEmbedBackButton.addEventListener("click", closeFlightManagementPage);
 managementPhaseActionButton.addEventListener("click", beginManagementAction);
+managementEditBoardingButton.addEventListener("click", () => openManagementScheduleModal("boarding"));
 managementEditDepartureButton.addEventListener("click", () => openManagementScheduleModal("departure"));
 managementEditArrivalButton.addEventListener("click", () => openManagementScheduleModal("arrival"));
 managementChecklistSurface.addEventListener("click", handleManagementChecklistClick);
@@ -15859,7 +15903,10 @@ transactionDeleteButton.addEventListener("click", async () => {
         isManagementDeletingFlight = false;
         updateManagementDeleteButton();
         closeManagementModal(managementDeleteModal, () => {
-          closeFlightDetails();
+          showManagementMiniToast("Flight has been deleted!");
+          window.setTimeout(() => {
+            closeFlightDetails();
+          }, 1300);
         });
       } catch (error) {
         console.error("Error deleting flight:", error);
