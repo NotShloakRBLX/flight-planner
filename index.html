@@ -5602,7 +5602,24 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .transaction-email-note { margin: 8px 0 0; color: rgba(255,255,255,.65); font-size: 13px; line-height: 1.4; }
 #transactionEmailError { margin-top: 6px; color: #ff8995; font-size: 14px; }
 #transactionReviewPopup,
-#paymentConfirmationPopup { max-height: 88dvh; overflow-y: auto; }
+#paymentConfirmationPopup {
+  max-height: 88dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: #526075 transparent;
+}
+#transactionReviewPopup::-webkit-scrollbar,
+#paymentConfirmationPopup::-webkit-scrollbar { width: 6px; }
+#transactionReviewPopup::-webkit-scrollbar-track,
+#paymentConfirmationPopup::-webkit-scrollbar-track { background: transparent; margin: 24px 0; }
+#transactionReviewPopup::-webkit-scrollbar-thumb,
+#paymentConfirmationPopup::-webkit-scrollbar-thumb { background: #526075; border-radius: 999px; }
+#transactionReviewPopup::-webkit-scrollbar-thumb:hover,
+#paymentConfirmationPopup::-webkit-scrollbar-thumb:hover { background: #718199; }
+#transactionReviewPopup::-webkit-scrollbar-button,
+#paymentConfirmationPopup::-webkit-scrollbar-button { display: none; }
 .payment-confirmation-email-row { align-items: flex-start; }
 .payment-confirmation-email-row strong { min-width: 0; text-align: right; overflow-wrap: anywhere; }
 
@@ -8379,7 +8396,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
   <div class="transaction-email-field">
     <label for="transactionEmailInput">Email</label>
-    <input id="transactionEmailInput" type="email" autocomplete="email" maxlength="254" required aria-describedby="transactionEmailNote transactionEmailError" aria-invalid="false" />
+    <input id="transactionEmailInput" type="email" autocomplete="off" maxlength="254" required aria-describedby="transactionEmailNote transactionEmailError" aria-invalid="false" />
     <p class="transaction-email-note" id="transactionEmailNote">Used for your trip confirmation and check-in reminder. Processed by Google services for this flight simulation.</p>
     <div id="transactionEmailError" role="alert" hidden></div>
   </div>
@@ -11373,7 +11390,7 @@ function buildTransactionReview({
 
 function showTransactionReview(review) {
   if (pendingTransactionReview !== review) {
-    transactionEmailInput.value = review.customerEmail || auth.currentUser?.email || "";
+    transactionEmailInput.value = "";
     transactionEmailInput.setAttribute("aria-invalid", "false");
     transactionEmailError.hidden = true;
   }
