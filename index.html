@@ -5594,6 +5594,15 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   font-weight: 950;
 }
 
+.transaction-email-field { margin-top: 18px; text-align: left; }
+.transaction-email-field label { display: block; margin-bottom: 8px; color: #fff; font-weight: 800; }
+.transaction-email-field input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 12px 16px; border: 1px solid rgba(255,255,255,.2); border-radius: 18px; background: rgba(255,255,255,.06); color: #fff; font: inherit; font-size: 16px; transition: border-color .2s, box-shadow .2s; }
+.transaction-email-field input:focus { outline: none; border-color: #20d995; box-shadow: 0 0 0 3px rgba(32,217,149,.12); }
+.transaction-email-field input[aria-invalid="true"] { border-color: #ff6576; box-shadow: 0 0 0 3px rgba(255,101,118,.12); }
+.transaction-email-note { margin: 8px 0 0; color: rgba(255,255,255,.65); font-size: 13px; line-height: 1.4; }
+#transactionEmailError { margin-top: 6px; color: #ff8995; font-size: 14px; }
+#transactionReviewPopup { max-height: 88dvh; overflow-y: auto; }
+
 .transaction-payment-box {
   display: flex;
   align-items: center;
@@ -8365,6 +8374,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     </div>
   </div>
 
+  <div class="transaction-email-field">
+    <label for="transactionEmailInput">Email</label>
+    <input id="transactionEmailInput" type="email" autocomplete="email" maxlength="254" required aria-describedby="transactionEmailNote transactionEmailError" aria-invalid="false" />
+    <p class="transaction-email-note" id="transactionEmailNote">Used for your trip confirmation and check-in reminder. Processed by Google services for this flight simulation.</p>
+    <div id="transactionEmailError" role="alert" hidden></div>
+  </div>
+
   <div class="transaction-actions">
     <button class="transaction-cancel-button" id="transactionCancelButton" type="button">Cancel</button>
     <button class="transaction-pay-button" id="transactionPayButton" type="button">
@@ -8730,6 +8746,13 @@ const transactionPaymentName = document.getElementById("transactionPaymentName")
 const transactionPaymentSubtitle = document.getElementById("transactionPaymentSubtitle");
 const transactionCancelButton = document.getElementById("transactionCancelButton");
 const transactionPayButton = document.getElementById("transactionPayButton");
+const transactionEmailInput = document.getElementById("transactionEmailInput");
+const transactionEmailError = document.getElementById("transactionEmailError");
+let transactionPaymentProcessing = false;
+transactionEmailInput.addEventListener("input", () => {
+  transactionEmailInput.setAttribute("aria-invalid", "false");
+  transactionEmailError.hidden = true;
+});
 
 const paymentConfirmationPopup = document.getElementById("paymentConfirmationPopup");
 const paymentConfirmationSubtitle = document.getElementById("paymentConfirmationSubtitle");
@@ -11341,6 +11364,11 @@ function buildTransactionReview({
 }
 
 function showTransactionReview(review) {
+  if (pendingTransactionReview !== review) {
+    transactionEmailInput.value = review.customerEmail || auth.currentUser?.email || "";
+    transactionEmailInput.setAttribute("aria-invalid", "false");
+    transactionEmailError.hidden = true;
+  }
   pendingTransactionReview = review;
 
   const flight = review.flight;
@@ -11388,7 +11416,7 @@ if (cardImage) {
     transactionPaymentSubtitle.textContent = `Available credit: ${formatMoney(availableCredit)}`;
   }
 
-  transactionPayButton.disabled = !canPay;
+  transactionPayButton.disabled = !canPay || transactionPaymentProcessing;
 
   if (!canPay) {
     transactionPaymentSubtitle.textContent = review.paymentMethod === "miles"
@@ -11478,6 +11506,28 @@ const savedFirstBusiness = review.cabin === "First/Business";
 
 const flightToSave = {
   ...review.flight,
+  customerEmail: review.customerEmail,
+  passengerName: currentPassport?.fullName || auth.currentUser?.displayName || "Passenger",
+  emailNotificationsVersion: 1,
+  bookingReceipt: {
+    ...Object.fromEntries(Object.entries(review.flight).filter(([key]) => [
+      "airline", "airlineName", "flightNumber", "departureAirport", "arrivalAirport",
+      "cityDeparture", "cityArrival", "flightDateRaw", "scheduledDeparture", "scheduledArrival", "boardingCode"
+    ].includes(key))),
+    passengerName: currentPassport?.fullName || auth.currentUser?.displayName || "Passenger",
+    issuedAt: new Date().toISOString(),
+    assignedSeat: review.seat || "",
+    seatCabin: review.cabin || "",
+    paymentMethod: review.paymentMethod,
+    cardLast4: AVIATOR_RESERVE_LAST4,
+    baseAmount: review.paymentMethod === "miles" ? dollarsToMiles(review.baseFare) : review.baseFare,
+    totalAmount: review.paymentMethod === "miles" ? dollarsToMiles(review.totalFare) : review.totalFare,
+    seatAmount: review.paymentMethod === "miles"
+      ? dollarsToMiles(review.totalFare) - dollarsToMiles(review.baseFare)
+      : Math.round((review.totalFare - review.baseFare) * 100) / 100,
+    scheduleTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  },
+  scheduleTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   assignedSeat: review.seat,
   seatCabin: review.cabin,
   seatType: savedSeatType,
@@ -11514,6 +11564,7 @@ const flightToSave = {
 
     batch.set(cardTransactionRef, {
       type: "flight_purchase",
+      customerEmail: review.customerEmail,
       status: "pending",
       amount: review.totalFare,
       baseFare: review.baseFare,
@@ -11559,6 +11610,7 @@ const flightToSave = {
     batch.set(milesTransactionRef, {
       type: "spent",
       title: "Flight Purchase",
+      customerEmail: review.customerEmail,
       amount: requiredMiles,
       airline: flightToSave.airline || "",
       airlineName: flightToSave.airlineName || flightToSave.airline || "Airline",
@@ -11601,8 +11653,19 @@ pendingAssignedBoardingGroup = review.boardingGroup;
 
 async function processTransactionReviewPayment() {
   if (!pendingTransactionReview) return;
+  if (transactionPayButton.disabled || transactionPaymentProcessing) return;
 
   const review = pendingTransactionReview;
+  const email = transactionEmailInput.value.trim();
+  transactionEmailInput.value = email;
+  if (!email || !transactionEmailInput.checkValidity() || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) {
+    transactionEmailError.textContent = email ? "Enter a valid email" : "Email required";
+    transactionEmailError.hidden = false;
+    transactionEmailInput.setAttribute("aria-invalid", "true");
+    transactionEmailInput.focus();
+    return;
+  }
+  review.customerEmail = email;
   const requiredMiles = dollarsToMiles(review.totalFare);
 
   if (review.paymentMethod === "miles" && currentMilesBalance < requiredMiles) {
@@ -11615,6 +11678,9 @@ async function processTransactionReviewPayment() {
     return;
   }
 
+  transactionPaymentProcessing = true;
+  transactionEmailInput.disabled = true;
+  transactionCancelButton.disabled = true;
   transactionPayButton.disabled = true;
   transactionPayButton.textContent = "Processing...";
 
@@ -11627,6 +11693,9 @@ async function processTransactionReviewPayment() {
     alert("Payment could not be processed. Check Firestore rules.");
     transactionPayButton.disabled = false;
   } finally {
+    transactionPaymentProcessing = false;
+    transactionEmailInput.disabled = false;
+    transactionCancelButton.disabled = false;
     transactionPayButton.innerHTML = `
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1ZM9 9V7a3 3 0 0 1 6 0v2H9Z" />
