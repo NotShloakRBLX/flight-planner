@@ -5601,7 +5601,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 .transaction-email-field input[aria-invalid="true"] { border-color: #ff6576; box-shadow: 0 0 0 3px rgba(255,101,118,.12); }
 .transaction-email-note { margin: 8px 0 0; color: rgba(255,255,255,.65); font-size: 13px; line-height: 1.4; }
 #transactionEmailError { margin-top: 6px; color: #ff8995; font-size: 14px; }
-#transactionReviewPopup { max-height: 88dvh; overflow-y: auto; }
+#transactionReviewPopup,
+#paymentConfirmationPopup { max-height: 88dvh; overflow-y: auto; }
+.payment-confirmation-email-row { align-items: flex-start; }
+.payment-confirmation-email-row strong { min-width: 0; text-align: right; overflow-wrap: anywhere; }
 
 .transaction-payment-box {
   display: flex;
@@ -8426,6 +8429,10 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       <span>Miles pending</span>
       <strong id="paymentConfirmationMiles">0 mi</strong>
     </div>
+    <div class="transaction-breakdown-row payment-confirmation-email-row">
+      <span>Email</span>
+      <strong id="paymentConfirmationEmail">--</strong>
+    </div>
   </div>
 
   <button class="transaction-pay-button payment-continue-button" id="paymentContinueButton" type="button">Continue</button>
@@ -8763,6 +8770,7 @@ const paymentConfirmationTotal = document.getElementById("paymentConfirmationTot
 const paymentConfirmationMethod = document.getElementById("paymentConfirmationMethod");
 const paymentConfirmationMilesRow = document.getElementById("paymentConfirmationMilesRow");
 const paymentConfirmationMiles = document.getElementById("paymentConfirmationMiles");
+const paymentConfirmationEmail = document.getElementById("paymentConfirmationEmail");
 const paymentContinueButton = document.getElementById("paymentContinueButton");
 const seatRedirectPopup = document.getElementById("seatRedirectPopup");
 const externalSeatConfirmPopup = document.getElementById("externalSeatConfirmPopup");
@@ -11462,6 +11470,7 @@ function showPaymentConfirmation(review) {
   paymentConfirmationGroup.textContent = review.boardingGroup ? `Group ${review.boardingGroup}` : "Group --";
   paymentConfirmationTotal.textContent = formatPaymentAmountForReview(review, review.totalFare);
   paymentConfirmationMethod.textContent = getPaymentMethodLabel(review.paymentMethod);
+  paymentConfirmationEmail.textContent = review.customerEmail || "--";
 
   if (review.paymentMethod === "card") {
     paymentConfirmationSubtitle.textContent = "Your Aviator Reserve transaction is pending.";
