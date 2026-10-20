@@ -5751,6 +5751,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   opacity: 1;
   cursor: wait;
   box-shadow: 0 0 0 3px rgba(44,233,140,.12);
+  animation: transaction-pay-press 320ms ease-out;
 }
 
 #transactionPayButton.is-processing .transaction-pay-ready {
@@ -5764,16 +5765,24 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 }
 
 .transaction-pay-spinner {
-  width: 18px;
-  height: 18px;
+  display: inline-block;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
   box-sizing: border-box;
-  border: 2px solid rgba(4,20,11,.25);
+  border: 3px solid rgba(4,20,11,.15);
   border-top-color: currentColor;
+  border-right-color: currentColor;
   border-radius: 50%;
 }
 
 #transactionPayButton.is-processing .transaction-pay-spinner {
-  animation: transaction-pay-spin 800ms linear infinite;
+  animation: transaction-pay-spin 650ms linear infinite;
+}
+
+@keyframes transaction-pay-press {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(.97); }
 }
 
 @keyframes transaction-pay-spin {
@@ -5789,9 +5798,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   #transactionPayButton:not(:disabled):active {
     transform: none;
   }
-  #transactionPayButton.is-processing .transaction-pay-spinner {
-    animation: none;
+  #transactionPayButton.is-processing {
+    animation: transaction-pay-feedback 200ms ease-out;
   }
+}
+
+@keyframes transaction-pay-feedback {
+  from { opacity: .8; }
+  to { opacity: 1; }
 }
 
 .payment-confirmation-check {
