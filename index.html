@@ -5714,6 +5714,86 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   cursor: not-allowed;
 }
 
+#transactionPayButton {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  transition: transform 180ms ease, opacity 220ms ease, box-shadow 220ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#transactionPayButton:not(:disabled):active {
+  transform: scale(.97);
+}
+
+#transactionPayButton:focus-visible {
+  outline: 2px solid #b5f9d7;
+  outline-offset: 4px;
+}
+
+#transactionPayButton .transaction-pay-state {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 10px;
+  transition: opacity 240ms ease, transform 240ms ease;
+}
+
+#transactionPayButton .transaction-pay-processing {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+#transactionPayButton.is-processing {
+  opacity: 1;
+  cursor: wait;
+  box-shadow: 0 0 0 3px rgba(44,233,140,.12);
+}
+
+#transactionPayButton.is-processing .transaction-pay-ready {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+#transactionPayButton.is-processing .transaction-pay-processing {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transaction-pay-spinner {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 2px solid rgba(4,20,11,.25);
+  border-top-color: currentColor;
+  border-radius: 50%;
+}
+
+#transactionPayButton.is-processing .transaction-pay-spinner {
+  animation: transaction-pay-spin 800ms linear infinite;
+}
+
+@keyframes transaction-pay-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #transactionPayButton,
+  #transactionPayButton .transaction-pay-state {
+    transition: none;
+    transform: none;
+  }
+  #transactionPayButton:not(:disabled):active {
+    transform: none;
+  }
+  #transactionPayButton.is-processing .transaction-pay-spinner {
+    animation: none;
+  }
+}
+
 .payment-confirmation-check {
   width: 72px;
   height: 72px;
@@ -8404,10 +8484,16 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   <div class="transaction-actions">
     <button class="transaction-cancel-button" id="transactionCancelButton" type="button">Cancel</button>
     <button class="transaction-pay-button" id="transactionPayButton" type="button">
+      <span class="transaction-pay-state transaction-pay-ready">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1ZM9 9V7a3 3 0 0 1 6 0v2H9Z" />
       </svg>
       Pay now
+      </span>
+      <span class="transaction-pay-state transaction-pay-processing" aria-hidden="true">
+        <span class="transaction-pay-spinner" aria-hidden="true"></span>
+        Processing...
+      </span>
     </button>
   </div>
 </section>
@@ -11708,7 +11794,9 @@ async function processTransactionReviewPayment() {
   transactionEmailInput.disabled = true;
   transactionCancelButton.disabled = true;
   transactionPayButton.disabled = true;
-  transactionPayButton.textContent = "Processing...";
+  transactionPayButton.classList.add("is-processing");
+  transactionPayButton.setAttribute("aria-busy", "true");
+  transactionPayButton.setAttribute("aria-label", "Processing payment");
 
   try {
     await new Promise(resolve => setTimeout(resolve, 5000));
@@ -11722,12 +11810,9 @@ async function processTransactionReviewPayment() {
     transactionPaymentProcessing = false;
     transactionEmailInput.disabled = false;
     transactionCancelButton.disabled = false;
-    transactionPayButton.innerHTML = `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1ZM9 9V7a3 3 0 0 1 6 0v2H9Z" />
-      </svg>
-      Pay now
-    `;
+    transactionPayButton.classList.remove("is-processing");
+    transactionPayButton.removeAttribute("aria-busy");
+    transactionPayButton.removeAttribute("aria-label");
   }
 }
     
