@@ -8650,6 +8650,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   deleteDoc,
   doc,
   writeBatch,
+  runTransaction,
   increment,
   getDoc,
   setDoc,
@@ -9173,6 +9174,9 @@ const AVIATOR_RESERVE_LAST4 = "7250";
 const AVIATOR_RESERVE_LIMIT = 20000;
 const MILES_PER_DOLLAR_REDEMPTION = 3.25;
 const CARD_MILES_MULTIPLIER = 3;
+const CARD_FLIGHT_MILES_RATES = { economy: 5, premiumEconomy: 4.5, firstBusiness: 4 };
+const CARD_FLIGHT_REWARDS_VERSION = 2;
+const pendingRewardsUpdates = new Set();
 const PASSPORT_RENEWAL_COST = 85;
 
     timezoneDifferenceInput.addEventListener("input", updateEDTOffsetVisibility);
@@ -11552,32 +11556,68 @@ if (cardImage) {
   transactionReviewPopup.classList.add("active");
 }
 
-function isPremiumCabinName(cabin) {
-  return cabin === "First/Business" || cabin === "Premium Economy";
+function getCardFlightMilesRate(flight = {}) {
+  const cabin = String(flight.cabin || flight.seatCabin || flight.seatType || "").trim().toLowerCase();
+  if (["first/business", "first", "business", "first class", "business class"].includes(cabin)) {
+    return CARD_FLIGHT_MILES_RATES.firstBusiness;
+  }
+  if (cabin === "premium economy" || flight.premiumEconomySeat === true) {
+    return CARD_FLIGHT_MILES_RATES.premiumEconomy;
+  }
+  return flight.premiumSeat === true
+    ? CARD_FLIGHT_MILES_RATES.firstBusiness
+    : CARD_FLIGHT_MILES_RATES.economy;
 }
 
-function isPremiumCabinFlight(flight) {
-  return (
-    flight?.premiumSeat === true ||
-    flight?.premiumEconomySeat === true ||
-    isPremiumCabinName(flight?.seatCabin)
-  );
+function calculateCardFlightMiles(amount, rate) {
+  const fare = Number(amount);
+  return Number.isFinite(fare) && fare > 0 ? Math.floor(fare * rate) : 0;
 }
 
 function calculateCardMilesForReview(review) {
-  if (!review || review.paymentMethod !== "card" || isPremiumCabinName(review.cabin)) {
+  if (!review || review.paymentMethod !== "card") {
     return 0;
   }
 
-  return Math.floor(Number(review.totalFare || 0) * CARD_MILES_MULTIPLIER);
+  return calculateCardFlightMiles(review.totalFare, getCardFlightMilesRate({ ...review.flight, ...review }));
 }
 
 function calculateFallbackCardMilesForFlight(flight) {
-  if (isPremiumCabinFlight(flight)) {
-    return 0;
-  }
+  return calculateCardFlightMiles(flight?.totalFare, getCardFlightMilesRate(flight));
+}
 
-  return Math.floor(Number(flight?.totalFare || 0) * CARD_MILES_MULTIPLIER);
+async function updatePendingFlightRewards() {
+  const candidates = currentCardTransactions.filter(transaction =>
+    transaction.type === "flight_purchase" && transaction.status === "pending" &&
+    transaction.flightId && transaction.rewardsVersion !== CARD_FLIGHT_REWARDS_VERSION
+  );
+  for (const candidate of candidates) {
+    if (pendingRewardsUpdates.has(candidate.id)) continue;
+    pendingRewardsUpdates.add(candidate.id);
+    try {
+      await runTransaction(db, async transaction => {
+        const ref = doc(db, "cardTransactions", candidate.id);
+        const snapshot = await transaction.get(ref);
+        if (!snapshot.exists()) return;
+        const current = snapshot.data();
+        if (current.type !== "flight_purchase" || current.status !== "pending" ||
+          current.rewardsVersion === CARD_FLIGHT_REWARDS_VERSION || !current.flightId) return;
+        const flightSnapshot = await transaction.get(getFlightRef(current.flightId));
+        if (!flightSnapshot.exists()) return;
+        const rate = getCardFlightMilesRate({ ...current, ...flightSnapshot.data() });
+        transaction.update(ref, {
+          milesEarned: calculateCardFlightMiles(current.amount, rate),
+          rewardsRate: rate,
+          rewardsVersion: CARD_FLIGHT_REWARDS_VERSION,
+          updatedAt: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      console.error("Error updating pending flight rewards:", error);
+    } finally {
+      pendingRewardsUpdates.delete(candidate.id);
+    }
+  }
 }
 
 function showPaymentConfirmation(review) {
@@ -11696,6 +11736,8 @@ const flightToSave = {
       baseFare: review.baseFare,
       seatCost: review.seatCost,
       milesEarned: calculateCardMilesForReview(review),
+      rewardsRate: getCardFlightMilesRate({ ...review.flight, ...review }),
+      rewardsVersion: CARD_FLIGHT_REWARDS_VERSION,
       cardName: "Aviator Reserve",
       cardLast4: AVIATOR_RESERVE_LAST4,
       airline: flightToSave.airline || "",
@@ -14610,6 +14652,7 @@ onSnapshot(cardTransactionsQuery, (snapshot) => {
     id: transactionDoc.id,
     ...transactionDoc.data()
   }));
+  updatePendingFlightRewards();
 
   currentPendingCardHold = currentCardTransactions
     .filter(isCardPending)
@@ -15544,12 +15587,20 @@ if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransacti
   const cardTransactionSnap = await getDoc(cardTransactionRef);
   const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
 
-  awardedMiles = Math.floor(Number(cardTransaction?.milesEarned ?? calculateFallbackCardMilesForFlight(completedFlight)));
+  const rewardFlight = { ...completedFlight, totalFare: cardTransaction?.amount ?? completedFlight.totalFare };
+  awardedMiles = cardTransaction?.status === "pending" || !cardTransaction
+    ? calculateFallbackCardMilesForFlight(rewardFlight)
+    : Math.floor(Number(cardTransaction.milesEarned ?? calculateFallbackCardMilesForFlight(rewardFlight)));
 
   batch.set(
     cardTransactionRef,
     {
       status: "approved",
+      ...(cardTransaction?.status === "pending" ? {
+        milesEarned: awardedMiles,
+        rewardsRate: getCardFlightMilesRate(rewardFlight),
+        rewardsVersion: CARD_FLIGHT_REWARDS_VERSION
+      } : {}),
       postedAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     },
