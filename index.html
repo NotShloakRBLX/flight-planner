@@ -2951,6 +2951,71 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       font-size: clamp(22px, 6.1vw, 34px);
     }
 
+    .nfl-fields { grid-column: 1 / -1; }
+    .nfl-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .32s ease, opacity .24s ease; }
+    .nfl-reveal.open { grid-template-rows: 1fr; opacity: 1; }
+    .nfl-reveal > div { min-height: 0; overflow: hidden; }
+    .nfl-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 8px 0; }
+    .nfl-form-grid input { width: 100%; min-width: 0; }
+    .nfl-form-error { grid-column: 1 / -1; color: #ff999e; font-size: 14px; margin: 0; }
+    .nfl-match-link { width: 100%; min-height: 74px; margin-top: 14px; padding: 14px 18px; display: flex; gap: 14px; align-items: center; border: 1px solid #534e78; border-radius: 24px; background: linear-gradient(115deg,#122e58,#371b31); color: #fff; cursor: pointer; text-align: left; font: inherit; transition: transform .22s ease, border-color .22s ease; }
+    .nfl-match-link.hidden { display: none; }
+    .nfl-match-link:active { transform: scale(.985); }
+    .nfl-match-link img { width: 44px; height: 48px; object-fit: contain; flex: 0 0 44px; }
+    .nfl-match-link span { min-width: 0; font-size: 18px; font-weight: 800; overflow-wrap: anywhere; }
+    .nfl-home-card { width: 100%; padding: 26px 22px; border: 1px solid #42485e; border-radius: 24px; background: linear-gradient(125deg,#132943,#271b29 75%); color: #fff; text-align: center; box-shadow: 0 14px 32px #0003; animation: nfl-content-in .35s ease; transition: opacity .26s ease, transform .26s ease, max-height .28s ease, padding .28s ease, border-width .28s ease; }
+    .nfl-home-card.leaving { opacity: 0; transform: translateY(6px); max-height: 0 !important; padding-top: 0; padding-bottom: 0; border-top-width: 0; border-bottom-width: 0; overflow: hidden; pointer-events: none; }
+    .nfl-logo { width: 62px; height: 70px; object-fit: contain; display: block; margin: 0 auto 16px; }
+    .nfl-heading { margin: 0; font-size: 25px; line-height: 1.25; font-weight: 800; overflow-wrap: anywhere; letter-spacing: 0; }
+    .nfl-divider { height: 1px; background: #ffffff26; margin: 20px 0; }
+    .nfl-meta { color: #b5becd; font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
+    .nfl-meta p { margin: 5px 0; }
+    .nfl-wager-summary { margin: 20px 0 0; font-weight: 750; font-size: 18px; color: #fff; overflow-wrap: anywhere; }
+    .nfl-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 22px; }
+    .nfl-actions .nfl-action { font-size: 14px; padding: 12px 8px; }
+    .nfl-action { min-height: 48px; padding: 12px; border: 1px solid #3973b7; border-radius: 8px; background: #16447b; color: white; font: inherit; font-size: 15px; font-weight: 750; cursor: pointer; transition: background .22s ease, border-color .22s ease, opacity .22s ease, transform .18s ease; }
+    .nfl-action:active:not(:disabled) { transform: scale(.97); }
+    .nfl-action.red { background: #672333; border-color: #ac4556; }
+    .nfl-action.green { background: #123d2d; border-color: #2bac78; }
+    .nfl-action.secondary { background: #ffffff09; border-color: #ffffff25; }
+    .nfl-action:disabled { opacity: .4; cursor: default; }
+    .nfl-action[aria-busy="true"] { opacity: 1; cursor: default; }
+    .nfl-overlay { position: fixed; inset: 0; z-index: 600; display: flex; justify-content: center; align-items: center; padding: 18px; background: #0009; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .28s ease, visibility .28s; }
+    .nfl-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+    .nfl-dialog { position: relative; width: 100%; max-width: 480px; max-height: calc(100dvh - 36px); overflow-y: auto; overscroll-behavior: contain; padding: 28px 24px; border: 1px solid #414b63; border-radius: 24px; background: #111a28; color: #fff; text-align: center; transform: translateY(36px) scale(.985); transition: transform .38s cubic-bezier(.2,.8,.2,1); scrollbar-width: thin; scrollbar-color: #4f5e73 transparent; }
+    .nfl-overlay.active .nfl-dialog { transform: translateY(0) scale(1); }
+    .nfl-overlay.sheet { align-items: flex-end; padding: 0; }
+    .nfl-overlay.sheet .nfl-dialog { max-width: 580px; max-height: 88dvh; border-radius: 24px 24px 0 0; padding-bottom: max(32px,env(safe-area-inset-bottom)); transform: translateY(100%); }
+    .nfl-overlay.sheet.active .nfl-dialog { transform: translateY(0); }
+    .nfl-close { position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; padding: 0; display: grid; place-items: center; border: 1px solid #ffffff25; border-radius: 50%; background: #ffffff09; color: white; font-size: 26px; cursor: pointer; }
+    .nfl-close[hidden] { display: none; }
+    .nfl-team-choices { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr); align-items: stretch; gap: 6px; }
+    .nfl-team-choices > span { align-self: center; color: #a4afc1; font-size: 13px; }
+    .nfl-choice { min-height: 54px; border: 1px solid #ffffff25; border-radius: 8px; padding: 12px 8px; background: #ffffff04; color: #fff; font: inherit; font-weight: 700; cursor: pointer; overflow-wrap: anywhere; transition: border-color .24s ease, background .24s ease, transform .2s ease; }
+    .nfl-choice[aria-pressed="true"] { border-color: #6faeff; background: #24457266; box-shadow: inset 0 0 0 1px #6faeff; }
+    .nfl-choice:active:not(:disabled) { transform: scale(.97); }
+    .nfl-choice:disabled { opacity: .35; cursor: default; }
+    .nfl-stake-value { font-size: 38px; line-height: 1.2; font-weight: 850; margin: 26px 0 6px; font-variant-numeric: tabular-nums; }
+    .nfl-stake-value span { display: inline-block; animation: nfl-value-in .24s ease; }
+    .nfl-balance { color: #9eabbe; font-size: 13px; margin: 0 0 22px; }
+    .nfl-stakes { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding-top: 14px; }
+    .nfl-stakes .nfl-choice:last-child { grid-column: 1 / -1; }
+    .nfl-confirm-wrap { padding-top: 18px; }
+    .nfl-confirm-wrap .nfl-action, .nfl-wage-button { width: 100%; }
+    .nfl-error { color: #ff9caa; font-size: 14px; line-height: 1.4; margin: 14px 0 0; }
+    .nfl-error:empty { display: none; }
+    .nfl-dialog-body { animation: nfl-content-in .26s ease; }
+    .nfl-loader { width: 20px; height: 20px; display: inline-block; vertical-align: middle; box-sizing: border-box; border: 2px solid #ffffff35; border-top-color: #fff; border-right-color: #fff; border-radius: 50%; animation: nfl-spin .7s linear infinite, nfl-loader-in .2s ease; }
+    .nfl-action:focus-visible, .nfl-choice:focus-visible, .nfl-close:focus-visible, .nfl-match-link:focus-visible { outline: 2px solid #9ac5ff; outline-offset: 3px; }
+    @keyframes nfl-spin { to { transform: rotate(360deg); } }
+    @keyframes nfl-loader-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes nfl-content-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes nfl-value-in { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      .nfl-overlay, .nfl-dialog, .nfl-reveal, .nfl-choice, .nfl-action, .nfl-match-link, .nfl-home-card { transition-duration: .01ms; }
+      .nfl-dialog-body, .nfl-stake-value span, .nfl-home-card { animation: none; }
+    }
+
     .flight-management-button {
       width: 100%;
       min-height: 74px;
@@ -7643,6 +7708,20 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
           <div class="form-section-heading">Extras</div>
 <div class="form-section-subtitle">Optional display and timing features for this flight.</div>
 
+<div class="toggle-field">
+  <div class="toggle-text"><div class="toggle-title">NFL match</div></div>
+  <label class="toggle-switch"><input id="nflMatchToggle" type="checkbox" aria-label="NFL match" aria-controls="nflFields" aria-expanded="false" /><span class="toggle-slider"></span></label>
+</div>
+<div class="nfl-fields nfl-reveal" id="nflFields" inert>
+  <div><div class="nfl-form-grid">
+    <div class="form-field"><label for="nflTeam1">Team 1</label><input id="nflTeam1" type="text" maxlength="60" disabled /></div>
+    <div class="form-field"><label for="nflTeam2">Team 2</label><input id="nflTeam2" type="text" maxlength="60" disabled /></div>
+    <div class="form-field"><label for="nflVenue">Venue</label><input id="nflVenue" type="text" maxlength="120" disabled /></div>
+    <div class="form-field"><label for="nflMatchDate">Match date</label><input id="nflMatchDate" type="date" disabled /></div>
+  </div></div>
+</div>
+<p class="nfl-form-error" id="nflFormError" role="alert" hidden></p>
+
           <div class="toggle-field">
   <div class="toggle-text">
     <div class="toggle-title">Pay with miles</div>
@@ -8012,6 +8091,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
               <path d="m11.6 13.4 8.4-7.4"></path>
             </svg>
           </span>
+        </button>
+        <button class="nfl-match-link hidden" id="openNflMatchButton" type="button">
+          <img src="./nfl.png" alt="NFL" /><span id="nflMatchButtonTitle"></span>
         </button>
 
       </main>
@@ -8644,6 +8726,13 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <div class="popup-inner">
       <div class="popup-title" id="popupTitle">Flight added!</div>
     </div>
+  </div>
+
+  <div class="nfl-overlay" id="nflOverlay" aria-hidden="true">
+    <section class="nfl-dialog" id="nflDialog" role="dialog" aria-modal="true" aria-labelledby="nflDialogTitle" tabindex="-1">
+      <button class="nfl-close" id="nflCloseButton" type="button" aria-label="Close NFL match">&times;</button>
+      <div id="nflDialogContent"></div>
+    </section>
   </div>
 
   <script type="module">
@@ -9308,6 +9397,489 @@ document.addEventListener("click", (event) => {
 
 window.addEventListener("resize", positionAircraftDropdown);
 addFlightPage.addEventListener("scroll", positionAircraftDropdown);
+
+// NFL_CORE_START
+const NFL_STAKES = [500, 1000, 1500, 2500, 5000];
+
+function nflMatchRef() {
+  // Reuse the owner-only sports collection, in a separate NFL document.
+  return doc(db, "activeWorldCupMatch", "nfl");
+}
+
+function nflIsOpen(match) {
+  return Boolean(match && ["linked", "awaitingWager", "active"].includes(match.status));
+}
+
+function nflValidateMatch(values) {
+  const match = {
+    team1: String(values.team1 || "").trim(), team2: String(values.team2 || "").trim(),
+    venue: String(values.venue || "").trim(), date: String(values.date || "").trim()
+  };
+  if (!match.team1 || !match.team2 || !match.venue || !match.date) throw new Error("Enter both teams, the venue, and match date.");
+  if (match.team1.length > 60 || match.team2.length > 60 || match.venue.length > 120) throw new Error("Match details are too long.");
+  if (match.team1.toLowerCase() === match.team2.toLowerCase()) throw new Error("Choose two different teams.");
+  const parsed = new Date(`${match.date}T12:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(match.date) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== match.date) throw new Error("Enter a valid match date.");
+  return match;
+}
+
+function nflBalance(snapshot) {
+  const balance = Number(snapshot.exists() ? snapshot.data().balance || 0 : 0);
+  if (!Number.isFinite(balance) || balance < 0) throw new Error("Miles balance is unavailable. Please reload.");
+  return balance;
+}
+
+async function nflCreateStandalone(values) {
+  const details = nflValidateMatch(values);
+  const id = doc(collection(db, "activeWorldCupMatch")).id;
+  return runTransaction(db, async transaction => {
+    const slot = await transaction.get(nflMatchRef());
+    const balance = nflBalance(await transaction.get(doc(db, "miles", "balance")));
+    if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
+    if (balance < NFL_STAKES[0]) return false;
+    transaction.set(nflMatchRef(), { ...details, id, flightId: null, status: "awaitingWager", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    return true;
+  });
+}
+
+async function nflPlaceWager(id, team, stake) {
+  if (![0, 1].includes(team) || !NFL_STAKES.includes(stake)) throw new Error("Choose a team and wager amount.");
+  return runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(nflMatchRef());
+    const balanceRef = doc(db, "miles", "balance");
+    const balance = nflBalance(await transaction.get(balanceRef));
+    const match = snapshot.exists() ? snapshot.data() : null;
+    if (!match || match.id !== id) throw new Error("This match is no longer available.");
+    if (match.status === "active") return false;
+    if (match.status !== "awaitingWager") throw new Error("This match is no longer awaiting a wager.");
+    if (balance < stake) throw new Error("You do not have enough miles for that wager.");
+    transaction.set(balanceRef, { balance: balance - stake, updatedAt: serverTimestamp() }, { merge: true });
+    transaction.set(doc(db, "mileTransactions", `nfl_${id}_stake`), {
+      type: "spent", icon: "nfl", airline: "NFL", title: `${match.team1} vs ${match.team2}`,
+      amount: stake, nflMatchId: id, selectedTeam: team === 0 ? match.team1 : match.team2, createdAt: serverTimestamp()
+    });
+    transaction.update(nflMatchRef(), { status: "active", selectedTeam: team, stake, wageredAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    return true;
+  });
+}
+
+async function nflResolveMatch(id, result) {
+  if (![0, 1, "tie", "cancel"].includes(result)) throw new Error("Choose a match result.");
+  return runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(nflMatchRef());
+    const balanceRef = doc(db, "miles", "balance");
+    const balance = nflBalance(await transaction.get(balanceRef));
+    const match = snapshot.exists() ? snapshot.data() : null;
+    if (!match || match.id !== id) throw new Error("This match is no longer available.");
+    if (match.status === "closed") return false;
+    if (match.status !== "active" || !NFL_STAKES.includes(match.stake) || ![0, 1].includes(match.selectedTeam)) throw new Error("This match has no active wager.");
+    const refund = result === "tie" || result === "cancel";
+    const won = !refund && result === match.selectedTeam;
+    const credit = refund ? match.stake : won ? match.stake * 2 : 0;
+    if (credit > 0) {
+      transaction.set(balanceRef, { balance: balance + credit, updatedAt: serverTimestamp() }, { merge: true });
+      transaction.set(doc(db, "mileTransactions", `nfl_${id}_settlement`), {
+        type: "earned", icon: "nfl", airline: "NFL", title: won ? "Wager won" : "Wager refunded",
+        amount: credit, nflMatchId: id, matchTitle: `${match.team1} vs ${match.team2}`,
+        result: String(result), createdAt: serverTimestamp()
+      });
+    }
+    transaction.update(nflMatchRef(), { status: "closed", result: String(result), outcome: refund ? "refunded" : won ? "won" : "lost", creditedMiles: credit, settledAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    return true;
+  });
+}
+
+async function nflSkipIfUnaffordable(id) {
+  return runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(nflMatchRef());
+    const balance = nflBalance(await transaction.get(doc(db, "miles", "balance")));
+    const match = snapshot.exists() ? snapshot.data() : null;
+    if (match?.id === id && match.status === "awaitingWager" && balance < NFL_STAKES[0]) {
+      transaction.update(nflMatchRef(), { status: "skipped", updatedAt: serverTimestamp() });
+      return true;
+    }
+    return false;
+  });
+}
+async function completeFlightWithNfl(completedFlight) {
+  return runTransaction(db, async batch => {
+    const flightRef = getFlightRef(completedFlight.id);
+    const flightSnapshot = await batch.get(flightRef);
+    if (!flightSnapshot.exists()) return false;
+    completedFlight = { id: completedFlight.id, ...flightSnapshot.data() };
+    if (getFlightPhase(completedFlight) !== "gateArrival" || !completedFlight.checklistComplete ||
+      !hasCompletedAllDocuments(completedFlight) || (completedFlight.internationalUSArrival && !completedFlight.cbpSubmitted)) {
+      throw new Error("Complete all flight requirements first.");
+    }
+    const cardTransactionRef = completedFlight.paymentMethod === "card" && completedFlight.paymentTransactionId
+      ? doc(db, "cardTransactions", completedFlight.paymentTransactionId) : null;
+    const cardTransactionSnap = cardTransactionRef ? await batch.get(cardTransactionRef) : null;
+    const cardTransaction = cardTransactionSnap?.exists() ? cardTransactionSnap.data() : null;
+    const slot = completedFlight.nflMatch ? await batch.get(nflMatchRef()) : null;
+    const match = slot?.exists() ? slot.data() : null;
+    const balance = match && match.id === completedFlight.nflMatch?.id && match.status === "linked"
+      ? nflBalance(await batch.get(doc(db, "miles", "balance"))) : null;
+    let awardedMiles = 0;
+    if (cardTransactionRef) {
+  const rewardFlight = { ...completedFlight, totalFare: cardTransaction?.amount ?? completedFlight.totalFare };
+  awardedMiles = cardTransaction?.status === "pending" || !cardTransaction
+    ? calculateFallbackCardMilesForFlight(rewardFlight)
+    : Math.floor(Number(cardTransaction.milesEarned ?? calculateFallbackCardMilesForFlight(rewardFlight)));
+
+  batch.set(cardTransactionRef, {
+        status: "approved",
+        ...(cardTransaction?.status === "pending" ? {
+          milesEarned: awardedMiles, rewardsRate: getCardFlightMilesRate(rewardFlight), rewardsVersion: CARD_FLIGHT_REWARDS_VERSION
+        } : {}),
+        postedAt: serverTimestamp(), updatedAt: serverTimestamp()
+      }, { merge: true });
+      batch.set(doc(db, "cardAccount", "aviatorReserve"), {
+        currentBalance: increment(Number(cardTransaction?.amount || completedFlight.totalFare || 0)),
+        rewardsMiles: increment(awardedMiles), creditLimit: AVIATOR_RESERVE_LIMIT,
+        last4: AVIATOR_RESERVE_LAST4, updatedAt: serverTimestamp()
+      }, { merge: true });
+    }
+    batch.set(doc(db, "documentPackets", completedFlight.id), {
+      status: "archived", flightCompleted: true, documentsStatus: "archived", archivedAt: serverTimestamp(), updatedAt: serverTimestamp()
+    }, { merge: true });
+    if (balance !== null) {
+      batch.update(nflMatchRef(), {
+        status: balance >= NFL_STAKES[0] ? "awaitingWager" : "skipped", flightCompletedAt: serverTimestamp(), updatedAt: serverTimestamp()
+      });
+    }
+    batch.delete(flightRef);
+    return true;
+  });
+}
+
+async function deleteFlightWithNfl(deletingFlight) {
+  return runTransaction(db, async batch => {
+    const flightRef = getFlightRef(deletingFlight.id);
+    const flightSnapshot = await batch.get(flightRef);
+    if (!flightSnapshot.exists()) return false;
+    deletingFlight = { id: deletingFlight.id, ...flightSnapshot.data() };
+    const cardRef = deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId
+      ? doc(db, "cardTransactions", deletingFlight.paymentTransactionId) : null;
+    const cardSnap = cardRef ? await batch.get(cardRef) : null;
+    const card = cardSnap?.exists() ? cardSnap.data() : null;
+    const slot = deletingFlight.nflMatch ? await batch.get(nflMatchRef()) : null;
+    const match = slot?.exists() ? slot.data() : null;
+    batch.delete(flightRef);
+    batch.delete(doc(db, "documentPackets", deletingFlight.id));
+    batch.delete(doc(db, "boardingSessions", deletingFlight.boardingSessionId || deletingFlight.id));
+    if (cardRef) {
+      batch.delete(cardRef);
+      if (card && card.status !== "pending") {
+        batch.set(doc(db, "cardAccount", "aviatorReserve"), {
+          currentBalance: increment(-Number(card.amount || deletingFlight.totalFare || 0)), updatedAt: serverTimestamp()
+        }, { merge: true });
+      }
+    }
+    if (deletingFlight.paymentMethod === "miles") {
+      const refundMiles = dollarsToMiles(Number(deletingFlight.totalFare || 0));
+      if (refundMiles > 0) {
+        batch.set(doc(db, "miles", "balance"), { balance: increment(refundMiles), updatedAt: serverTimestamp() }, { merge: true });
+        batch.set(doc(collection(db, "mileTransactions")), {
+          type: "earned", title: "Flight Purchase Refund", amount: refundMiles,
+          airline: deletingFlight.airline || "", airlineName: deletingFlight.airlineName || deletingFlight.airline || "Airline",
+          flightNumber: deletingFlight.flightNumber || "", departureAirport: deletingFlight.departureAirport || "",
+          arrivalAirport: deletingFlight.arrivalAirport || "", createdAt: serverTimestamp()
+        });
+      }
+      if (deletingFlight.paymentTransactionId) batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
+    }
+    if (match && match.id === deletingFlight.nflMatch?.id && match.status === "linked") {
+      batch.update(nflMatchRef(), { status: "closed", outcome: "flightDeleted", updatedAt: serverTimestamp() });
+    }
+    return true;
+  });
+}
+// NFL_CORE_END
+
+// NFL_UI_START
+let nflCurrentMatch = null;
+let nflStateLoaded = false;
+let nflMilesLoaded = false;
+let nflSkipBusy = false;
+let nflDialogBusy = false;
+let nflCompletionBusy = false;
+let nflDialogMode = "";
+let nflDialogMatch = null;
+let nflPickedTeam = null;
+let nflPickedStake = 0;
+let nflPickedResult = null;
+let nflPreviousFocus = null;
+let nflPreviousOverflow = "";
+let nflCloseTimer = null;
+const nflToggle = document.getElementById("nflMatchToggle");
+const nflFields = document.getElementById("nflFields");
+const nflOverlay = document.getElementById("nflOverlay");
+const nflDialog = document.getElementById("nflDialog");
+const nflContent = document.getElementById("nflDialogContent");
+const nflCloseButton = document.getElementById("nflCloseButton");
+const nflLink = document.getElementById("openNflMatchButton");
+const nflFieldIds = ["nflTeam1", "nflTeam2", "nflVenue", "nflMatchDate"];
+
+function nflTitle(match) { return `${match.team1} vs ${match.team2}`; }
+function nflFormatDate(date) { return new Date(`${date}T12:00:00`).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }); }
+function nflHeader(match, title = nflTitle(match)) {
+  return `<img class="nfl-logo" src="./nfl.png" alt="NFL" /><h2 class="nfl-heading" id="nflDialogTitle">${escapeHTML(title)}</h2><div class="nfl-divider"></div>`;
+}
+function nflMeta(match) { return `<div class="nfl-meta"><p>${escapeHTML(nflFormatDate(match.date))}</p><p>${escapeHTML(match.venue)}</p></div>`; }
+
+function updateNflForm() {
+  const enabled = nflToggle.checked;
+  nflFields.classList.toggle("open", enabled);
+  nflFields.inert = !enabled;
+  nflToggle.setAttribute("aria-expanded", String(enabled));
+  nflFieldIds.forEach(id => { document.getElementById(id).disabled = !enabled; });
+  document.getElementById("nflFormError").hidden = true;
+}
+
+function nflReadForm() {
+  return nflValidateMatch({ team1: document.getElementById("nflTeam1").value, team2: document.getElementById("nflTeam2").value, venue: document.getElementById("nflVenue").value, date: document.getElementById("nflMatchDate").value });
+}
+
+function nflIsMatchOnlyForm() {
+  return !selectedAircraftType && ![...flightForm.querySelectorAll("input:not([type=checkbox]):not([type=hidden]), select")]
+    .some(input => !nflFields.contains(input) && String(input.value || "").trim());
+}
+
+function updateNflFlightLink(flight) {
+  nflLink.classList.toggle("hidden", !flight?.nflMatch);
+  document.getElementById("nflMatchButtonTitle").textContent = flight?.nflMatch ? nflTitle(flight.nflMatch) : "";
+}
+
+function closeNflDialog(force = false) {
+  if ((!force && nflDialogMode === "wager") || nflDialogBusy) return;
+  nflOverlay.classList.remove("active");
+  nflOverlay.setAttribute("aria-hidden", "true");
+  nflDialogMode = "";
+  nflDialogMatch = null;
+  document.body.style.overflow = nflPreviousOverflow;
+  nflPreviousFocus?.focus?.();
+  clearTimeout(nflCloseTimer);
+  nflCloseTimer = setTimeout(() => { if (!nflDialogMode) nflContent.replaceChildren(); }, 300);
+}
+
+function openNflDialog(mode, match) {
+  clearTimeout(nflCloseTimer);
+  if (!nflDialogMode) {
+    nflPreviousFocus = document.activeElement;
+    nflPreviousOverflow = document.body.style.overflow;
+  }
+  nflDialogMode = mode;
+  nflDialogMatch = { ...match };
+  nflOverlay.classList.toggle("sheet", mode === "info");
+  nflCloseButton.hidden = mode === "wager";
+  document.body.style.overflow = "hidden";
+  nflOverlay.setAttribute("aria-hidden", "false");
+  if (mode === "info") {
+    nflContent.innerHTML = `<div class="nfl-dialog-body">${nflHeader(match)}${nflMeta(match)}</div>`;
+  } else if (mode === "wager") {
+    nflPickedTeam = null;
+    nflPickedStake = 0;
+    nflContent.innerHTML = `<div class="nfl-dialog-body">${nflHeader(match)}
+      <div class="nfl-team-choices"><button type="button" class="nfl-choice" data-nfl-team="0" aria-pressed="false">${escapeHTML(match.team1)}</button><span>vs</span><button type="button" class="nfl-choice" data-nfl-team="1" aria-pressed="false">${escapeHTML(match.team2)}</button></div>
+      <div class="nfl-stake-value" id="nflStakeValue" aria-live="polite"><span>0 miles</span></div>
+      <p class="nfl-balance" id="nflBalanceLabel"></p>
+      <button class="nfl-action green nfl-wage-button" id="nflWageButton" type="button" aria-expanded="false" aria-controls="nflStakeOptions">Wage</button>
+      <div class="nfl-reveal" id="nflStakeOptions" inert><div><div class="nfl-stakes">${NFL_STAKES.map(stake => `<button type="button" class="nfl-choice" data-nfl-stake="${stake}" aria-pressed="false">${stake.toLocaleString("en-US")} miles</button>`).join("")}</div></div></div>
+      <div class="nfl-reveal" id="nflConfirmReveal" inert><div><div class="nfl-confirm-wrap"><button type="button" class="nfl-action green" id="nflConfirmWager">Confirm wager</button></div></div></div>
+      <p class="nfl-error" id="nflDialogError" role="alert"></p></div>`;
+    updateNflWagerControls();
+  } else if (mode === "result") {
+    nflPickedResult = null;
+    nflContent.innerHTML = `<div class="nfl-dialog-body">${nflHeader(match, "Who won?")}<p class="nfl-meta">${escapeHTML(nflTitle(match))}</p>
+      <div class="nfl-team-choices"><button class="nfl-choice" type="button" data-nfl-result="0" aria-pressed="false">${escapeHTML(match.team1)}</button><span>vs</span><button class="nfl-choice" type="button" data-nfl-result="1" aria-pressed="false">${escapeHTML(match.team2)}</button></div>
+      <button type="button" class="nfl-choice" data-nfl-result="tie" aria-pressed="false" style="width:100%;margin-top:10px">Tie</button>
+      <button type="button" class="nfl-action" id="nflReviewResult" style="width:100%;margin-top:20px" disabled>Review result</button></div>`;
+  } else if (mode === "cancel") {
+    renderNflSettlementConfirmation("cancel");
+  }
+  nflDialog.scrollTop = 0;
+  requestAnimationFrame(() => {
+    if (nflDialogMode !== mode || nflDialogMatch?.id !== match.id) return;
+    nflOverlay.classList.add("active");
+    nflDialog.focus({ preventScroll: true });
+  });
+}
+
+function updateNflWagerControls() {
+  if (nflDialogMode !== "wager" || nflDialogBusy) return;
+  document.getElementById("nflBalanceLabel").textContent = `${currentMilesBalance.toLocaleString("en-US")} miles available`;
+  nflContent.querySelectorAll("[data-nfl-stake]").forEach(button => { button.disabled = Number(button.dataset.nflStake) > currentMilesBalance; });
+  if (nflPickedStake > currentMilesBalance) {
+    nflPickedStake = 0;
+    nflContent.querySelectorAll("[data-nfl-stake]").forEach(button => button.setAttribute("aria-pressed", "false"));
+    document.getElementById("nflStakeValue").innerHTML = "<span>0 miles</span>";
+  }
+  const valid = nflPickedTeam !== null && NFL_STAKES.includes(nflPickedStake) && nflPickedStake <= currentMilesBalance;
+  const reveal = document.getElementById("nflConfirmReveal");
+  reveal.classList.toggle("open", valid);
+  reveal.inert = !valid;
+  document.getElementById("nflConfirmWager").disabled = !valid;
+}
+
+function renderNflSettlementConfirmation(result) {
+  const match = nflDialogMatch;
+  const refund = result === "cancel" || result === "tie";
+  const won = !refund && result === match.selectedTeam;
+  const title = result === "cancel" ? "Cancel match?" : result === "tie" ? "Confirm a tie?" : `${result === 0 ? match.team1 : match.team2} won?`;
+  const detail = refund ? `${match.stake.toLocaleString("en-US")} miles will be refunded.` : won ? `${(match.stake * 2).toLocaleString("en-US")} miles will be credited.` : "Your wager is lost. No additional miles will be deducted.";
+  nflPickedResult = result;
+  nflContent.innerHTML = `<div class="nfl-dialog-body">${nflHeader(match, title)}<p class="nfl-meta">${escapeHTML(nflTitle(match))}</p><p>${escapeHTML(detail)}</p>
+    <div class="nfl-actions"><button class="nfl-action secondary" id="nflBackResult" type="button">Back</button><button class="nfl-action ${result === "cancel" ? "red" : "green"}" id="nflConfirmResult" type="button">${result === "cancel" ? "Cancel match" : "Confirm result"}</button></div><p class="nfl-error" id="nflDialogError" role="alert"></p></div>`;
+}
+
+async function submitNflDialogAction(button, action) {
+  if (nflDialogBusy || !nflDialogMatch) return;
+  nflDialogBusy = true;
+  const matchId = nflDialogMatch.id;
+  const original = button.textContent;
+  button.style.minHeight = `${button.getBoundingClientRect().height}px`;
+  const controls = [...nflContent.querySelectorAll("button")];
+  controls.forEach(control => { control.disabled = true; });
+  nflCloseButton.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  button.innerHTML = '<span class="nfl-loader" aria-hidden="true"></span>';
+  try {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    if (action === "stake") {
+      const changed = await nflPlaceWager(matchId, nflPickedTeam, nflPickedStake);
+      if (!changed) {
+        const saved = await getDoc(nflMatchRef());
+        nflCurrentMatch = saved.exists() ? saved.data() : null;
+      }
+      if (changed && nflCurrentMatch?.id === matchId && nflCurrentMatch.status === "awaitingWager") {
+        nflCurrentMatch = { ...nflCurrentMatch, status: "active", selectedTeam: nflPickedTeam, stake: nflPickedStake };
+      }
+    } else {
+      const changed = await nflResolveMatch(matchId, nflPickedResult);
+      if (!changed) {
+        const saved = await getDoc(nflMatchRef());
+        nflCurrentMatch = saved.exists() ? saved.data() : null;
+      }
+      if (changed && nflCurrentMatch?.id === matchId && nflCurrentMatch.status === "active") nflCurrentMatch = { ...nflCurrentMatch, status: "closed" };
+    }
+    nflDialogBusy = false;
+    renderHomeFlights();
+    closeNflDialog(true);
+  } catch (error) {
+    nflDialogBusy = false;
+    button.textContent = original;
+    button.style.minHeight = "";
+    button.removeAttribute("aria-busy");
+    controls.forEach(control => { control.disabled = false; });
+    const errorEl = document.getElementById("nflDialogError");
+    if (errorEl) errorEl.textContent = error.message || "Unable to save. Please try again.";
+    updateNflWagerControls();
+  } finally {
+    nflCloseButton.disabled = false;
+    syncNflState();
+  }
+}
+
+function renderNflHomeCard(existing = null) {
+  if (nflCurrentMatch?.status !== "active") {
+    if (existing && !existing.classList.contains("leaving")) {
+      existing.style.maxHeight = `${existing.getBoundingClientRect().height}px`;
+      existing.getBoundingClientRect();
+      existing.classList.add("leaving");
+      setTimeout(() => existing.remove(), 300);
+    }
+    return;
+  }
+  const match = nflCurrentMatch;
+  if (existing?.dataset.matchId === match.id) return;
+  existing?.remove();
+  const card = document.createElement("section");
+  card.className = "nfl-home-card";
+  card.dataset.matchId = match.id;
+  card.setAttribute("aria-label", nflTitle(match));
+  card.innerHTML = `<img class="nfl-logo" src="./nfl.png" alt="NFL" /><h2 class="nfl-heading">${escapeHTML(nflTitle(match))}</h2><div class="nfl-divider"></div>${nflMeta(match)}<p class="nfl-wager-summary">${match.stake.toLocaleString("en-US")} miles on ${escapeHTML(match.selectedTeam === 0 ? match.team1 : match.team2)}</p><div class="nfl-actions"><button class="nfl-action" type="button" data-nfl-home="result">Complete match</button><button class="nfl-action red" type="button" data-nfl-home="cancel">Cancel match</button></div>`;
+  card.addEventListener("click", event => {
+    const button = event.target.closest("[data-nfl-home]");
+    if (button && nflCurrentMatch?.id === match.id && nflCurrentMatch.status === "active") openNflDialog(button.dataset.nflHome, nflCurrentMatch);
+  });
+  flightsList.prepend(card);
+}
+
+function syncNflState() {
+  if (!nflStateLoaded || !nflMilesLoaded || nflCompletionBusy) return;
+  updateNflWagerControls();
+  if (nflCurrentMatch?.status === "awaitingWager") {
+    if (currentMilesBalance < NFL_STAKES[0]) {
+      if (!nflSkipBusy && !nflDialogBusy) {
+        nflSkipBusy = true;
+        nflSkipIfUnaffordable(nflCurrentMatch.id).catch(error => console.error("NFL eligibility check failed:", error)).finally(() => { nflSkipBusy = false; });
+      }
+      if (nflDialogMode === "wager" && !nflDialogBusy) closeNflDialog(true);
+    } else if (!nflDialogBusy && (nflDialogMode !== "wager" || nflDialogMatch?.id !== nflCurrentMatch.id)) {
+      openNflDialog("wager", nflCurrentMatch);
+    }
+  } else if (nflDialogMode && nflDialogMode !== "info" && !nflDialogBusy &&
+    (nflDialogMatch?.id !== nflCurrentMatch?.id || nflCurrentMatch?.status !== "active" || nflDialogMode === "wager")) {
+    closeNflDialog(true);
+  }
+}
+
+function startNflWatcher() {
+  onSnapshot(nflMatchRef(), snapshot => {
+    nflCurrentMatch = snapshot.exists() ? snapshot.data() : null;
+    nflStateLoaded = true;
+    renderHomeFlights();
+    syncNflState();
+  }, error => { console.error("Error loading NFL match:", error); });
+}
+
+nflToggle.addEventListener("change", updateNflForm);
+flightForm.addEventListener("reset", () => setTimeout(updateNflForm, 0));
+nflLink.addEventListener("click", () => { if (activeFlight?.nflMatch) openNflDialog("info", activeFlight.nflMatch); });
+nflCloseButton.addEventListener("click", () => closeNflDialog());
+nflOverlay.addEventListener("click", event => { if (event.target === nflOverlay) closeNflDialog(); });
+nflOverlay.addEventListener("keydown", event => {
+  if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); closeNflDialog(); }
+  if (event.key !== "Tab") return;
+  const controls = [...nflDialog.querySelectorAll("button:not(:disabled), [href], input:not(:disabled)")].filter(el => !el.hidden && !el.closest("[inert]") && el.getClientRects().length);
+  if (!controls.length) { event.preventDefault(); return; }
+  const first = controls[0], last = controls.at(-1);
+  if (event.shiftKey && (document.activeElement === first || document.activeElement === nflDialog)) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && (document.activeElement === last || document.activeElement === nflDialog)) { event.preventDefault(); first.focus(); }
+});
+nflContent.addEventListener("click", event => {
+  const button = event.target.closest("button");
+  if (!button || button.disabled || nflDialogBusy) return;
+  if (button.hasAttribute("data-nfl-team")) {
+    nflPickedTeam = Number(button.dataset.nflTeam);
+    nflContent.querySelectorAll("[data-nfl-team]").forEach(el => el.setAttribute("aria-pressed", String(el === button)));
+    updateNflWagerControls();
+  } else if (button.id === "nflWageButton") {
+    const options = document.getElementById("nflStakeOptions");
+    const open = !options.classList.contains("open");
+    options.classList.toggle("open", open); options.inert = !open;
+    button.setAttribute("aria-expanded", String(open));
+  } else if (button.hasAttribute("data-nfl-stake")) {
+    nflPickedStake = Number(button.dataset.nflStake);
+    nflContent.querySelectorAll("[data-nfl-stake]").forEach(el => el.setAttribute("aria-pressed", String(el === button)));
+    document.getElementById("nflStakeValue").innerHTML = `<span>${nflPickedStake.toLocaleString("en-US")} miles</span>`;
+    updateNflWagerControls();
+  } else if (button.id === "nflConfirmWager") {
+    submitNflDialogAction(button, "stake");
+  } else if (button.hasAttribute("data-nfl-result")) {
+    nflPickedResult = button.dataset.nflResult === "tie" ? "tie" : Number(button.dataset.nflResult);
+    nflContent.querySelectorAll("[data-nfl-result]").forEach(el => el.setAttribute("aria-pressed", String(el === button)));
+    document.getElementById("nflReviewResult").disabled = false;
+  } else if (button.id === "nflReviewResult") {
+    renderNflSettlementConfirmation(nflPickedResult);
+  } else if (button.id === "nflBackResult") {
+    if (nflDialogMode === "cancel") closeNflDialog();
+    else openNflDialog("result", nflDialogMatch);
+  } else if (button.id === "nflConfirmResult") {
+    submitNflDialogAction(button, "result");
+  }
+});
+// NFL_UI_END
 
     editButton.addEventListener("click", () => {
       flightsPage.classList.add("hidden");
@@ -10856,6 +11428,7 @@ function getEarnedMiles(flight) {
 
 function updateCompleteFlightButton(flight) {
   if (!completeFlightButton) return;
+  if (nflCompletionBusy) return;
 
   const arrivedAtGate = flight && getFlightPhase(flight) === "gateArrival";
   const cbpClear = flight?.internationalUSArrival === true
@@ -11733,9 +12306,22 @@ const flightToSave = {
     documentsStatus: "active"
   };
 
-  const batch = writeBatch(db);
   const flightRef = doc(collection(db, "flights"));
   const savedFlightId = flightRef.id;
+  if (flightToSave.nflMatch) flightToSave.nflMatch = { ...flightToSave.nflMatch, id: savedFlightId };
+
+  await runTransaction(db, async batch => {
+    if (flightToSave.nflMatch) {
+      const slot = await batch.get(nflMatchRef());
+      if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
+    }
+    if (review.paymentMethod === "miles") {
+      const balance = nflBalance(await batch.get(doc(db, "miles", "balance")));
+      if (balance < dollarsToMiles(review.totalFare)) throw new Error("Not enough miles for this purchase.");
+    }
+    if (flightToSave.nflMatch) {
+      batch.set(nflMatchRef(), { ...flightToSave.nflMatch, flightId: savedFlightId, status: "linked", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    }
 
   if (review.paymentMethod === "card") {
     const cardTransactionRef = doc(collection(db, "cardTransactions"));
@@ -11824,7 +12410,7 @@ const flightToSave = {
   );
 }
 
-await batch.commit();
+  });
 
 pendingAssignedBoardingGroup = review.boardingGroup;
   pendingDocumentFlightId = savedFlightId;
@@ -13061,7 +13647,9 @@ function closeBoardingPassPage() {
 }
 
 function renderHomeFlights() {
-  flightsList.innerHTML = "";
+  const existingNflCard = flightsList.querySelector(".nfl-home-card");
+  [...flightsList.children].forEach(child => { if (child !== existingNflCard) child.remove(); });
+  renderNflHomeCard(existingNflCard);
 
   const sortedFlights = getSortedFlightsForHome();
 
@@ -13438,6 +14026,7 @@ arrivalStatusLine.innerHTML = `
 
     function openFlightDetails(flight) {
       activeFlight = flight;
+      updateNflFlightLink(flight);
 
       detailLogoSpace.innerHTML = `
   <img
@@ -14510,7 +15099,36 @@ document.addEventListener("keydown", (event) => {
       flightAddedPopup.classList.add("active");
     }
 
-    addFlightButton.addEventListener("click", () => {
+    addFlightButton.addEventListener("click", async () => {
+  if (addFlightButton.disabled) return;
+  let nflMatchDetails = null;
+  if (nflToggle.checked) {
+    addFlightButton.disabled = true;
+    try {
+      nflMatchDetails = nflReadForm();
+      if (nflIsMatchOnlyForm()) {
+        addFlightButton.disabled = true;
+        const created = await nflCreateStandalone(nflMatchDetails);
+        if (!created) {
+          showNotification("At least 500 miles are required to wager.");
+          return;
+        }
+        flightForm.reset();
+        backButton.click();
+        syncNflState();
+        return;
+      }
+      const slot = await getDoc(nflMatchRef());
+      if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
+    } catch (error) {
+      const errorEl = document.getElementById("nflFormError");
+      errorEl.textContent = error.message || "Unable to add the NFL match.";
+      errorEl.hidden = false;
+      return;
+    } finally {
+      addFlightButton.disabled = false;
+    }
+  }
   if (!selectedAircraftType) {
     showNotification("Select an aircraft!");
     openAircraftDropdown();
@@ -14518,6 +15136,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   const flight = {
+    nflMatch: nflMatchDetails,
     airline: airlineInput.value.trim().toUpperCase() || "AA",
 airlineName: airlineNameInput.value.trim() || airlineInput.value.trim().toUpperCase() || "Airline",
 flightNumber: flightNumberInput.value.trim() || "0000",
@@ -14612,6 +15231,7 @@ createdAt: serverTimestamp()
     }
 
     function startMainSite() {
+    startNflWatcher();
     onSnapshot(doc(db, "cbpLock", "main"), (snapshot) => {
   const data = snapshot.exists() ? snapshot.data() : null;
 
@@ -14643,6 +15263,8 @@ createdAt: serverTimestamp()
   const balance = Number(data.balance || 0);
 
   currentMilesBalance = balance;
+  nflMilesLoaded = true;
+  syncNflState();
   milesBalanceDisplay.textContent = balance.toLocaleString("en-US");
   if (renewPassportPopup.classList.contains("active")) {
     updateRenewPassportPaymentUI();
@@ -14741,7 +15363,6 @@ onSnapshot(transactionsQuery, (snapshot) => {
     const flightsQuery = query(collection(db, "flights"), orderBy("createdAt", "desc"));
 
     onSnapshot(flightsQuery, (snapshot) => {
-      flightsList.innerHTML = "";
 allFlights.clear();
 latestFlightsCache = [];
 
@@ -15584,11 +16205,12 @@ if (
     });
 
     completeFlightButton?.addEventListener("click", async () => {
-  if (!activeFlight || getFlightPhase(activeFlight) !== "gateArrival") {
+  if (!activeFlight || getFlightPhase(activeFlight) !== "gateArrival" || completeFlightButton.disabled || nflCompletionBusy) {
     return;
   }
 
   const completedFlight = activeFlight;
+  nflCompletionBusy = true;
 
 completeFlightButton.disabled = true;
 completeFlightButton.classList.add("disabled");
@@ -15596,76 +16218,22 @@ completeFlightButton.classList.add("loading");
 completeFlightButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
 
   try {
-    const batch = writeBatch(db);
-
-    const flightRef = getFlightRef(completedFlight.id);
-
-let awardedMiles = 0;
-
-if (completedFlight.paymentMethod === "card" && completedFlight.paymentTransactionId) {
-  const cardTransactionRef = doc(db, "cardTransactions", completedFlight.paymentTransactionId);
-  const cardTransactionSnap = await getDoc(cardTransactionRef);
-  const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
-
-  const rewardFlight = { ...completedFlight, totalFare: cardTransaction?.amount ?? completedFlight.totalFare };
-  awardedMiles = cardTransaction?.status === "pending" || !cardTransaction
-    ? calculateFallbackCardMilesForFlight(rewardFlight)
-    : Math.floor(Number(cardTransaction.milesEarned ?? calculateFallbackCardMilesForFlight(rewardFlight)));
-
-  batch.set(
-    cardTransactionRef,
-    {
-      status: "approved",
-      ...(cardTransaction?.status === "pending" ? {
-        milesEarned: awardedMiles,
-        rewardsRate: getCardFlightMilesRate(rewardFlight),
-        rewardsVersion: CARD_FLIGHT_REWARDS_VERSION
-      } : {}),
-      postedAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
-
-  batch.set(
-    doc(db, "cardAccount", "aviatorReserve"),
-    {
-      currentBalance: increment(Number(cardTransaction?.amount || completedFlight.totalFare || 0)),
-      rewardsMiles: increment(awardedMiles),
-      creditLimit: AVIATOR_RESERVE_LIMIT,
-      last4: AVIATOR_RESERVE_LAST4,
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
-}
-    
-    batch.set(
-  doc(db, "documentPackets", completedFlight.id),
-  {
-    status: "archived",
-    flightCompleted: true,
-    documentsStatus: "archived",
-    archivedAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  },
-  { merge: true }
-);
-
-batch.delete(flightRef);
-
-    await batch.commit();
+    await completeFlightWithNfl(completedFlight);
 
     closeFlightDetails();
     allFlights.delete(completedFlight.id);
 
     showNotification("Flight completed!");
+    renderHomeFlights();
   } catch (error) {
     console.error("Error completing flight:", error);
     alert("Flight could not be completed. Check your Firestore rules.");
     completeFlightButton.classList.remove("loading");
     completeFlightButton.textContent = "Complete flight";
-    updateCompleteFlightButton(activeFlight);
+  } finally {
+    nflCompletionBusy = false;
+    if (activeFlight) updateCompleteFlightButton(activeFlight);
+    syncNflState();
   }
 });
     
@@ -16184,67 +16752,7 @@ transactionDeleteButton.addEventListener("click", async () => {
 
         const deletingId = activeFlight.id;
         const deletingFlight = activeFlight;
-        const batch = writeBatch(db);
-
-        batch.delete(getFlightRef(deletingId));
-        batch.delete(doc(db, "documentPackets", deletingId));
-
-        if (deletingFlight.boardingSessionId || deletingFlight.id) {
-          batch.delete(doc(db, "boardingSessions", deletingFlight.boardingSessionId || deletingFlight.id));
-        }
-
-        if (deletingFlight.paymentMethod === "card" && deletingFlight.paymentTransactionId) {
-          const cardTransactionRef = doc(db, "cardTransactions", deletingFlight.paymentTransactionId);
-          const cardTransactionSnap = await getDoc(cardTransactionRef);
-          const cardTransaction = cardTransactionSnap.exists() ? cardTransactionSnap.data() : null;
-          const shouldReverseCardBalance = cardTransaction && cardTransaction.status !== "pending";
-
-          batch.delete(cardTransactionRef);
-
-          if (shouldReverseCardBalance) {
-            batch.set(
-              doc(db, "cardAccount", "aviatorReserve"),
-              {
-                currentBalance: increment(-Number(cardTransaction.amount || deletingFlight.totalFare || 0)),
-                updatedAt: serverTimestamp()
-              },
-              { merge: true }
-            );
-          }
-        }
-
-        if (deletingFlight.paymentMethod === "miles") {
-          const refundMiles = dollarsToMiles(Number(deletingFlight.totalFare || 0));
-
-          if (refundMiles > 0) {
-            batch.set(
-              doc(db, "miles", "balance"),
-              {
-                balance: increment(refundMiles),
-                updatedAt: serverTimestamp()
-              },
-              { merge: true }
-            );
-
-            batch.set(doc(collection(db, "mileTransactions")), {
-              type: "earned",
-              title: "Flight Purchase Refund",
-              amount: refundMiles,
-              airline: deletingFlight.airline || "",
-              airlineName: deletingFlight.airlineName || deletingFlight.airline || "Airline",
-              flightNumber: deletingFlight.flightNumber || "",
-              departureAirport: deletingFlight.departureAirport || "",
-              arrivalAirport: deletingFlight.arrivalAirport || "",
-              createdAt: serverTimestamp()
-            });
-          }
-
-          if (deletingFlight.paymentTransactionId) {
-            batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
-          }
-        }
-
-        await batch.commit();
+        await deleteFlightWithNfl(deletingFlight);
 
         allFlights.delete(deletingId);
         isManagementDeletingFlight = false;
