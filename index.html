@@ -9401,9 +9401,23 @@ addFlightPage.addEventListener("scroll", positionAircraftDropdown);
 // NFL_CORE_START
 const NFL_STAKES = [500, 1000, 1500, 2500, 5000];
 
-function nflMatchRef() {
+function nflMatchRef(id) {
   // Reuse the owner-only sports collection, in a separate NFL document.
-  return doc(db, "activeWorldCupMatch", "nfl");
+  if (!id || !/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error("Invalid match ID.");
+  return doc(db, "activeWorldCupMatch", `nfl_${id}`);
+}
+
+async function nflMigrateLegacyMatch() {
+  return runTransaction(db, async transaction => {
+    const legacyRef = doc(db, "activeWorldCupMatch", "nfl");
+    const legacy = await transaction.get(legacyRef);
+    const match = legacy.exists() ? legacy.data() : null;
+    if (!nflIsOpen(match) || !match.id) return;
+    const targetRef = nflMatchRef(match.id);
+    const target = await transaction.get(targetRef);
+    if (!target.exists()) transaction.set(targetRef, { ...match, sport: "NFL" });
+    transaction.update(legacyRef, { status: "migrated", migratedTo: `nfl_${match.id}`, updatedAt: serverTimestamp() });
+  });
 }
 
 function nflIsOpen(match) {
@@ -9433,11 +9447,9 @@ async function nflCreateStandalone(values) {
   const details = nflValidateMatch(values);
   const id = doc(collection(db, "activeWorldCupMatch")).id;
   return runTransaction(db, async transaction => {
-    const slot = await transaction.get(nflMatchRef());
     const balance = nflBalance(await transaction.get(doc(db, "miles", "balance")));
-    if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
     if (balance < NFL_STAKES[0]) return false;
-    transaction.set(nflMatchRef(), { ...details, id, flightId: null, status: "awaitingWager", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    transaction.set(nflMatchRef(id), { ...details, id, sport: "NFL", flightId: null, status: "awaitingWager", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return true;
   });
 }
@@ -9445,7 +9457,7 @@ async function nflCreateStandalone(values) {
 async function nflPlaceWager(id, team, stake) {
   if (![0, 1].includes(team) || !NFL_STAKES.includes(stake)) throw new Error("Choose a team and wager amount.");
   return runTransaction(db, async transaction => {
-    const snapshot = await transaction.get(nflMatchRef());
+    const snapshot = await transaction.get(nflMatchRef(id));
     const balanceRef = doc(db, "miles", "balance");
     const balance = nflBalance(await transaction.get(balanceRef));
     const match = snapshot.exists() ? snapshot.data() : null;
@@ -9458,7 +9470,7 @@ async function nflPlaceWager(id, team, stake) {
       type: "spent", icon: "nfl", airline: "NFL", title: `${match.team1} vs ${match.team2}`,
       amount: stake, nflMatchId: id, selectedTeam: team === 0 ? match.team1 : match.team2, createdAt: serverTimestamp()
     });
-    transaction.update(nflMatchRef(), { status: "active", selectedTeam: team, stake, wageredAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    transaction.update(nflMatchRef(id), { status: "active", selectedTeam: team, stake, wageredAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return true;
   });
 }
@@ -9466,7 +9478,7 @@ async function nflPlaceWager(id, team, stake) {
 async function nflResolveMatch(id, result) {
   if (![0, 1, "tie", "cancel"].includes(result)) throw new Error("Choose a match result.");
   return runTransaction(db, async transaction => {
-    const snapshot = await transaction.get(nflMatchRef());
+    const snapshot = await transaction.get(nflMatchRef(id));
     const balanceRef = doc(db, "miles", "balance");
     const balance = nflBalance(await transaction.get(balanceRef));
     const match = snapshot.exists() ? snapshot.data() : null;
@@ -9484,24 +9496,25 @@ async function nflResolveMatch(id, result) {
         result: String(result), createdAt: serverTimestamp()
       });
     }
-    transaction.update(nflMatchRef(), { status: "closed", result: String(result), outcome: refund ? "refunded" : won ? "won" : "lost", creditedMiles: credit, settledAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    transaction.update(nflMatchRef(id), { status: "closed", result: String(result), outcome: refund ? "refunded" : won ? "won" : "lost", creditedMiles: credit, settledAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return true;
   });
 }
 
 async function nflSkipIfUnaffordable(id) {
   return runTransaction(db, async transaction => {
-    const snapshot = await transaction.get(nflMatchRef());
+    const snapshot = await transaction.get(nflMatchRef(id));
     const balance = nflBalance(await transaction.get(doc(db, "miles", "balance")));
     const match = snapshot.exists() ? snapshot.data() : null;
     if (match?.id === id && match.status === "awaitingWager" && balance < NFL_STAKES[0]) {
-      transaction.update(nflMatchRef(), { status: "skipped", updatedAt: serverTimestamp() });
+      transaction.update(nflMatchRef(id), { status: "skipped", updatedAt: serverTimestamp() });
       return true;
     }
     return false;
   });
 }
 async function completeFlightWithNfl(completedFlight) {
+  if (completedFlight.nflMatch) await nflMigrateLegacyMatch();
   return runTransaction(db, async batch => {
     const flightRef = getFlightRef(completedFlight.id);
     const flightSnapshot = await batch.get(flightRef);
@@ -9515,7 +9528,7 @@ async function completeFlightWithNfl(completedFlight) {
       ? doc(db, "cardTransactions", completedFlight.paymentTransactionId) : null;
     const cardTransactionSnap = cardTransactionRef ? await batch.get(cardTransactionRef) : null;
     const cardTransaction = cardTransactionSnap?.exists() ? cardTransactionSnap.data() : null;
-    const slot = completedFlight.nflMatch ? await batch.get(nflMatchRef()) : null;
+    const slot = completedFlight.nflMatch ? await batch.get(nflMatchRef(completedFlight.nflMatch.id)) : null;
     const match = slot?.exists() ? slot.data() : null;
     const balance = match && match.id === completedFlight.nflMatch?.id && match.status === "linked"
       ? nflBalance(await batch.get(doc(db, "miles", "balance"))) : null;
@@ -9543,7 +9556,7 @@ async function completeFlightWithNfl(completedFlight) {
       status: "archived", flightCompleted: true, documentsStatus: "archived", archivedAt: serverTimestamp(), updatedAt: serverTimestamp()
     }, { merge: true });
     if (balance !== null) {
-      batch.update(nflMatchRef(), {
+      batch.update(nflMatchRef(match.id), {
         status: balance >= NFL_STAKES[0] ? "awaitingWager" : "skipped", flightCompletedAt: serverTimestamp(), updatedAt: serverTimestamp()
       });
     }
@@ -9553,6 +9566,7 @@ async function completeFlightWithNfl(completedFlight) {
 }
 
 async function deleteFlightWithNfl(deletingFlight) {
+  if (deletingFlight.nflMatch) await nflMigrateLegacyMatch();
   return runTransaction(db, async batch => {
     const flightRef = getFlightRef(deletingFlight.id);
     const flightSnapshot = await batch.get(flightRef);
@@ -9562,7 +9576,7 @@ async function deleteFlightWithNfl(deletingFlight) {
       ? doc(db, "cardTransactions", deletingFlight.paymentTransactionId) : null;
     const cardSnap = cardRef ? await batch.get(cardRef) : null;
     const card = cardSnap?.exists() ? cardSnap.data() : null;
-    const slot = deletingFlight.nflMatch ? await batch.get(nflMatchRef()) : null;
+    const slot = deletingFlight.nflMatch ? await batch.get(nflMatchRef(deletingFlight.nflMatch.id)) : null;
     const match = slot?.exists() ? slot.data() : null;
     batch.delete(flightRef);
     batch.delete(doc(db, "documentPackets", deletingFlight.id));
@@ -9589,7 +9603,7 @@ async function deleteFlightWithNfl(deletingFlight) {
       if (deletingFlight.paymentTransactionId) batch.delete(doc(db, "mileTransactions", deletingFlight.paymentTransactionId));
     }
     if (match && match.id === deletingFlight.nflMatch?.id && match.status === "linked") {
-      batch.update(nflMatchRef(), { status: "closed", outcome: "flightDeleted", updatedAt: serverTimestamp() });
+      batch.update(nflMatchRef(match.id), { status: "closed", outcome: "flightDeleted", updatedAt: serverTimestamp() });
     }
     return true;
   });
@@ -9597,7 +9611,7 @@ async function deleteFlightWithNfl(deletingFlight) {
 // NFL_CORE_END
 
 // NFL_UI_START
-let nflCurrentMatch = null;
+let nflMatches = new Map();
 let nflStateLoaded = false;
 let nflMilesLoaded = false;
 let nflSkipBusy = false;
@@ -9659,11 +9673,15 @@ function closeNflDialog(force = false) {
   document.body.style.overflow = nflPreviousOverflow;
   nflPreviousFocus?.focus?.();
   clearTimeout(nflCloseTimer);
-  nflCloseTimer = setTimeout(() => { if (!nflDialogMode) nflContent.replaceChildren(); }, 300);
+  nflCloseTimer = setTimeout(() => {
+    nflCloseTimer = null;
+    if (!nflDialogMode) { nflContent.replaceChildren(); syncNflState(); }
+  }, 300);
 }
 
 function openNflDialog(mode, match) {
   clearTimeout(nflCloseTimer);
+  nflCloseTimer = null;
   if (!nflDialogMode) {
     nflPreviousFocus = document.activeElement;
     nflPreviousOverflow = document.body.style.overflow;
@@ -9748,19 +9766,23 @@ async function submitNflDialogAction(button, action) {
     if (action === "stake") {
       const changed = await nflPlaceWager(matchId, nflPickedTeam, nflPickedStake);
       if (!changed) {
-        const saved = await getDoc(nflMatchRef());
-        nflCurrentMatch = saved.exists() ? saved.data() : null;
+        const saved = await getDoc(nflMatchRef(matchId));
+        if (saved.exists()) nflMatches.set(matchId, saved.data());
+        else nflMatches.delete(matchId);
       }
-      if (changed && nflCurrentMatch?.id === matchId && nflCurrentMatch.status === "awaitingWager") {
-        nflCurrentMatch = { ...nflCurrentMatch, status: "active", selectedTeam: nflPickedTeam, stake: nflPickedStake };
+      const current = nflMatches.get(matchId);
+      if (changed && current?.status === "awaitingWager") {
+        nflMatches.set(matchId, { ...current, status: "active", selectedTeam: nflPickedTeam, stake: nflPickedStake });
       }
     } else {
       const changed = await nflResolveMatch(matchId, nflPickedResult);
       if (!changed) {
-        const saved = await getDoc(nflMatchRef());
-        nflCurrentMatch = saved.exists() ? saved.data() : null;
+        const saved = await getDoc(nflMatchRef(matchId));
+        if (saved.exists()) nflMatches.set(matchId, saved.data());
+        else nflMatches.delete(matchId);
       }
-      if (changed && nflCurrentMatch?.id === matchId && nflCurrentMatch.status === "active") nflCurrentMatch = { ...nflCurrentMatch, status: "closed" };
+      const current = nflMatches.get(matchId);
+      if (changed && current?.status === "active") nflMatches.set(matchId, { ...current, status: "closed" });
     }
     nflDialogBusy = false;
     renderHomeFlights();
@@ -9780,18 +9802,8 @@ async function submitNflDialogAction(button, action) {
   }
 }
 
-function renderNflHomeCard(existing = null) {
-  if (nflCurrentMatch?.status !== "active") {
-    if (existing && !existing.classList.contains("leaving")) {
-      existing.style.maxHeight = `${existing.getBoundingClientRect().height}px`;
-      existing.getBoundingClientRect();
-      existing.classList.add("leaving");
-      setTimeout(() => existing.remove(), 300);
-    }
-    return;
-  }
-  const match = nflCurrentMatch;
-  if (existing?.dataset.matchId === match.id) return;
+function renderNflHomeCard(match, existing = null) {
+  if (existing?.dataset.matchId === match.id) return existing;
   existing?.remove();
   const card = document.createElement("section");
   card.className = "nfl-home-card";
@@ -9800,33 +9812,63 @@ function renderNflHomeCard(existing = null) {
   card.innerHTML = `<img class="nfl-logo" src="./nfl.png" alt="NFL" /><h2 class="nfl-heading">${escapeHTML(nflTitle(match))}</h2><div class="nfl-divider"></div>${nflMeta(match)}<p class="nfl-wager-summary">${match.stake.toLocaleString("en-US")} miles on ${escapeHTML(match.selectedTeam === 0 ? match.team1 : match.team2)}</p><div class="nfl-actions"><button class="nfl-action" type="button" data-nfl-home="result">Complete match</button><button class="nfl-action red" type="button" data-nfl-home="cancel">Cancel match</button></div>`;
   card.addEventListener("click", event => {
     const button = event.target.closest("[data-nfl-home]");
-    if (button && nflCurrentMatch?.id === match.id && nflCurrentMatch.status === "active") openNflDialog(button.dataset.nflHome, nflCurrentMatch);
+    const current = nflMatches.get(match.id);
+    if (button && current?.status === "active") openNflDialog(button.dataset.nflHome, current);
   });
-  flightsList.prepend(card);
+  return card;
+}
+
+function nflSortedMatches(status) {
+  return [...nflMatches.values()].filter(match => match.status === status)
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)) || a.id.localeCompare(b.id));
+}
+
+function renderNflHomeCards() {
+  const active = nflSortedMatches("active");
+  const ids = new Set(active.map(match => match.id));
+  const existing = new Map([...flightsList.querySelectorAll(".nfl-home-card")].map(card => [card.dataset.matchId, card]));
+  existing.forEach((card, id) => {
+    if (ids.has(id) || card.classList.contains("leaving")) return;
+    card.style.maxHeight = `${card.getBoundingClientRect().height}px`;
+    card.getBoundingClientRect();
+    card.classList.add("leaving");
+    setTimeout(() => card.remove(), 300);
+  });
+  let previous = null;
+  active.forEach(match => {
+    const card = renderNflHomeCard(match, existing.get(match.id));
+    const position = previous ? previous.nextSibling : flightsList.firstChild;
+    if (card !== position) flightsList.insertBefore(card, position);
+    previous = card;
+  });
 }
 
 function syncNflState() {
-  if (!nflStateLoaded || !nflMilesLoaded || nflCompletionBusy) return;
+  if (!nflStateLoaded || !nflMilesLoaded || nflCompletionBusy || nflDialogBusy) return;
   updateNflWagerControls();
-  if (nflCurrentMatch?.status === "awaitingWager") {
-    if (currentMilesBalance < NFL_STAKES[0]) {
-      if (!nflSkipBusy && !nflDialogBusy) {
-        nflSkipBusy = true;
-        nflSkipIfUnaffordable(nflCurrentMatch.id).catch(error => console.error("NFL eligibility check failed:", error)).finally(() => { nflSkipBusy = false; });
-      }
-      if (nflDialogMode === "wager" && !nflDialogBusy) closeNflDialog(true);
-    } else if (!nflDialogBusy && (nflDialogMode !== "wager" || nflDialogMatch?.id !== nflCurrentMatch.id)) {
-      openNflDialog("wager", nflCurrentMatch);
-    }
-  } else if (nflDialogMode && nflDialogMode !== "info" && !nflDialogBusy &&
-    (nflDialogMatch?.id !== nflCurrentMatch?.id || nflCurrentMatch?.status !== "active" || nflDialogMode === "wager")) {
-    closeNflDialog(true);
+  const showing = nflMatches.get(nflDialogMatch?.id);
+  if (nflDialogMode && nflDialogMode !== "info") {
+    const expected = nflDialogMode === "wager" ? "awaitingWager" : "active";
+    if (showing?.status !== expected || (nflDialogMode === "wager" && currentMilesBalance < NFL_STAKES[0])) closeNflDialog(true);
   }
+  const pending = nflSortedMatches("awaitingWager");
+  if (currentMilesBalance < NFL_STAKES[0]) {
+    if (pending.length && !nflSkipBusy) {
+      nflSkipBusy = true;
+      Promise.all(pending.map(match => nflSkipIfUnaffordable(match.id)))
+        .catch(error => console.error("NFL eligibility check failed:", error))
+        .finally(() => { nflSkipBusy = false; });
+    }
+    return;
+  }
+  if (!nflDialogMode && !nflCloseTimer && pending.length) openNflDialog("wager", pending[0]);
 }
 
-function startNflWatcher() {
-  onSnapshot(nflMatchRef(), snapshot => {
-    nflCurrentMatch = snapshot.exists() ? snapshot.data() : null;
+async function startNflWatcher() {
+  try { await nflMigrateLegacyMatch(); }
+  catch (error) { console.error("Unable to migrate the existing NFL match:", error); showNotification("NFL matches could not be loaded. Please reload."); return; }
+  onSnapshot(query(collection(db, "activeWorldCupMatch"), where("sport", "==", "NFL")), snapshot => {
+    nflMatches = new Map(snapshot.docs.map(item => { const match = item.data(); return [match.id, match]; }));
     nflStateLoaded = true;
     renderHomeFlights();
     syncNflState();
@@ -12312,15 +12354,15 @@ const flightToSave = {
 
   await runTransaction(db, async batch => {
     if (flightToSave.nflMatch) {
-      const slot = await batch.get(nflMatchRef());
-      if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
+      const existing = await batch.get(nflMatchRef(savedFlightId));
+      if (existing.exists()) throw new Error("This flight already has a match.");
     }
     if (review.paymentMethod === "miles") {
       const balance = nflBalance(await batch.get(doc(db, "miles", "balance")));
       if (balance < dollarsToMiles(review.totalFare)) throw new Error("Not enough miles for this purchase.");
     }
     if (flightToSave.nflMatch) {
-      batch.set(nflMatchRef(), { ...flightToSave.nflMatch, flightId: savedFlightId, status: "linked", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      batch.set(nflMatchRef(savedFlightId), { ...flightToSave.nflMatch, sport: "NFL", flightId: savedFlightId, status: "linked", selectedTeam: null, stake: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     }
 
   if (review.paymentMethod === "card") {
@@ -13647,9 +13689,8 @@ function closeBoardingPassPage() {
 }
 
 function renderHomeFlights() {
-  const existingNflCard = flightsList.querySelector(".nfl-home-card");
-  [...flightsList.children].forEach(child => { if (child !== existingNflCard) child.remove(); });
-  renderNflHomeCard(existingNflCard);
+  [...flightsList.children].forEach(child => { if (!child.classList.contains("nfl-home-card")) child.remove(); });
+  renderNflHomeCards();
 
   const sortedFlights = getSortedFlightsForHome();
 
@@ -15118,8 +15159,6 @@ document.addEventListener("keydown", (event) => {
         syncNflState();
         return;
       }
-      const slot = await getDoc(nflMatchRef());
-      if (nflIsOpen(slot.exists() ? slot.data() : null)) throw new Error("Finish or cancel your current NFL match first.");
     } catch (error) {
       const errorEl = document.getElementById("nflFormError");
       errorEl.textContent = error.message || "Unable to add the NFL match.";
