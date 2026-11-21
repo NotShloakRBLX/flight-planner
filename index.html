@@ -10785,15 +10785,24 @@ function isFlightMoreThan24HoursAway(flight) {
   return departureDate - new Date() > 24 * 60 * 60 * 1000;
 }
 
+function getTripCheckInAnchor(flight) {
+  if (!flight?.tripId) return flight;
+  const trip=trips.find(item=>item.id === flight.tripId);
+  const leg=trip?.legs.find(item=>(item.flightId || item.flight?.id) === flight.id);
+  const first=trip?.legs.find(item=>item.direction === (leg?.direction || flight.tripDirection));
+  return first ? allFlights.get(first.flightId || first.flight?.id) || first.flight : flight;
+}
     function getCheckInOpenDate(flight) {
-  const departureDate = getDepartureDateTime(flight);
+  const departureDate = getDepartureDateTime(getTripCheckInAnchor(flight));
   if (!departureDate || Number.isNaN(departureDate.getTime())) return null;
   return addMinutes(departureDate, -24 * 60);
 }
 
 function hasCheckInOpened(flight) {
   if (!flight) return false;
-  if (flight.checkInOpened === true) return true;
+  const anchor=getTripCheckInAnchor(flight);
+  if (flight.tripId && ((anchor.phase && anchor.phase !== "scheduled") || getDepartureDateTime(anchor)<=new Date())) return false;
+  if (anchor.checkInOpened === true) return true;
 
   const checkInOpenDate = getCheckInOpenDate(flight);
   if (!checkInOpenDate) return false;
@@ -10829,6 +10838,11 @@ function formatCheckInOpenText(flight) {
     function getCheckInSiteUrl(flight) {
   const url = new URL(CHECK_IN_SITE_URL);
   url.searchParams.set("flightId", flight.id || "");
+  if (flight.tripId) {
+    url.searchParams.set("tripId",flight.tripId);
+    const leg=trips.find(trip=>trip.id === flight.tripId)?.legs.find(item=>(item.flightId || item.flight?.id) === flight.id);
+    url.searchParams.set("direction",leg?.direction || flight.tripDirection || "depart");
+  }
   url.searchParams.set("returnUrl", MAIN_SITE_RETURN_URL);
   return url.toString();
 }
