@@ -7475,8 +7475,6 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .transaction-trip-leg div { min-width: 0; }
     .transaction-trip-leg small, .transaction-trip-leg span { display: block; color: #aebccd; font-size: 12px; margin-top: 5px; }
     .transaction-trip-leg > strong { white-space: nowrap; }
-    .transaction-trip-method { display: block; margin: 18px 0; font-size: 14px; color: #bdc5d6; }
-    .transaction-trip-method select { display: block; width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #526075; border-radius: 7px; background: #171f2e; color: white; font: inherit; }
     .trips-segment { position: relative; isolation: isolate; }
     .trips-segment::before { content: ""; position: absolute; z-index: -1; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 12px)/2); border-radius: 5px; background: #303c4d; transition: transform .42s cubic-bezier(.22,1,.36,1); }
     .trips-segment.is-oneway::before { transform: translateX(calc(100% + 4px)); }
@@ -12647,6 +12645,12 @@ pendingAssignedBoardingGroup = review.boardingGroup;
   return savedFlightId;
 }
 
+function paymentFailureMessage(error) {
+  if (error?.code === "permission-denied") return "Payment could not be processed. Access was denied. Sign in again and retry.";
+  if (["unavailable","deadline-exceeded"].includes(error?.code)) return "The booking result could not be confirmed. Check Trips before trying again.";
+  return error?.message ? `Payment could not be processed: ${error.message}` : "Payment could not be processed. Please try again.";
+}
+
 async function processTransactionReviewPayment() {
   if (!pendingTransactionReview) return;
   if (transactionPayButton.disabled || transactionPaymentProcessing) return;
@@ -12676,13 +12680,13 @@ async function processTransactionReviewPayment() {
 
   transactionPaymentProcessing = true;
   transactionEmailInput.disabled = true;
-  if (document.getElementById("transactionTripPayment")) document.getElementById("transactionTripPayment").disabled = true;
   transactionCancelButton.disabled = true;
   transactionPayButton.disabled = true;
   transactionPayButton.classList.add("is-processing");
   transactionPayButton.setAttribute("aria-busy", "true");
   transactionPayButton.setAttribute("aria-label", "Processing payment");
 
+  let paymentError = null;
   try {
     await new Promise(resolve => setTimeout(resolve, review.tripId ? 1400 : 5000));
     if (review.tripId) await confirmTripBooking(review);
@@ -12690,17 +12694,17 @@ async function processTransactionReviewPayment() {
     showPaymentConfirmation(review);
   } catch (error) {
     console.error("Payment could not be processed:", error);
-    alert("Payment could not be processed. Check Firestore rules.");
+    paymentError = error;
     transactionPayButton.disabled = false;
   } finally {
     transactionPaymentProcessing = false;
     transactionEmailInput.disabled = false;
-    if (document.getElementById("transactionTripPayment")) document.getElementById("transactionTripPayment").disabled = false;
     transactionCancelButton.disabled = false;
     transactionPayButton.classList.remove("is-processing");
     transactionPayButton.removeAttribute("aria-busy");
     transactionPayButton.removeAttribute("aria-label");
   }
+  if (paymentError) alert(paymentFailureMessage(paymentError));
 }
     
     function watchActiveSeatSelectionSession(sessionId, allowRetry = true) {
@@ -17107,8 +17111,8 @@ async function saveTripBooking(review) {
     const balanceRef=doc(db,"miles","balance");
     const balance=review.paymentMethod === "miles" ? nflBalance(await transaction.get(balanceRef)) : null;
     if (balance !== null && balance<milesTotal) throw new Error("Not enough miles for this trip.");
-    const account=review.paymentMethod === "card" ? await transaction.get(doc(db,"cardAccount","aviatorReserve")) : null;
-    if (account && Number(account.data()?.currentBalance || 0)+currentPendingCardHold+booked.totalFare>AVIATOR_RESERVE_LIMIT) throw new Error("Not enough available credit.");
+    // Reserve's net balance comes from its statement/payment ledger, not the legacy account counter.
+    if (review.paymentMethod === "card" && getAvailableCredit()<booked.totalFare) throw new Error("Not enough available credit.");
     for (const e of entries) {
       const prior=await transaction.get(e.flightRef);
       if (prior.exists()) throw new Error("A flight in this booking already exists.");
@@ -17522,8 +17526,7 @@ function configureTripTransactionReview(review) {
   if (!isTrip) { summary.replaceChildren(); summary.tripReview=null; return; }
   transactionReviewRoute.textContent = tripCheckoutTitle(review.legs);
   if (summary.tripReview !== review) {
-  summary.innerHTML = review.legs.map(leg=>`<div class="transaction-trip-leg"><img class="transaction-trip-airline" src="${escapeHTML(getAirlineLogoPath(leg.flight.airline))}" alt="${escapeHTML(leg.flight.airline)} logo" onerror="this.style.visibility='hidden'"><div><strong>${escapeHTML(leg.flight.airline)} ${escapeHTML(leg.flight.flightNumber)} / ${escapeHTML(leg.flight.departureAirport)} &rarr; ${escapeHTML(leg.flight.arrivalAirport)}</strong><small>${escapeHTML(tripsDate(leg.flight))} &middot; ${escapeHTML(leg.flight.seatCabin)} &middot; ${escapeHTML(leg.flight.seat)}</small><span>Fare <span data-trip-base></span> &middot; Seat <span data-trip-seat></span></span></div><strong data-trip-total></strong></div>`).join("") +
-    `<label class="transaction-trip-method">Payment method<select id="transactionTripPayment" ${transactionPaymentProcessing ? "disabled" : ""}><option value="card" ${review.paymentMethod === "card" ? "selected" : ""}>Aviator Reserve</option><option value="miles" ${review.paymentMethod === "miles" ? "selected" : ""}>Miles</option></select></label>`;
+  summary.innerHTML = review.legs.map(leg=>`<div class="transaction-trip-leg"><img class="transaction-trip-airline" src="${escapeHTML(getAirlineLogoPath(leg.flight.airline))}" alt="${escapeHTML(leg.flight.airline)} logo" onerror="this.style.visibility='hidden'"><div><strong>${escapeHTML(leg.flight.airline)} ${escapeHTML(leg.flight.flightNumber)} / ${escapeHTML(leg.flight.departureAirport)} &rarr; ${escapeHTML(leg.flight.arrivalAirport)}</strong><small>${escapeHTML(tripsDate(leg.flight))} &middot; ${escapeHTML(leg.flight.seatCabin)} &middot; ${escapeHTML(leg.flight.seat)}</small><span>Fare <span data-trip-base></span> &middot; Seat <span data-trip-seat></span></span></div><strong data-trip-total></strong></div>`).join("");
   summary.tripReview = review;
   }
   summary.querySelectorAll(".transaction-trip-leg").forEach((row,index)=>{
@@ -17532,11 +17535,6 @@ function configureTripTransactionReview(review) {
     row.querySelector("[data-trip-seat]").textContent=formatPaymentAmountForReview(review,flight.seatCost);
     row.querySelector("[data-trip-total]").textContent=formatPaymentAmountForReview(review,flight.totalFare);
   });
-  document.getElementById("transactionTripPayment").value=review.paymentMethod;
-  document.getElementById("transactionTripPayment").disabled=transactionPaymentProcessing;
-  document.getElementById("transactionTripPayment").onchange = event => {
-    review.paymentMethod = event.target.value; showTransactionReview(review);
-  };
 }
 async function confirmTripBooking(review) {
   await saveTripBooking(review);
