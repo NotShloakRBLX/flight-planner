@@ -7503,10 +7503,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .trip-connection-notice { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 0; margin:0 0 16px; border-bottom:1px solid #ffffff24; color:var(--connection-color); font-size:15px; font-weight:700; }
     .trip-connection-notice .connection-airport { color:#92939d; font-weight:600; }
     .trip-connection-notice > strong { text-align:right; }
-    .trip-connection-card { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px; margin-bottom:14px; border:1px solid #ffffff28; border-radius:20px; background:#16161d; }
-    .trip-connection-card h3 { margin:0 0 7px; color:var(--connection-color); font-size:21px; line-height:1.3; }
-    .trip-connection-card p { margin:0; color:#92939d; font-size:16px; line-height:1.5; }
-    .trip-connection-card img { width:44px; height:44px; object-fit:contain; flex:none; }
+    .trip-connection-card { margin-top:0; margin-bottom:14px; }
+    .trip-connection-card h3 { margin:0; color:var(--connection-color); }
+    .trip-connection-card img { width:100%; height:100%; object-fit:contain; }
     #tripConnectionCards:empty { display:none; }
     #tripConnectionCards:not(:empty) { margin-top:20px; }
     .trip-connection-card img[hidden] { display:none; }
@@ -9676,6 +9675,7 @@ async function nflSkipIfUnaffordable(id) {
   });
 }
 async function completeFlightWithNfl(completedFlight) {
+  if (completedFlight.tripId) await consolidatePendingTripCharge(completedFlight.tripId);
   if (completedFlight.nflMatch) await nflMigrateLegacyMatch();
   return runTransaction(db, async batch => {
     const flightRef = getFlightRef(completedFlight.id);
@@ -17236,6 +17236,7 @@ async function saveTripBooking(review) {
 
 // TRIP_DELETE_START
 async function deleteTripBooking(id) {
+  await consolidatePendingTripCharge(id);
   const ref=doc(db,"trips",id);
   const removed=[];
   await runTransaction(db,async transaction=>{
@@ -17292,7 +17293,60 @@ async function deleteTripBooking(id) {
 }
 // TRIP_DELETE_END
 
+// TRIP_CHARGE_MIGRATION_START
+async function consolidatePendingTripCharge(id) {
+  return runTransaction(db,async transaction=>{
+    const tripRef=doc(db,"trips",id);
+    const snapshot=await transaction.get(tripRef);
+    if (!snapshot.exists()) return false;
+    const trip=snapshot.data();
+    if (trip.status !== "booked" || trip.paymentMethod !== "card" || trip.billingVersion === 2 ||
+      !trip.legs?.length || trip.legs.some(leg=>leg.flight?.phase === "completed")) return false;
+    const ids=trip.legs.map(leg=>leg.flight?.paymentTransactionId);
+    if (ids.some(value=>!value) || new Set(ids).size !== ids.length) return false;
+    const combinedRef=doc(db,"cardTransactions",`trip_${id}`);
+    if ((await transaction.get(combinedRef)).exists()) return false;
+    const rows=[];
+    for (const leg of trip.legs) {
+      const chargeRef=doc(db,"cardTransactions",leg.flight.paymentTransactionId);
+      const charge=await transaction.get(chargeRef);
+      const flightRef=getFlightRef(leg.flightId || leg.flight.id);
+      const liveFlight=await transaction.get(flightRef);
+      if (!charge.exists() || !liveFlight.exists()) return false;
+      const data=charge.data();
+      if (data.tripId !== id || data.status !== "pending" || data.type !== "flight_purchase" ||
+        (data.flightId && data.flightId !== flightRef.id) || liveFlight.data().tripId !== id ||
+        liveFlight.data().paymentTransactionId !== chargeRef.id || liveFlight.data().phase === "completed" ||
+        !Number.isFinite(Number(data.amount)) || Number(data.amount)<0) return false;
+      rows.push({leg,chargeRef,charge:data,flightRef,flight:liveFlight.data()});
+    }
+    const round=value=>Math.round(value*100)/100;
+    const tripLegs=rows.map(row=>({flightId:row.flightRef.id,amount:Number(row.charge.amount),
+      baseFare:Number(row.charge.baseFare ?? row.flight.baseFare ?? row.charge.amount),
+      seatCost:Number(row.charge.seatCost ?? row.flight.seatCost ?? 0),
+      milesEarned:Math.floor(Number(row.charge.milesEarned ?? calculateFallbackCardMilesForFlight(row.flight))),
+      rewardsRate:Number(row.charge.rewardsRate ?? getCardFlightMilesRate(row.flight))}));
+    if (tripLegs.some(leg=>[leg.amount,leg.baseFare,leg.seatCost,leg.milesEarned,leg.rewardsRate].some(value=>!Number.isFinite(value) || value<0))) return false;
+    transaction.set(combinedRef,{type:"flight_purchase",status:"pending",tripId:id,tripName:trip.name,
+      title:"MSFS Trips",airlineName:"MSFS Trips",icon:"msfs-flight-operations-avatar.png",tripLegs,
+      customerEmail:trip.customerEmail || rows[0].charge.customerEmail || "",
+      amount:round(tripLegs.reduce((sum,leg)=>sum+leg.amount,0)),baseFare:round(tripLegs.reduce((sum,leg)=>sum+leg.baseFare,0)),
+      seatCost:round(tripLegs.reduce((sum,leg)=>sum+leg.seatCost,0)),milesEarned:tripLegs.reduce((sum,leg)=>sum+leg.milesEarned,0),
+      rewardsVersion:CARD_FLIGHT_REWARDS_VERSION,cardName:"Aviator Reserve",cardLast4:AVIATOR_RESERVE_LAST4,
+      createdAt:rows[0].charge.createdAt || serverTimestamp(),updatedAt:serverTimestamp()});
+    for (const row of rows) {
+      transaction.delete(row.chargeRef);
+      transaction.update(row.flightRef,{paymentTransactionId:combinedRef.id});
+    }
+    transaction.update(tripRef,{billingVersion:2,paymentTransactionId:combinedRef.id,
+      legs:rows.map(row=>({...row.leg,flight:{...row.leg.flight,...row.flight,paymentTransactionId:combinedRef.id}})),updatedAt:serverTimestamp()});
+    return true;
+  });
+}
+// TRIP_CHARGE_MIGRATION_END
+
 // TRIPS_UI_START
+const tripChargeMigrationAttempts=new Set();
 function persistTripPlanner() {
   if (tripBooking) sessionStorage.setItem(TRIP_PLANNER_STORAGE_KEY,JSON.stringify({booking:tripBooking,legContext:tripLegContext}));
   else sessionStorage.removeItem(TRIP_PLANNER_STORAGE_KEY);
@@ -17336,7 +17390,7 @@ function updateTripFlightDetails(flight) {
   const trip=trips.find(item=>item.id === flight.tripId);
   const connections=tripConnectionsForFlight(trip ? resolveTripFlights(trip) : null,flight);
   const key=JSON.stringify(connections);
-  const html=connections.map(connection=>`<section class="trip-connection-card" style="--connection-color:${connection.color}"><div><h3>${connection.type} Connection</h3><p>${escapeHTML(connection.duration)} between flights at ${escapeHTML(connection.airport)}.</p></div><img src="${connection.icon}" alt="" onerror="this.hidden=true"></section>`).join("");
+  const html=connections.map(connection=>`<section class="timezone-card trip-connection-card" style="--connection-color:${connection.color}"><div class="timezone-icon"><img src="${connection.icon}" alt="" onerror="this.hidden=true"></div><div><h3 class="timezone-title">${connection.type} Connection</h3><p class="timezone-subtitle">${escapeHTML(connection.duration)} between flights at ${escapeHTML(connection.airport)}.</p></div></section>`).join("");
   if (holder.dataset.connectionKey !== key) {
     holder.innerHTML=html;
     holder.dataset.connectionKey=key;
@@ -17348,6 +17402,14 @@ function resolveSiteFlight(id) {
 function startTripsWatcher() {
   onSnapshot(collection(db,"trips"),snapshot=>{
     trips=snapshot.docs.map(item=>({id:item.id,...item.data()}));
+    for (const trip of trips.filter(item=>item.status === "booked" && item.paymentMethod === "card" && item.billingVersion !== 2)) {
+      if (tripChargeMigrationAttempts.has(trip.id)) continue;
+      tripChargeMigrationAttempts.add(trip.id);
+      consolidatePendingTripCharge(trip.id).catch(error=>{
+        tripChargeMigrationAttempts.delete(trip.id);
+        console.error("Pending trip charge could not be consolidated",error);
+      });
+    }
     renderHomeFlights();
     const params=new URLSearchParams(window.location.search);
     const requested=params.get("tripId");
