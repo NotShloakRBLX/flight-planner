@@ -7437,22 +7437,14 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .trips-seat-grid button[aria-pressed=true] { background: #167861; border-color: #a9ffdc; }
     .trips-page .featured-flight-card { margin: 16px 0; }
     .trips-page .flight-card { width: 100%; margin: 14px 0; }
-    .trips-page .featured-info-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
-    .trips-page .featured-info-cell { min-width: 0; padding: 16px; text-align: left; }
-    .trips-page .featured-info-label { font-size: 13px; }
-    .trips-page .featured-info-value { font-size: 18px; line-height: 1.25; overflow-wrap: anywhere; }
-    .trips-page .featured-route-line { font-size: 38px; }
-    .trips-page .featured-route-area { padding: 22px; }
-    .trips-page *, .trips-modal * { letter-spacing: 0; }
-    .trips-page .featured-passenger-name { white-space: normal; overflow-wrap: anywhere; }
-    .trips-page .featured-main-status { font-size: 30px; line-height: 1.2; }
+    .trips-header, .trips-section, .trips-booking-heading, .trip-summary, .trips-modal * { letter-spacing: 0; }
     body.trip-leg-editing #nflMatchToggle, body.trip-leg-editing #payWithMilesToggle { pointer-events: none; }
     .trip-edit-banner { display: none; color: #a4dfd1; margin: 16px 0; font-size: 13px; }
     body.trip-leg-editing .trip-edit-banner { display: block; }
     .trip-cabin-back { display: none; }
     body.trip-leg-editing .trip-cabin-back { display: block; }
     body.viewing-trip-flight #deleteFlightButton { display: none; }
-    .trips-page:not(.trips-creation) .trips-shell { max-width: 466px; }
+    .trips-page:not(.trips-creation) .trips-shell { max-width: 430px; padding-left: 18px; padding-right: 18px; }
     .trips-creation .trips-shell { max-width: 1060px; padding-top: 42px; }
     .trips-creation .trips-header { margin-bottom: 28px; }
     .trips-creation .trips-field { max-width: 680px; }
@@ -7497,6 +7489,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .trips-stepper-arrows button:last-child svg { transform: rotate(180deg); }
     #tripCountsNote { min-height: 40px; }
     #transactionReviewPopup.trip-checkout .transaction-route-row { display: none; }
+    #transactionReviewPopup.trip-checkout .transaction-total-row { padding-top: 18px; }
     #transactionReviewPopup.trip-checkout .seat-popup-title { font-size: 28px; overflow-wrap: anywhere; }
     #transactionReviewPopup.trip-checkout .transaction-route-row + .transaction-review-line,
     #transactionReviewPopup.trip-checkout .transaction-breakdown + .transaction-review-line { display: none; }
@@ -7505,7 +7498,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .transaction-trip-leg [data-trip-base], .transaction-trip-leg [data-trip-seat] { display: inline; color: inherit; font: inherit; margin: 0; }
     @media(prefers-reduced-motion:reduce) { .trips-segment::before,.trips-counts,.trips-return-count,.trips-stepper { transition: none; } }
     @media(max-width:700px) { .trips-creation .trips-shell { padding-top: 24px; } .trips-creation #tripItinerary { grid-template-columns: minmax(0,1fr); } .trips-creation .trips-booking-footer .trips-primary { width: 100%; } }
-    @media(max-width:480px) { .trips-shell { padding: 24px 16px 60px; } .trip-summary { padding: 18px 15px; } .trips-page .featured-info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media(max-width:480px) { .trips-shell { padding: 24px 16px 60px; } .trip-summary { padding: 18px 15px; } }
     @media(prefers-reduced-motion:reduce) { .trips-page,.trips-modal,.trips-dialog { transition: none; } }
   </style>
 </head>
@@ -17070,6 +17063,8 @@ async function saveTripBooking(review) {
   if (!trip || trip.id !== review.tripId) throw new Error("This booking is no longer available.");
   validateTrip(trip);
   const booked = bookTrip(trip, review.paymentMethod);
+  const confirmationCode = trip.confirmationCode || trip.legs[0].flight.reservationCode || trip.legs[0].flight.boardingCode;
+  booked.confirmationCode = confirmationCode;
   const tripRef = doc(db, "trips", trip.id);
   let milesTotal = 0;
   let cumulativeFare = 0;
@@ -17085,7 +17080,7 @@ async function saveTripBooking(review) {
     milesTotal += milesPaid;
     const flightRef = doc(db, "flights", leg.id);
     const paymentRef = doc(db, review.paymentMethod === "card" ? "cardTransactions" : "mileTransactions", `trip_${trip.id}_${index}`);
-    Object.assign(flight,{tripId:trip.id, tripDirection:leg.direction, tripLegIndex:index,
+    Object.assign(flight,{tripId:trip.id, reservationCode:confirmationCode, tripDirection:leg.direction, tripLegIndex:index,
       paymentTransactionId:paymentRef.id, milesPaid:review.paymentMethod === "miles" ? milesPaid : 0});
     if (flight.nflMatch) flight.nflMatch = {...flight.nflMatch,id:flightRef.id};
     if (review.paymentMethod === "miles") {
@@ -17095,7 +17090,7 @@ async function saveTripBooking(review) {
     }
     return {leg,flight,flightRef,paymentRef,legReview,milesPaid};
   });
-  const receipt = {passengerName:entries[0].flight.passengerName, issuedAt:new Date().toISOString(),
+  const receipt = {confirmationCode, passengerName:entries[0].flight.passengerName, issuedAt:new Date().toISOString(),
     scheduleTimeZone:entries[0].flight.scheduleTimeZone,paymentMethod:review.paymentMethod,cardLast4:AVIATOR_RESERVE_LAST4,
     baseAmount:entries.reduce((sum,e)=>sum+e.flight.bookingReceipt.baseAmount,0),
     seatAmount:entries.reduce((sum,e)=>sum+e.flight.bookingReceipt.seatAmount,0),
