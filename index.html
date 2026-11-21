@@ -7477,6 +7477,35 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .transaction-trip-leg > strong { white-space: nowrap; }
     .transaction-trip-method { display: block; margin: 18px 0; font-size: 14px; color: #bdc5d6; }
     .transaction-trip-method select { display: block; width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #526075; border-radius: 7px; background: #171f2e; color: white; font: inherit; }
+    .trips-segment { position: relative; isolation: isolate; }
+    .trips-segment::before { content: ""; position: absolute; z-index: -1; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 12px)/2); border-radius: 5px; background: #303c4d; transition: transform .42s cubic-bezier(.22,1,.36,1); }
+    .trips-segment.is-oneway::before { transform: translateX(calc(100% + 4px)); }
+    .trips-segment button { transition: color .25s ease; }
+    .trips-segment button[aria-pressed=true] { background: transparent; }
+    .trips-counts { grid-template-columns: minmax(0,1fr) minmax(0,1fr); transition: grid-template-columns .42s cubic-bezier(.22,1,.36,1), column-gap .42s ease; }
+    .trips-counts.is-oneway { grid-template-columns: minmax(0,1fr) minmax(0,0fr); column-gap: 0; }
+    .trips-count-field { min-width: 0; }
+    .trips-return-count { overflow: hidden; transition: opacity .25s ease, transform .4s ease, visibility .4s; }
+    .trips-counts.is-oneway .trips-return-count { opacity: 0; transform: translateX(12px); visibility: hidden; }
+    .trips-stepper { display: grid; grid-template-columns: minmax(0,1fr) 40px; align-items: stretch; height: 54px; margin-top: 9px; border: 1px solid #3b4351; border-radius: 8px; background: #191e29; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
+    .trips-stepper:focus-within { border-color: #69b9aa; box-shadow: 0 0 0 2px #69b9aa18; }
+    .trips-stepper output { display: flex; align-items: center; padding: 0 16px; font-size: 19px; font-weight: 650; color: #fff; font-variant-numeric: tabular-nums; outline: none; }
+    .trips-stepper-arrows { display: grid; grid-template-rows: repeat(2,minmax(0,1fr)); border-left: 1px solid #ffffff12; }
+    .trips-stepper-arrows button { display: grid; place-items: center; padding: 0; border: 0; color: #b5c8d5; background: #232b38; cursor: pointer; transition: color .18s, background .18s; }
+    .trips-stepper-arrows button:first-child { border-bottom: 1px solid #ffffff12; }
+    .trips-stepper-arrows button:hover:not(:disabled) { background: #35485a; color: #9ee5d8; }
+    .trips-stepper-arrows button:disabled { opacity: .28; }
+    .trips-stepper-arrows svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; pointer-events: none; }
+    .trips-stepper-arrows button:last-child svg { transform: rotate(180deg); }
+    #tripCountsNote { min-height: 40px; }
+    #transactionReviewPopup.trip-checkout .transaction-route-row { display: none; }
+    #transactionReviewPopup.trip-checkout .seat-popup-title { font-size: 28px; overflow-wrap: anywhere; }
+    #transactionReviewPopup.trip-checkout .transaction-route-row + .transaction-review-line,
+    #transactionReviewPopup.trip-checkout .transaction-breakdown + .transaction-review-line { display: none; }
+    .transaction-trip-leg { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; column-gap: 14px; }
+    .transaction-trip-airline { width: 32px; height: 38px; object-fit: contain; align-self: start; margin-top: 3px; }
+    .transaction-trip-leg [data-trip-base], .transaction-trip-leg [data-trip-seat] { display: inline; color: inherit; font: inherit; margin: 0; }
+    @media(prefers-reduced-motion:reduce) { .trips-segment::before,.trips-counts,.trips-return-count,.trips-stepper { transition: none; } }
     @media(max-width:700px) { .trips-creation .trips-shell { padding-top: 24px; } .trips-creation #tripItinerary { grid-template-columns: minmax(0,1fr); } .trips-creation .trips-booking-footer .trips-primary { width: 100%; } }
     @media(max-width:480px) { .trips-shell { padding: 24px 16px 60px; } .trip-summary { padding: 18px 15px; } .trips-page .featured-info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
     @media(prefers-reduced-motion:reduce) { .trips-page,.trips-modal,.trips-dialog { transition: none; } }
@@ -12406,7 +12435,7 @@ function showPaymentConfirmation(review) {
 
   paymentConfirmationPopup.classList.add("active");
   if (review.testTripId) {
-    paymentConfirmationRoute.textContent = review.tripName;
+    paymentConfirmationRoute.textContent = tripCheckoutTitle(review.legs);
     paymentConfirmationSeat.textContent = String(review.legs.length);
     paymentConfirmationGroup.textContent = "Trip booked";
     paymentConfirmationSubtitle.textContent = "Test booking confirmed. No payment was made or email sent.";
@@ -16981,6 +17010,10 @@ function testTripArrivalLocal(flight) {
 function testTripTotal(trip) {
   return Math.round(trip.legs.reduce((sum, leg) => sum + Number(leg.flight?.totalFare || 0), 0) * 100) / 100;
 }
+function tripCheckoutTitle(legs) {
+  const destination = legs.filter(leg=>leg.direction === "depart").at(-1)?.flight;
+  return `Trip to ${destination?.cityArrival || destination?.arrivalAirport || "your destination"}`;
+}
 function validateTestTrip(trip) {
   if (!trip?.testOnly || !Array.isArray(trip.legs)) throw new Error("Invalid test trip.");
   const depart = trip.legs.filter(leg => leg.direction === "depart");
@@ -17127,12 +17160,13 @@ function renderTestTrips() {
   }
   if (testTripView === "setup") {
     const setup = testTripSetup || { name:"", type:"round", departCount:1, returnCount:1 };
+    testTripSetup = {...setup};
     content.innerHTML = tripsHeader("Add trip", "list") + testNote + `<label class="trips-field">Trip name<input id="tripName" maxlength="80" placeholder="London getaway" value="${escapeHTML(setup.name)}"></label>
-      <div class="trips-segment" role="group" aria-label="Trip type"><button data-trip-type="round" aria-pressed="${setup.type === "round"}">Round trip</button><button data-trip-type="oneway" aria-pressed="${setup.type === "oneway"}">One way</button></div>
-      <div class="trips-counts"><label class="trips-field">Depart<input id="tripDepartCount" aria-label="Depart flights" type="number" min="${setup.type === "oneway" ? 2 : 1}" max="8" step="1" value="${setup.departCount}"></label>
-      ${setup.type === "round" ? `<label class="trips-field">Return<input id="tripReturnCount" aria-label="Return flights" type="number" min="1" max="8" step="1" value="${setup.returnCount}"></label>` : ""}</div>
-      <p class="trips-note">${setup.type === "oneway" ? "At least two flights for a connecting journey." : "One flight is nonstop. Add more for connections."}</p>
+      <div class="trips-segment ${setup.type === "oneway" ? "is-oneway" : ""}" role="group" aria-label="Trip type"><button data-trip-type="round" aria-pressed="${setup.type === "round"}">Round trip</button><button data-trip-type="oneway" aria-pressed="${setup.type === "oneway"}">One way</button></div>
+      <div class="trips-counts ${setup.type === "oneway" ? "is-oneway" : ""}">${tripCountControl("depart","Depart",setup.departCount,setup.type === "oneway" ? 2 : 1)}${tripCountControl("return","Return",setup.returnCount,1)}</div>
+      <p class="trips-note" id="tripCountsNote">${setup.type === "oneway" ? "At least two flights for a connecting journey." : "One flight is nonstop. Add more for connections."}</p>
       <p id="tripError" class="trips-error" role="alert"></p><button class="trips-primary" data-trip-action="create">Continue</button>`;
+    syncTripSetupControls();
     return;
   }
   if (!trip) { testTripView = "list"; renderTestTrips(); return; }
@@ -17166,6 +17200,40 @@ function renderTestTrips() {
 function readTripSetup() {
   return { name:document.getElementById("tripName").value, type:testTripSetup?.type || "round",
     departCount:Number(document.getElementById("tripDepartCount").value), returnCount:Number(document.getElementById("tripReturnCount")?.value || 0) };
+}
+function tripCountControl(direction,label,value,min) {
+  const id = direction === "depart" ? "tripDepartCount" : "tripReturnCount";
+  const arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>';
+  return `<div class="trips-field trips-count-field ${direction === "return" ? "trips-return-count" : ""}"><label for="${id}">${label}</label><div class="trips-stepper"><output id="${id}" role="spinbutton" tabindex="0" aria-label="${label} flights" aria-valuemin="${min}" aria-valuemax="8" aria-valuenow="${value}">${value}</output><div class="trips-stepper-arrows"><button type="button" data-trip-step="${direction}" data-delta="1" aria-label="Increase ${label.toLowerCase()} flights" title="Increase ${label.toLowerCase()} flights">${arrow}</button><button type="button" data-trip-step="${direction}" data-delta="-1" aria-label="Decrease ${label.toLowerCase()} flights" title="Decrease ${label.toLowerCase()} flights">${arrow}</button></div></div></div>`;
+}
+function syncTripSetupControls() {
+  const setup = testTripSetup;
+  const oneWay = setup.type === "oneway";
+  document.querySelector(".trips-segment").classList.toggle("is-oneway",oneWay);
+  document.querySelectorAll("[data-trip-type]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.tripType === setup.type)));
+  document.querySelector(".trips-counts").classList.toggle("is-oneway",oneWay);
+  const returning = document.querySelector(".trips-return-count");
+  returning.inert = oneWay; returning.setAttribute("aria-hidden",String(oneWay));
+  for (const direction of ["depart","return"]) {
+    const output = document.getElementById(direction === "depart" ? "tripDepartCount" : "tripReturnCount");
+    const min = direction === "depart" && oneWay ? 2 : 1;
+    const value = setup[`${direction}Count`];
+    if (output.value !== String(value)) {
+      output.value = String(value);
+      output.getAnimations().forEach(animation=>animation.cancel());
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) output.animate([{opacity:.35,transform:"translateY(3px)"},{opacity:1,transform:"none"}],{duration:180,easing:"ease-out"});
+    }
+    output.setAttribute("aria-valuenow",String(value)); output.setAttribute("aria-valuemin",String(min));
+    document.querySelectorAll(`[data-trip-step="${direction}"]`).forEach(button=>button.disabled=Number(button.dataset.delta)>0 ? value>=8 : value<=min);
+  }
+  document.getElementById("tripCountsNote").textContent = oneWay ? "At least two flights for a connecting journey." : "One flight is nonstop. Add more for connections.";
+}
+function stepTripCount(direction,delta) {
+  testTripSetup = readTripSetup();
+  const min = direction === "depart" && testTripSetup.type === "oneway" ? 2 : 1;
+  const key = `${direction}Count`;
+  testTripSetup[key] = Math.max(min,Math.min(8,testTripSetup[key]+delta));
+  syncTripSetupControls();
 }
 function tripsError(error) {
   const target = document.getElementById("tripsModal").classList.contains("active")
@@ -17311,16 +17379,29 @@ function configureTripTransactionReview(review) {
     transactionReviewPopup.querySelector(".transaction-breakdown").before(summary);
   }
   const isTrip = !!review.testTripId;
+  transactionReviewPopup.classList.toggle("trip-checkout",isTrip);
+  transactionReviewPopup.querySelector(".seat-popup-title").textContent = isTrip ? tripCheckoutTitle(review.legs) : "Review transaction";
   transactionReviewPopup.querySelectorAll(".transaction-breakdown").forEach(el=>el.style.display=isTrip ? "none" : "");
   summary.hidden = !isTrip;
   document.getElementById("transactionEmailNote").textContent = isTrip
     ? "TEST BOOKING. No email will be sent and no balance will change."
     : "Used for your trip confirmation and check-in reminder. Processed by Google services for this flight simulation.";
-  if (!isTrip) { summary.replaceChildren(); return; }
-  transactionReviewRoute.textContent = review.tripName;
+  if (!isTrip) { summary.replaceChildren(); summary.tripReview=null; return; }
+  transactionReviewRoute.textContent = tripCheckoutTitle(review.legs);
   transactionPaymentSubtitle.textContent = "Test checkout / no charge";
-  summary.innerHTML = review.legs.map(leg=>`<div class="transaction-trip-leg"><div><strong>${escapeHTML(leg.flight.airline)} ${escapeHTML(leg.flight.flightNumber)} / ${escapeHTML(leg.flight.departureAirport)} &rarr; ${escapeHTML(leg.flight.arrivalAirport)}</strong><small>${escapeHTML(tripsDate(leg.flight))} &middot; ${escapeHTML(leg.flight.seatCabin)} &middot; ${escapeHTML(leg.flight.seat)}</small><span>Fare ${formatPaymentAmountForReview(review,leg.flight.baseFare)} &middot; Seat ${formatPaymentAmountForReview(review,leg.flight.seatCost)}</span></div><strong>${formatPaymentAmountForReview(review,leg.flight.totalFare)}</strong></div>`).join("") +
+  if (summary.tripReview !== review) {
+  summary.innerHTML = review.legs.map(leg=>`<div class="transaction-trip-leg"><img class="transaction-trip-airline" src="${escapeHTML(getAirlineLogoPath(leg.flight.airline))}" alt="${escapeHTML(leg.flight.airline)} logo" onerror="this.style.visibility='hidden'"><div><strong>${escapeHTML(leg.flight.airline)} ${escapeHTML(leg.flight.flightNumber)} / ${escapeHTML(leg.flight.departureAirport)} &rarr; ${escapeHTML(leg.flight.arrivalAirport)}</strong><small>${escapeHTML(tripsDate(leg.flight))} &middot; ${escapeHTML(leg.flight.seatCabin)} &middot; ${escapeHTML(leg.flight.seat)}</small><span>Fare <span data-trip-base></span> &middot; Seat <span data-trip-seat></span></span></div><strong data-trip-total></strong></div>`).join("") +
     `<label class="transaction-trip-method">Payment method<select id="transactionTripPayment" ${transactionPaymentProcessing ? "disabled" : ""}><option value="card" ${review.paymentMethod === "card" ? "selected" : ""}>Aviator Reserve</option><option value="miles" ${review.paymentMethod === "miles" ? "selected" : ""}>Miles</option></select></label>`;
+  summary.tripReview = review;
+  }
+  summary.querySelectorAll(".transaction-trip-leg").forEach((row,index)=>{
+    const flight=review.legs[index].flight;
+    row.querySelector("[data-trip-base]").textContent=formatPaymentAmountForReview(review,flight.baseFare);
+    row.querySelector("[data-trip-seat]").textContent=formatPaymentAmountForReview(review,flight.seatCost);
+    row.querySelector("[data-trip-total]").textContent=formatPaymentAmountForReview(review,flight.totalFare);
+  });
+  document.getElementById("transactionTripPayment").value=review.paymentMethod;
+  document.getElementById("transactionTripPayment").disabled=transactionPaymentProcessing;
   document.getElementById("transactionTripPayment").onchange = event => {
     review.paymentMethod = event.target.value; showTransactionReview(review);
   };
@@ -17368,10 +17449,12 @@ document.getElementById("tripsContent").addEventListener("click",event=>{
   try {
     if (button.dataset.tripId) { showTestTrips("trip",button.dataset.tripId); return; }
     if (button.dataset.tripLeg) { beginTestTripLeg(button.dataset.tripLeg); return; }
+    if (button.dataset.tripStep) { stepTripCount(button.dataset.tripStep,Number(button.dataset.delta)); return; }
     if (button.dataset.tripType) {
+      if (button.dataset.tripType === testTripSetup.type) return;
       testTripSetup={...readTripSetup(),type:button.dataset.tripType};
       testTripSetup.departCount=Math.max(button.dataset.tripType === "oneway" ? 2 : 1,testTripSetup.departCount);
-      testTripSetup.returnCount=Math.max(1,testTripSetup.returnCount); renderTestTrips(); animateTripsContent(); return;
+      testTripSetup.returnCount=Math.max(1,testTripSetup.returnCount); syncTripSetupControls(); return;
     }
     switch(button.dataset.tripAction) {
       case "home": hideTestTrips(); break;
@@ -17398,6 +17481,10 @@ document.getElementById("tripsContent").addEventListener("click",event=>{
       }
     }
   } catch(error) { tripsError(error); }
+});
+document.getElementById("tripsContent").addEventListener("keydown",event=>{
+  if (!["tripDepartCount","tripReturnCount"].includes(event.target.id) || !["ArrowUp","ArrowDown"].includes(event.key)) return;
+  event.preventDefault(); stepTripCount(event.target.id === "tripDepartCount" ? "depart" : "return",event.key === "ArrowUp" ? 1 : -1);
 });
 backButton.addEventListener("click",event=>{
   if (!testTripLegContext) return;
