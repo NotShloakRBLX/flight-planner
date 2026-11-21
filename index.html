@@ -7389,6 +7389,76 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
   width: 100%;
 }
     
+    /* Trips prototype: all state and checkout stay separate from live bookings. */
+    #tripsButton { right: 138px; color: #74dcc7; }
+    .trips-page { position: fixed; inset: 0; z-index: 34; overflow-y: auto; background: #0d1019; visibility: hidden; opacity: 0; transform: translateX(28px); transition: opacity .3s, transform .3s, visibility .3s; }
+    .trips-page.active { visibility: visible; opacity: 1; transform: none; }
+    .trips-shell { max-width: 720px; margin: auto; padding: 28px 20px 70px; }
+    .trips-header { display: grid; grid-template-columns: 40px minmax(0,1fr) 40px; gap: 12px; align-items: center; border-bottom: 1px solid #383c49; padding-bottom: 20px; margin-bottom: 24px; }
+    .trips-header h1 { text-align: center; font-size: 26px; letter-spacing: 0; overflow-wrap: anywhere; }
+    .trips-icon { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 1px solid #404653; border-radius: 50%; background: #20242f; color: #fff; font-size: 25px; cursor: pointer; }
+    .trips-icon svg { width: 20px; height: 20px; fill: currentColor; }
+    .trips-test { display: inline-block; font-size: 10px; font-weight: 800; color: #86dfcb; border: 1px solid #397263; padding: 3px 6px; border-radius: 4px; vertical-align: middle; letter-spacing: 0; }
+    .trips-note { color: #a6b0c3; font-size: 13px; line-height: 1.6; margin-bottom: 22px; }
+    .trips-section { margin: 28px 0 12px; font-size: 18px; font-weight: 750; }
+    .trips-field { display: block; margin: 20px 0; font-size: 14px; color: #c9d0df; }
+    .trips-field input, .trips-field select { display: block; width: 100%; margin-top: 9px; min-height: 48px; border: 1px solid #3b4351; border-radius: 8px; background: #191e29; color: white; padding: 12px; font: inherit; }
+    .trips-segment { display: flex; background: #191e29; border: 1px solid #3b4351; border-radius: 8px; padding: 4px; gap: 4px; }
+    .trips-segment button { flex: 1; border: 0; border-radius: 5px; padding: 13px 8px; color: #bac5d5; background: transparent; font: inherit; cursor: pointer; }
+    .trips-segment button[aria-pressed=true] { background: #303c4d; color: white; }
+    .trips-counts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+    .trips-primary, .trips-secondary { width: 100%; min-height: 50px; padding: 14px 18px; border: 1px solid #369e86; border-radius: 8px; background: #166c59; color: #fff; font: inherit; font-weight: 750; cursor: pointer; margin-top: 16px; transition: transform .18s, background .2s; }
+    .trips-secondary { background: transparent; border-color: #444c5d; color: #c7d0df; }
+    .trips-danger { color: #ffa7b0; border-color: #7e3d49; }
+    .trips-page button:active, .trips-modal button:active { transform: scale(.98); }
+    .trips-page button:disabled, .trips-modal button:disabled { opacity: .5; cursor: not-allowed; }
+    .trip-summary { display: grid; grid-template-columns: 42px minmax(0,1fr) 18px; align-items: center; width: 100%; gap: 14px; padding: 20px; margin: 14px 0; text-align: left; border: 1px solid #46677a; border-radius: 18px; color: #fff; background: linear-gradient(115deg,#182d38,#1d202c 65%,#302239); cursor: pointer; font: inherit; }
+    .trip-summary svg { width: 32px; height: 32px; fill: #8bddce; }
+    .trip-summary strong { display: block; font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
+    .trip-summary small { display: block; margin-top: 7px; color: #bbc7d5; line-height: 1.5; font-size: 12px; }
+    .trip-leg { display: flex; gap: 14px; align-items: center; padding: 18px 0; border-bottom: 1px solid #2e3542; }
+    .trip-leg-index { flex: 0 0 34px; height: 34px; border-radius: 50%; background: #293444; display: grid; place-items: center; color: #95dfd1; }
+    .trip-leg-copy { flex: 1; min-width: 0; line-height: 1.5; }
+    .trip-leg-copy small { display: block; color: #a4b0c1; }
+    .trip-leg button { flex: 0 0 auto; padding: 10px 13px; background: #242f40; color: #aee8dd; border: 1px solid #455a6d; border-radius: 6px; cursor: pointer; }
+    .trips-empty { padding: 65px 10px; text-align: center; color: #a7b3c6; }
+    .trips-empty svg { display: block; width: 64px; height: 64px; fill: #77beae; margin: 0 auto 22px; }
+    .trips-empty h2 { color: #fff; margin-bottom: 12px; font-size: 22px; }
+    .trips-error { color: #ffa6ae; font-size: 14px; line-height: 1.5; margin: 14px 0; }
+    .trips-modal { position: fixed; inset: 0; z-index: 30000; background: #000b; display: grid; place-items: center; padding: 18px; opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
+    .trips-modal.active { opacity: 1; visibility: visible; }
+    .trips-dialog { width: 100%; max-width: 520px; max-height: 88dvh; overflow-y: auto; background: #171d28; border: 1px solid #465265; border-radius: 16px; padding: 24px; transform: translateY(24px); transition: transform .3s; }
+    .trips-modal.active .trips-dialog { transform: none; }
+    .trips-dialog h2 { font-size: 22px; margin: 10px 0 18px; }
+    .trips-price { font-size: 32px; font-weight: 800; margin: 24px 0 8px; }
+    .trips-price-line { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; padding: 12px 0; border-bottom: 1px solid #3c4453; }
+    .trips-price-line span { min-width: 0; overflow-wrap: anywhere; }
+    .trips-price-line strong { white-space: nowrap; }
+    .trips-seat-grid { display: grid; grid-template-columns: repeat(var(--seat-columns,6),minmax(0,1fr)); gap: 7px; max-height: 260px; overflow-y: auto; padding: 5px; margin: 18px 0; }
+    .trips-seat-grid button { min-height: 38px; color: #c6e8df; background: #263d3e; border: 1px solid #527877; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .trips-seat-grid button[aria-pressed=true] { background: #167861; border-color: #a9ffdc; }
+    .trips-spinner { display: inline-block; width: 17px; height: 17px; border: 2px solid #ffffff55; border-top-color: #fff; border-radius: 50%; animation: trips-spin .8s linear infinite; vertical-align: middle; margin-right: 8px; }
+    .trips-page .featured-flight-card { margin: 16px 0; }
+    .trips-page .flight-card { width: 100%; margin: 14px 0; }
+    .trips-page .featured-info-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .trips-page .featured-info-cell { min-width: 0; padding: 16px; text-align: left; }
+    .trips-page .featured-info-label { font-size: 13px; }
+    .trips-page .featured-info-value { font-size: 18px; line-height: 1.25; overflow-wrap: anywhere; }
+    .trips-page .featured-route-line { font-size: 38px; }
+    .trips-page .featured-route-area { padding: 22px; }
+    .trips-leg-detail { margin: 16px 0; padding: 16px 0; border-bottom: 1px solid #394150; display: flex; justify-content: space-between; gap: 16px; line-height: 1.6; }
+    .trips-leg-detail strong { text-align: right; overflow-wrap: anywhere; }
+    .trips-page *, .trips-modal * { letter-spacing: 0; }
+    .trips-page .featured-passenger-name { white-space: normal; overflow-wrap: anywhere; }
+    .trips-page .featured-main-status { font-size: 30px; line-height: 1.2; }
+    body.trip-leg-editing #nflMatchToggle, body.trip-leg-editing #payWithMilesToggle { pointer-events: none; }
+    .trip-edit-banner { display: none; color: #a4dfd1; margin: 16px 0; font-size: 13px; }
+    body.trip-leg-editing .trip-edit-banner { display: block; }
+    .trip-cabin-back { display: none; }
+    body.trip-leg-editing .trip-cabin-back { display: block; }
+    @keyframes trips-spin { to { transform: rotate(360deg); } }
+    @media(max-width:480px) { .trips-shell { padding: 24px 16px 60px; } .trip-summary { padding: 18px 15px; } .trips-page .featured-info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media(prefers-reduced-motion:reduce) { .trips-page,.trips-modal,.trips-dialog { transition: none; } }
   </style>
 </head>
 
@@ -7399,6 +7469,9 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
 
       <div class="header-line"></div>
 
+      <button class="passport-button" id="tripsButton" aria-label="Trips" title="Trips" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16Z"/></svg>
+      </button>
       <button class="passport-button" id="passportButton" aria-label="Passport">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M7 2.5h8.75A3.25 3.25 0 0 1 19 5.75v12.5a3.25 3.25 0 0 1-3.25 3.25H7A2.75 2.75 0 0 1 4.25 18.75V5.25A2.75 2.75 0 0 1 7 2.5Zm0 2a.75.75 0 0 0-.75.75v13.5c0 .41.34.75.75.75h8.75c.69 0 1.25-.56 1.25-1.25V5.75c0-.69-.56-1.25-1.25-1.25H7Zm2.1 4.05a3.4 3.4 0 1 1 5.8 2.4 3.4 3.4 0 0 1-5.8-2.4Zm3.4-1.4a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.65 7.1c0-1.3 1.05-2.35 2.35-2.35h2.6c1.3 0 2.35 1.05 2.35 2.35v.25a1 1 0 0 1-1 1h-5.3a1 1 0 0 1-1-1v-.25Zm2.15-.25h3c-.05-.06-.12-.1-.2-.1h-2.6c-.08 0-.15.04-.2.1Z" />
@@ -7421,6 +7494,8 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     <section class="flights-list" id="flightsList"></section>
   </main>
 
+  <section class="trips-page" id="tripsPage" aria-label="Trips" inert><div class="trips-shell" id="tripsContent"></div></section>
+  <div class="trips-modal" id="tripsModal" inert><section class="trips-dialog" role="dialog" aria-modal="true" aria-labelledby="tripsDialogTitle" tabindex="-1" id="tripsDialog"></section></div>
   <section class="cbp-page" id="cbpPage">
   <div class="cbp-shell">
     <img class="cbp-logo" src="./cbp.png" alt="CBP logo" />
@@ -7555,6 +7630,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
         <h1 class="add-flight-title">Add flight</h1>
       </header>
 
+      <div class="trip-edit-banner">TEST TRIP LEG &middot; No emails, documents, payments, or rewards</div>
       <form class="flight-form" id="flightForm">
         <div class="form-grid">
         <div class="form-section-heading">Flight Information</div>
@@ -8478,6 +8554,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       <div class="cabin-choice-subtitle">Premium seat selection using miles</div>
     </button>
   </div>
+  <button type="button" class="trips-secondary trip-cabin-back" id="tripCabinCancel">Back to flight</button>
 </section>
 
 <section class="seat-popup cabin-select-popup" id="economyChoicePopup">
@@ -8495,6 +8572,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
       <div class="cabin-choice-subtitle">Open seat map with paid options</div>
     </button>
   </div>
+  <button type="button" class="trips-secondary trip-cabin-back" id="tripEconomyCancel">Back to flight</button>
 </section>
   
 <section class="seat-popup" id="premiumPaymentPopup">
@@ -9259,6 +9337,14 @@ let preclearanceCheckTimer = null;
 let activeSeatSelectionWindow = null;
     let activeSeatSelectionUnsubscribe = null;
 let selectedAircraftType = "";
+let testTripLegContext = null;
+let testTrips = [];
+let testTripActiveId = "";
+let testTripView = "list";
+let testTripSetup = null;
+let testTripModalReturnFocus = null;
+let testTripBusy = false;
+let testTripStorageError = "";
 
 const checkInOpenWriteLocks = new Set();
 const AIRCRAFT_OPTIONS = ["A319", "A320", "A321", "A350-900", "A350-1000", "B777-300ER", "B737-800", "B787-9"];
@@ -12128,6 +12214,10 @@ function buildTransactionReview({
 }
 
 function showTransactionReview(review) {
+  if (testTripLegContext) {
+    saveTestTripLeg(review);
+    return;
+  }
   if (pendingTransactionReview !== review) {
     transactionEmailInput.value = "";
     transactionEmailInput.setAttribute("aria-invalid", "false");
@@ -12301,6 +12391,7 @@ function resetAddFlightAfterPayment() {
 }
 
 async function savePaidFlightWithSeat(review) {
+  if (review?.flight?.testOnly) throw new Error("Test trip flights cannot create live payments or documents.");
   const savedSeatType = review.seatType || review.cabin;
 const savedPremiumEconomy = review.cabin === "Premium Economy";
 const savedFirstBusiness = review.cabin === "First/Business";
@@ -12603,6 +12694,11 @@ showTransactionReview(review);
     
     async function createSeatMapSessionAndRedirect(cabinMode = "firstBusiness") {
   if (!pendingFlightToAdd) return;
+  if (pendingFlightToAdd.testOnly && !testTripLegContext) return;
+  if (testTripLegContext) {
+    openTestTripSeats(cabinMode);
+    return;
+  }
 
   const firstBusinessLastRow = Number(pendingFlightToAdd.premiumRows || 0);
 const premiumEconomyLastRow = Number(pendingFlightToAdd.premiumEconomyLastRow || 0);
@@ -13695,6 +13791,7 @@ function renderHomeFlights() {
   const sortedFlights = getSortedFlightsForHome();
 
   if (!sortedFlights.length) {
+    renderTestTripsHome();
     return;
   }
 
@@ -13705,6 +13802,7 @@ function renderHomeFlights() {
       createFlightCard(flight);
     }
   });
+  renderTestTripsHome();
 }
 
 function patchFlightCache(flightId, updates) {
@@ -15142,8 +15240,9 @@ document.addEventListener("keydown", (event) => {
 
     addFlightButton.addEventListener("click", async () => {
   if (addFlightButton.disabled) return;
+  if (testTripLegContext && !validateTestTripFlightForm()) return;
   let nflMatchDetails = null;
-  if (nflToggle.checked) {
+  if (!testTripLegContext && nflToggle.checked) {
     addFlightButton.disabled = true;
     try {
       nflMatchDetails = nflReadForm();
@@ -15238,10 +15337,16 @@ paymentTransactionId: "",
 createdAt: serverTimestamp()
   };
 
-  if (
+  if (testTripLegContext) {
+    flight.testOnly = true;
+    flight.emailNotificationsVersion = 0;
+    flight.createdAt = new Date().toISOString();
+  }
+
+  if (!testTripLegContext && (
   (flight.internationalUSArrival === true || flight.internationalUSDeparture === true) &&
   !isPassportActive()
-) {
+)) {
   alert("A valid passport is required for International US flights.");
   return;
 }
@@ -16571,11 +16676,11 @@ chooseEconomyRandomButton.addEventListener("click", () => {
   if (!pendingFlightToAdd) return;
 
   const lockKey = getRandomSeatLockKey(pendingFlightToAdd);
-  let seat = randomSeatLocks.get(lockKey) || "";
+  let seat = testTripLegContext ? "" : randomSeatLocks.get(lockKey) || "";
 
   if (!seat) {
     seat = assignEconomySeatFromFlight(pendingFlightToAdd);
-    if (seat) {
+    if (seat && !testTripLegContext) {
       randomSeatLocks.set(lockKey, seat);
     }
   }
@@ -16771,6 +16876,422 @@ transactionDeleteButton.addEventListener("click", async () => {
   }
 });
     
+// TRIPS_CORE_START
+const TEST_TRIPS_STORAGE_KEY = "msfs.testTrips.v1";
+function makeTestTrip({ name, type, departCount, returnCount }, id) {
+  const outbound = Number(departCount);
+  const inbound = type === "round" ? Number(returnCount) : 0;
+  if (!String(name || "").trim()) throw new Error("Enter a trip name.");
+  if (!["round", "oneway"].includes(type)) throw new Error("Choose a trip type.");
+  if (!Number.isInteger(outbound) || outbound < (type === "oneway" ? 2 : 1) || outbound > 8 ||
+      !Number.isInteger(inbound) || inbound < (type === "round" ? 1 : 0) || inbound > 8) {
+    throw new Error("One-way trips need 2-8 flights. Round trips need 1-8 flights each way.");
+  }
+  return { version: 1, testOnly: true, id, name: name.trim().slice(0,80), type, status: "draft",
+    createdAt: new Date().toISOString(), legs: [
+      ...Array.from({ length: outbound }, (_, index) => ({ id: `${id}-d${index}`, direction: "depart", index, flight: null })),
+      ...Array.from({ length: inbound }, (_, index) => ({ id: `${id}-r${index}`, direction: "return", index, flight: null }))
+    ] };
+}
+function testTripNextDeparture(previous) {
+  if (!previous) return {};
+  return { departureAirport: previous.arrivalAirport, departureAirportName: previous.arrivalAirportName,
+    cityDeparture: previous.cityArrival, flightDateRaw: testTripArrivalLocal(previous).slice(0,10) };
+}
+function testTripArrivalLocal(flight) {
+  const date = new Date(`${flight.flightDateRaw}T12:00:00Z`);
+  if (flight.overnight || flight.scheduledArrival <= flight.scheduledDeparture) date.setUTCDate(date.getUTCDate()+1);
+  return `${date.toISOString().slice(0,10)}T${flight.scheduledArrival}`;
+}
+function testTripTotal(trip) {
+  return Math.round(trip.legs.reduce((sum, leg) => sum + Number(leg.flight?.totalFare || 0), 0) * 100) / 100;
+}
+function validateTestTrip(trip) {
+  if (!trip?.testOnly || !Array.isArray(trip.legs)) throw new Error("Invalid test trip.");
+  const depart = trip.legs.filter(leg => leg.direction === "depart");
+  const returning = trip.legs.filter(leg => leg.direction === "return");
+  if ((trip.type === "oneway" && (depart.length < 2 || returning.length)) ||
+      (trip.type === "round" && (!depart.length || !returning.length))) throw new Error("Invalid trip itinerary.");
+  trip.legs.forEach((leg, index) => {
+    const flight = leg.flight;
+    if (!flight?.seat || !flight.flightDateRaw || !flight.scheduledDeparture || !flight.scheduledArrival ||
+        !/^[A-Z0-9]{3,4}$/.test(flight.departureAirport || "") ||
+        !/^[A-Z0-9]{3,4}$/.test(flight.arrivalAirport || "") || flight.departureAirport === flight.arrivalAirport ||
+        !Number.isFinite(flight.totalFare) || flight.totalFare <= 0) throw new Error("Finish every flight before checkout.");
+    const previous = trip.legs[index - 1]?.flight;
+    if (previous && previous.arrivalAirport !== flight.departureAirport) throw new Error("Each flight must depart from the previous arrival airport.");
+    if (previous && `${flight.flightDateRaw}T${flight.scheduledDeparture}` <= testTripArrivalLocal(previous)) {
+      throw new Error("Each connecting flight must depart after the previous arrival.");
+    }
+  });
+  if (trip.type === "round" && returning.at(-1).flight.arrivalAirport !== depart[0].flight.departureAirport) {
+    throw new Error("The last return flight must arrive at your original departure airport.");
+  }
+  return true;
+}
+function bookTestTrip(trip, method) {
+  validateTestTrip(trip);
+  if (!["card", "miles"].includes(method)) throw new Error("Choose a payment method.");
+  return { ...trip, status: "booked", paymentMethod: method, totalFare: testTripTotal(trip),
+    bookedAt: new Date().toISOString(), legs: trip.legs.map(leg => ({ ...leg, flight: {
+      ...leg.flight, testOnly: true, emailNotificationsVersion: 0, paymentStatus: "simulated", phase: "scheduled"
+    } })) };
+}
+function testTripSortKey(trip) {
+  const flight = trip.legs.find(leg => leg.flight && leg.flight.phase !== "completed")?.flight || trip.legs[0]?.flight;
+  return flight?.flightDateRaw ? `${flight.flightDateRaw}T${flight.scheduledDeparture || "00:00"}` : "9999";
+}
+// TRIPS_CORE_END
+
+// TRIPS_UI_START
+function readTestTrips() {
+  const raw = localStorage.getItem(TEST_TRIPS_STORAGE_KEY);
+  const data = raw ? JSON.parse(raw) : [];
+  if (!Array.isArray(data) || data.some(trip => trip.version !== 1 || !trip.testOnly || !trip.id || !Array.isArray(trip.legs))) {
+    throw new Error("Saved test trips could not be read. Your live flights are unaffected.");
+  }
+  return data;
+}
+function commitTestTrips(next) {
+  if (testTripStorageError) throw new Error(testTripStorageError);
+  localStorage.setItem(TEST_TRIPS_STORAGE_KEY, JSON.stringify(next));
+  testTrips = next;
+  renderTestTripsHome();
+}
+function updateTestTrip(updated) { commitTestTrips(testTrips.map(trip => trip.id === updated.id ? updated : trip)); }
+function currentTestTrip() { return testTrips.find(trip => trip.id === testTripActiveId); }
+function tripsPlane() { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16Z"/></svg>'; }
+function tripsDate(flight) { return flight?.flightDateRaw ? new Date(`${flight.flightDateRaw}T12:00:00`).toLocaleDateString("en-US", {month:"short",day:"numeric",year:"numeric"}) : "Unscheduled"; }
+function tripsTime(value) { return value ? formatTime12Hour(value) : "--"; }
+function tripSummaryHTML(trip) {
+  const completed = trip.legs.every(leg => leg.flight?.phase === "completed");
+  const first = trip.legs[0]?.flight;
+  const destination = trip.legs.filter(leg => leg.direction === "depart").at(-1)?.flight;
+  return `${tripsPlane()}<span><strong>${escapeHTML(trip.name)} <span class="trips-test">TEST</span></strong><small>${escapeHTML(first?.departureAirport || "Plan")}
+    &rarr; ${escapeHTML(destination?.arrivalAirport || "your journey")} &middot; ${trip.type === "round" ? "Round trip" : "One way"}<br>
+    ${escapeHTML(tripsDate(first))} &middot; ${trip.legs.length} flights &middot; ${trip.status === "draft" ? "Draft" : completed ? "Completed" : "Booked"}</small></span><span aria-hidden="true">&#8250;</span>`;
+}
+function renderTestTripsHome() {
+  const list = document.getElementById("flightsList");
+  list.querySelectorAll(".test-trip-home").forEach(el => el.remove());
+  [...testTrips].filter(trip => trip.status === "booked" && !trip.legs.every(leg => leg.flight?.phase === "completed"))
+    .sort((a,b) => testTripSortKey(a).localeCompare(testTripSortKey(b))).forEach(trip => {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "trip-summary test-trip-home";
+      button.innerHTML = tripSummaryHTML(trip);
+      button.addEventListener("click", () => showTestTrips("trip", trip.id));
+      list.append(button);
+    });
+}
+function tripsHeader(title, back, add = false) {
+  return `<header class="trips-header"><button type="button" class="trips-icon" data-trip-action="${back}" aria-label="Back" title="Back">&#8249;</button><h1>${escapeHTML(title)}</h1>
+    ${add ? '<button type="button" class="trips-icon" data-trip-action="new" title="Add trip" aria-label="Add trip">+</button>' : '<span></span>'}</header>`;
+}
+function showTestTrips(view = "list", id = testTripActiveId) {
+  testTripView = view; testTripActiveId = id;
+  document.getElementById("tripsPage").classList.add("active");
+  document.getElementById("tripsPage").inert = false;
+  flightsPage.classList.add("hidden"); flightsPage.inert = true;
+  document.body.style.overflow = "hidden";
+  renderTestTrips();
+  document.getElementById("tripsPage").scrollTop = 0;
+  document.querySelector(".trips-header button")?.focus({ preventScroll:true });
+}
+function hideTestTrips() {
+  document.getElementById("tripsPage").classList.remove("active");
+  document.getElementById("tripsPage").inert = true;
+  flightsPage.classList.remove("hidden"); flightsPage.inert = false;
+  document.body.style.overflow = "";
+  document.getElementById("tripsButton").focus();
+}
+function renderTestTrips() {
+  const content = document.getElementById("tripsContent");
+  const trip = currentTestTrip();
+  const testNote = '<p class="trips-note"><span class="trips-test">TEST</span> Saved on this browser only. No emails, payments, miles, or documents.</p>';
+  if (testTripView === "list") {
+    content.innerHTML = tripsHeader("Trips", "home", true) + testNote +
+      (testTripStorageError ? `<p class="trips-error">${escapeHTML(testTripStorageError)}</p>` : "") +
+      (testTrips.length ? [...testTrips].sort((a,b) => testTripSortKey(a).localeCompare(testTripSortKey(b))).map(item =>
+        `<button type="button" class="trip-summary" data-trip-id="${escapeHTML(item.id)}">${tripSummaryHTML(item)}</button>`).join("") :
+      `<div class="trips-empty">${tripsPlane()}<h2>Your next journey starts here</h2><p>No trips yet.</p><button class="trips-primary" data-trip-action="new">Add trip</button></div>`);
+    return;
+  }
+  if (testTripView === "setup") {
+    const setup = testTripSetup || { name:"", type:"round", departCount:1, returnCount:1 };
+    content.innerHTML = tripsHeader("Add trip", "list") + testNote + `<label class="trips-field">Trip name<input id="tripName" maxlength="80" placeholder="London getaway" value="${escapeHTML(setup.name)}"></label>
+      <div class="trips-segment" role="group" aria-label="Trip type"><button data-trip-type="round" aria-pressed="${setup.type === "round"}">Round trip</button><button data-trip-type="oneway" aria-pressed="${setup.type === "oneway"}">One way</button></div>
+      <div class="trips-counts"><label class="trips-field">Depart<input id="tripDepartCount" aria-label="Depart flights" type="number" min="${setup.type === "oneway" ? 2 : 1}" max="8" step="1" value="${setup.departCount}"></label>
+      ${setup.type === "round" ? `<label class="trips-field">Return<input id="tripReturnCount" aria-label="Return flights" type="number" min="1" max="8" step="1" value="${setup.returnCount}"></label>` : ""}</div>
+      <p class="trips-note">${setup.type === "oneway" ? "At least two flights for a connecting journey." : "One flight is nonstop. Add more for connections."}</p>
+      <p id="tripError" class="trips-error" role="alert"></p><button class="trips-primary" data-trip-action="create">Continue</button>`;
+    return;
+  }
+  if (!trip) { testTripView = "list"; renderTestTrips(); return; }
+  content.innerHTML = tripsHeader(trip.name, "list") + testNote + '<div id="tripItinerary"></div>';
+  const itinerary = document.getElementById("tripItinerary");
+  const next = trip.legs.find(leg => leg.flight?.phase !== "completed");
+  ["depart","return"].forEach(direction => {
+    const legs = trip.legs.filter(leg => leg.direction === direction);
+    if (!legs.length) return;
+    const title = document.createElement("h2"); title.className = "trips-section";
+    title.textContent = `${direction === "depart" ? "Depart" : "Return"} / ${legs.length === 1 ? "Nonstop" : `${legs.length - 1} connection${legs.length > 2 ? "s" : ""}`}`;
+    itinerary.append(title);
+    legs.forEach(leg => {
+      if (trip.status === "draft") {
+        const row = document.createElement("div"); row.className = "trip-leg";
+        const flight = leg.flight;
+        const previous = trip.legs[trip.legs.indexOf(leg)-1];
+        row.innerHTML = `<span class="trip-leg-index">${leg.index+1}</span><div class="trip-leg-copy"><strong>Flight ${leg.index+1}</strong><small>${flight ? `${escapeHTML(flight.departureAirport)} &rarr; ${escapeHTML(flight.arrivalAirport)} &middot; ${escapeHTML(tripsDate(flight))}<br>${escapeHTML(flight.seatCabin)} &middot; ${escapeHTML(flight.seat)} &middot; ${formatMoney(flight.totalFare)}` : "Not added"}</small></div>
+          <button type="button" data-trip-leg="${escapeHTML(leg.id)}" ${previous && !previous.flight ? "disabled" : ""}>${flight ? "Edit" : "Add"}</button>`;
+        itinerary.append(row);
+      } else itinerary.append(createTestTripFlightCard(leg, leg === next));
+    });
+  });
+  itinerary.insertAdjacentHTML("beforeend", `<p id="tripError" class="trips-error" role="alert"></p>${trip.status === "draft" ? `<div class="trips-price">${formatMoney(testTripTotal(trip))}</div><p class="trips-note">${trip.legs.filter(leg => leg.flight).length} of ${trip.legs.length} flights saved</p><button class="trips-primary" data-trip-action="checkout" ${trip.legs.some(leg => !leg.flight) ? "disabled" : ""}>Continue to checkout</button>` : ""}<button class="trips-secondary trips-danger" data-trip-action="delete">Delete trip</button>`);
+}
+function createTestTripFlightCard(leg, featured) {
+  const f = leg.flight;
+  const card = document.createElement(featured ? "article" : "button");
+  card.className = featured ? "featured-flight-card" : "flight-card";
+  if (featured) {
+    card.innerHTML = `<div class="featured-flight-top"><div class="featured-flight-number">${escapeHTML(f.airline)} ${escapeHTML(f.flightNumber)}</div><div class="featured-main-status">${f.checkedIn ? "Checked in" : "Next flight"}</div></div>
+      <div class="featured-route-area"><div class="featured-passenger-name">${escapeHTML(f.cityDeparture)} to ${escapeHTML(f.cityArrival)}</div><div class="featured-route-line"><span>${escapeHTML(f.departureAirport)}</span><span class="featured-route-arrow">&rarr;</span><span>${escapeHTML(f.arrivalAirport)}</span></div><div class="featured-date-line">${escapeHTML(tripsDate(f))}</div></div>
+      <div class="featured-info-grid">${[["Departs",tripsTime(f.scheduledDeparture)],["Arrives",tripsTime(f.scheduledArrival)],["Gate",f.boardingGate || "--"],["Seat",f.seat]].map(([label,value])=>`<div class="featured-info-cell"><div class="featured-info-label">${label}</div><div class="featured-info-value">${escapeHTML(value)}</div></div>`).join("")}</div>
+      <button class="featured-view-button" data-trip-flight="${escapeHTML(leg.id)}">View flight</button>`;
+  } else {
+    card.type = "button"; card.dataset.tripFlight = leg.id;
+    card.innerHTML = `<div class="logo-space"><img src="${getAirlineLogoPath(f.airline)}" alt="${escapeHTML(f.airline)}"></div><div class="flight-main"><div class="flight-meta">${escapeHTML(f.airline)} ${escapeHTML(f.flightNumber)} &middot; ${escapeHTML(f.departureAirport)} &rarr; ${escapeHTML(f.arrivalAirport)}</div><div class="flight-cities">${escapeHTML(f.cityDeparture)} to ${escapeHTML(f.cityArrival)}</div></div><div class="flight-date-display">${f.phase === "completed" ? "Completed" : escapeHTML(tripsDate(f))}</div>`;
+  }
+  return card;
+}
+function readTripSetup() {
+  return { name:document.getElementById("tripName").value, type:testTripSetup?.type || "round",
+    departCount:Number(document.getElementById("tripDepartCount").value), returnCount:Number(document.getElementById("tripReturnCount")?.value || 0) };
+}
+function tripsError(error) {
+  const target = document.getElementById("tripsModal").classList.contains("active")
+    ? document.getElementById("tripModalError") : testTripLegContext ? null : document.getElementById("tripError");
+  if (target) target.textContent = error.message || "Unable to save this test trip.";
+  else alert(error.message || "Unable to save this test trip.");
+}
+function beginTestTripLeg(id) {
+  const trip = currentTestTrip();
+  const leg = trip.legs.find(item => item.id === id);
+  const previous = trip.legs[trip.legs.indexOf(leg)-1]?.flight;
+  if (trip.status !== "draft" || !leg || (trip.legs.indexOf(leg) > 0 && !previous)) return;
+  resetAddFlightAfterPayment();
+  [...flightForm.elements].forEach(input => input.setCustomValidity?.(""));
+  testTripLegContext = { tripId:trip.id, legId:id };
+  const form = leg.flight?.formValues || {};
+  [...flightForm.elements].forEach(input => {
+    if (!input.id || !(input.id in form)) return;
+    if (input.type === "checkbox") input.checked = form[input.id] === true;
+    else input.value = form[input.id];
+    input.dispatchEvent(new Event("change", {bubbles:true}));
+  });
+  if (leg.flight) setAircraftSelection(leg.flight.aircraftType);
+  else if (previous) {
+    const initial = testTripNextDeparture(previous);
+    departureAirportInput.value = initial.departureAirport;
+    departureAirportNameInput.value = initial.departureAirportName;
+    cityDepartureInput.value = initial.cityDeparture;
+    flightDateInput.value = initial.flightDateRaw;
+  }
+  nflToggle.checked = false; nflToggle.disabled = true;
+  payWithMilesToggle.checked = false; payWithMilesToggle.disabled = true;
+  document.body.classList.add("trip-leg-editing");
+  document.querySelector("#addFlightPage .add-flight-title").textContent = `${leg.direction === "depart" ? "Depart" : "Return"} / Flight ${leg.index+1}`;
+  addFlightButton.disabled = false; addFlightButton.style.opacity = "1"; addFlightButton.style.cursor = "pointer";
+  addFlightButton.textContent = "Save flight";
+  document.getElementById("tripsPage").inert = true;
+  addFlightPage.classList.add("active"); addFlightPage.scrollTop = 0;
+  backButton.focus();
+}
+function endTestTripLeg() {
+  closeSeatPopups(); closeAircraftDropdown();
+  testTripLegContext = null; pendingFlightToAdd = null; pendingTransactionReview = null; pendingSeatAssignment = null;
+  document.body.classList.remove("trip-leg-editing");
+  nflToggle.disabled = false; payWithMilesToggle.disabled = false;
+  resetAddFlightAfterPayment();
+  document.querySelector("#addFlightPage .add-flight-title").textContent = "Add flight";
+  addFlightButton.textContent = "Add flight"; addFlightButton.disabled = false;
+  addFlightButton.style.opacity = "1"; addFlightButton.style.cursor = "pointer";
+  addFlightPage.classList.remove("active");
+  showTestTrips("trip");
+}
+function validateTestTripFlightForm() {
+  const fields = [departureAirportInput,arrivalAirportInput,departureAirportNameInput,arrivalAirportNameInput,
+    cityDepartureInput,cityArrivalInput,flightNumberInput,flightDateInput,scheduledDepartureInput,scheduledArrivalInput,routeDistanceInput];
+  const missing = fields.find(field => !field.value.trim());
+  if (missing) { missing.focus(); missing.setCustomValidity("Required for this trip flight."); missing.reportValidity(); missing.addEventListener("input",()=>missing.setCustomValidity(""),{once:true}); return false; }
+  const dep = departureAirportInput.value.trim().toUpperCase(), arr = arrivalAirportInput.value.trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,4}$/.test(dep) || !/^[A-Z0-9]{3,4}$/.test(arr) || dep === arr) { alert("Enter different valid departure and arrival airport codes."); return false; }
+  if (!getRouteDistanceMiles({routeDistance:routeDistanceInput.value})) { alert("Enter a route distance greater than zero."); routeDistanceInput.focus(); return false; }
+  const trip = currentTestTrip();
+  const legIndex = trip.legs.findIndex(leg => leg.id === testTripLegContext.legId);
+  const previous = trip.legs[legIndex-1]?.flight;
+  if (previous && previous.arrivalAirport !== dep) { alert(`This flight must depart from ${previous.arrivalAirport}.`); return false; }
+  if (previous && `${flightDateInput.value}T${scheduledDepartureInput.value}` <= testTripArrivalLocal(previous)) { alert("Schedule this flight after the previous arrival."); return false; }
+  return true;
+}
+function saveTestTripLeg(review) {
+  try {
+    const trip = currentTestTrip();
+    if (!trip || trip.id !== testTripLegContext.tripId || trip.status !== "draft") throw new Error("This trip draft is no longer available.");
+    const index = trip.legs.findIndex(leg => leg.id === testTripLegContext.legId);
+    const old = trip.legs[index].flight;
+    const routeChanged = old && ["departureAirport","arrivalAirport","flightDateRaw","scheduledDeparture","scheduledArrival","overnight"]
+      .some(key => old[key] !== review.flight[key]);
+    if (routeChanged && trip.legs.slice(index+1).some(leg=>leg.flight) && !confirm("Changing this route or schedule clears later saved legs so connections can be planned again. Continue?")) return;
+    const formValues = Object.fromEntries([...flightForm.elements].filter(input=>input.id).map(input=>[input.id,input.type === "checkbox" ? input.checked : input.value]));
+    const flight = { ...review.flight, createdAt:new Date().toISOString(), testOnly:true, nflMatch:null,
+      emailNotificationsVersion:0, seat:review.seat, seatCabin:review.cabin, seatType:review.seatType,
+      baseFare:review.baseFare, seatCost:review.seatCost, totalFare:review.totalFare, formValues };
+    const updated = { ...trip, legs:trip.legs.map((leg,i)=>i === index ? {...leg,flight} : routeChanged && i > index ? {...leg,flight:null} : leg) };
+    updateTestTrip(updated);
+    closeTestTripModal(); endTestTripLeg();
+  } catch (error) { tripsError(error); }
+}
+function openTestTripModal(html) {
+  const modal = document.getElementById("tripsModal");
+  if (!modal.classList.contains("active")) testTripModalReturnFocus = document.activeElement;
+  document.getElementById("tripsPage").inert = true;
+  addFlightPage.inert = true;
+  document.getElementById("tripsDialog").innerHTML = html + '<p id="tripModalError" class="trips-error" role="alert"></p>';
+  modal.classList.add("active"); modal.inert = false;
+  document.getElementById("tripsDialog").focus();
+}
+function closeTestTripModal() {
+  if (testTripBusy) return;
+  const modal = document.getElementById("tripsModal"); modal.classList.remove("active"); modal.inert = true;
+  document.getElementById("tripsPage").inert = !!testTripLegContext || !document.getElementById("tripsPage").classList.contains("active");
+  addFlightPage.inert = false;
+  if (testTripModalReturnFocus?.isConnected) testTripModalReturnFocus.focus();
+}
+function openTestTripSeats(mode) {
+  closeSeatPopups();
+  const f = pendingFlightToAdd;
+  const first = Number(f.premiumRows || 0), premium = Number(f.premiumEconomyLastRow || 0);
+  const start = mode === "firstBusiness" ? 1 : mode === "premiumEconomy" ? first+1 : (f.premiumEconomyEnabled ? premium : first)+1;
+  const end = Number(mode === "firstBusiness" ? f.premiumRows : mode === "premiumEconomy" ? f.premiumEconomyLastRow : f.economyRows);
+  const letters = parseSeatLetters(mode === "firstBusiness" ? f.premiumLetters : mode === "premiumEconomy" ? f.premiumEconomyLetters : f.economyLetters);
+  const cabin = mode === "firstBusiness" ? "First/Business" : mode === "premiumEconomy" ? "Premium Economy" : "Economy";
+  if (!Number.isInteger(end) || end < start || end > 100 || !letters.length) {
+    alert("Check the rows and seat letters for this cabin."); showCabinSelectPopup(); return;
+  }
+  const distance = getRouteDistanceMiles(f);
+  const cost = mode === "firstBusiness" ? getPremiumSeatDollarCost(distance) : mode === "premiumEconomy" ? getPremiumEconomySeatDollarCost(distance) : 0;
+  openTestTripModal(`<span class="trips-test">TEST</span><h2 id="tripsDialogTitle">${cabin}</h2><p class="trips-note">Seat fare ${formatMoney(cost)}</p><div class="trips-seat-grid" style="--seat-columns:${Math.min(letters.length,6)}">${Array.from({length:end-start+1},(_,i)=>letters.map(letter=>`<button type="button" data-test-seat="${start+i}${letter}" aria-pressed="false">${start+i}${letter}</button>`).join("")).join("")}</div><button class="trips-primary" id="tripSeatSave" disabled>Save seat</button><button class="trips-secondary" id="tripSeatBack">Back to cabins</button>`);
+  let selected = "";
+  document.querySelectorAll("[data-test-seat]").forEach(button=>button.onclick=()=>{
+    selected = button.dataset.testSeat;
+    document.querySelectorAll("[data-test-seat]").forEach(other=>other.setAttribute("aria-pressed",String(other===button)));
+    document.getElementById("tripSeatSave").disabled = false;
+  });
+  document.getElementById("tripSeatSave").onclick=()=>saveTestTripLeg(buildTransactionReview({flight:f,cabin,seat:selected,
+    isPremium:mode === "firstBusiness",isPremiumEconomy:mode === "premiumEconomy",seatCost:cost,seatType:cabin,assignmentMode:"custom"}));
+  document.getElementById("tripSeatBack").onclick=()=>{closeTestTripModal();showCabinSelectPopup();};
+}
+function openTestTripCheckout() {
+  const trip = currentTestTrip();
+  try { validateTestTrip(trip); } catch(error) { tripsError(error); return; }
+  openTestTripModal(`<span class="trips-test">SIMULATED CHECKOUT</span><h2 id="tripsDialogTitle">${escapeHTML(trip.name)}</h2>${trip.legs.map(leg=>`<div class="trips-price-line"><span>${escapeHTML(leg.flight.departureAirport)} &rarr; ${escapeHTML(leg.flight.arrivalAirport)}<br>${escapeHTML(leg.flight.seatCabin)} &middot; ${escapeHTML(leg.flight.seat)}</span><strong>${formatMoney(leg.flight.totalFare)}</strong></div>`).join("")}<div class="trips-price">${formatMoney(testTripTotal(trip))}</div><p class="trips-note">${dollarsToMiles(testTripTotal(trip)).toLocaleString("en-US")} miles equivalent. No balance will change.</p><label class="trips-field">Payment method<select id="tripPaymentMethod"><option value="card">Aviator Reserve (simulated)</option><option value="miles">Miles (simulated)</option></select></label><button class="trips-primary" id="tripBook">Confirm test booking</button><button class="trips-secondary" id="tripCheckoutBack">Back</button>`);
+  document.getElementById("tripCheckoutBack").onclick=closeTestTripModal;
+  document.getElementById("tripBook").onclick=async()=>{
+    if (testTripBusy) return;
+    testTripBusy = true;
+    const method = document.getElementById("tripPaymentMethod").value;
+    const button = document.getElementById("tripBook"); button.disabled=true;
+    document.getElementById("tripPaymentMethod").disabled=true;
+    document.getElementById("tripCheckoutBack").disabled=true;
+    button.innerHTML='<span class="trips-spinner" aria-hidden="true"></span>Booking test trip';
+    try {
+      await new Promise(resolve=>setTimeout(resolve,1100));
+      updateTestTrip(bookTestTrip(trip,method));
+      testTripBusy=false; closeTestTripModal(); renderTestTrips();
+    } catch(error) {
+      testTripBusy=false; tripsError(error); button.disabled=false; button.textContent="Try again";
+      document.getElementById("tripPaymentMethod").disabled=false; document.getElementById("tripCheckoutBack").disabled=false;
+    }
+  };
+}
+function openTestTripFlight(id) {
+  const trip=currentTestTrip(), leg=trip.legs.find(item=>item.id===id), f=leg?.flight;
+  if (!f) return;
+  const next=trip.legs.find(item=>item.flight?.phase!=="completed");
+  openTestTripModal(`<span class="trips-test">TEST FLIGHT</span><h2 id="tripsDialogTitle">${escapeHTML(f.cityDeparture)} to ${escapeHTML(f.cityArrival)}</h2>${[["Flight",`${f.airline} ${f.flightNumber}`],["Date",tripsDate(f)],["Departure",`${f.departureAirport} / ${tripsTime(f.scheduledDeparture)}`],["Arrival",`${f.arrivalAirport} / ${tripsTime(f.scheduledArrival)}`],["Aircraft",f.aircraftType],["Seat",`${f.seat} / ${f.seatCabin}`],["Status",f.phase === "completed" ? "Completed" : f.checkedIn ? "Checked in" : "Scheduled"]].map(([label,value])=>`<div class="trips-leg-detail"><span>${label}</span><strong>${escapeHTML(value)}</strong></div>`).join("")}
+    ${f.phase !== "completed" ? `<button class="trips-primary" id="tripLocalCheckIn" ${f.checkedIn || leg !== next ? "disabled" : ""}>${f.checkedIn ? "Checked in" : "Check in"}</button><button class="trips-secondary" id="tripLocalComplete" ${leg!==next ? "disabled" : ""}>Complete test flight</button>` : ""}<button class="trips-secondary" id="tripFlightClose">Close</button>`);
+  document.getElementById("tripFlightClose").onclick=closeTestTripModal;
+  function setLocalFlight(patch) { updateTestTrip({...trip,legs:trip.legs.map(item=>item.id===id ? {...item,flight:{...f,...patch}} : item)}); closeTestTripModal();renderTestTrips(); }
+  document.getElementById("tripLocalCheckIn")?.addEventListener("click",()=>setLocalFlight({checkedIn:true}));
+  document.getElementById("tripLocalComplete")?.addEventListener("click",()=>{
+    openTestTripModal('<h2 id="tripsDialogTitle">Complete this test flight?</h2><p class="trips-note">The next flight in your trip will become current. No rewards or documents will be created.</p><button class="trips-primary" id="tripConfirmComplete">Complete flight</button><button class="trips-secondary" id="tripCancelComplete">Back</button>');
+    document.getElementById("tripConfirmComplete").onclick=()=>setLocalFlight({phase:"completed"});
+    document.getElementById("tripCancelComplete").onclick=()=>openTestTripFlight(id);
+  });
+}
+document.getElementById("tripsButton").addEventListener("click",()=>showTestTrips());
+function cancelTestTripSeatSelection() {
+  if (!testTripLegContext) return;
+  closeSeatPopups();
+  pendingFlightToAdd = null; pendingSeatAssignment = null;
+  addFlightButton.disabled = false; addFlightButton.style.opacity = "1"; addFlightButton.style.cursor = "pointer";
+  addFlightButton.focus();
+}
+document.getElementById("tripCabinCancel").addEventListener("click",cancelTestTripSeatSelection);
+document.getElementById("tripEconomyCancel").addEventListener("click",cancelTestTripSeatSelection);
+document.getElementById("tripsContent").addEventListener("click",event=>{
+  const button=event.target.closest("button"); if (!button || button.disabled) return;
+  try {
+    if (button.dataset.tripId) { showTestTrips("trip",button.dataset.tripId); return; }
+    if (button.dataset.tripLeg) { beginTestTripLeg(button.dataset.tripLeg); return; }
+    if (button.dataset.tripFlight) { openTestTripFlight(button.dataset.tripFlight); return; }
+    if (button.dataset.tripType) {
+      testTripSetup={...readTripSetup(),type:button.dataset.tripType};
+      testTripSetup.departCount=Math.max(button.dataset.tripType === "oneway" ? 2 : 1,testTripSetup.departCount);
+      testTripSetup.returnCount=Math.max(1,testTripSetup.returnCount); renderTestTrips(); return;
+    }
+    switch(button.dataset.tripAction) {
+      case "home": hideTestTrips(); break;
+      case "list": showTestTrips("list"); break;
+      case "new": testTripSetup=null; showTestTrips("setup"); break;
+      case "create": {
+        const trip=makeTestTrip(readTripSetup(),crypto.randomUUID());
+        commitTestTrips([...testTrips,trip]); showTestTrips("trip",trip.id); break;
+      }
+      case "checkout": openTestTripCheckout(); break;
+      case "delete": {
+        const trip=currentTestTrip();
+        openTestTripModal(`<h2 id="tripsDialogTitle">Delete ${escapeHTML(trip.name)}?</h2><p class="trips-note">All ${trip.legs.length} test flights in this trip will be removed. This cannot be undone.</p><button class="trips-primary trips-danger" id="tripDeleteConfirm">Delete whole trip</button><button class="trips-secondary" id="tripDeleteCancel">Keep trip</button>`);
+        document.getElementById("tripDeleteCancel").onclick=closeTestTripModal;
+        document.getElementById("tripDeleteConfirm").onclick=()=>{try {commitTestTrips(testTrips.filter(item=>item.id!==trip.id));closeTestTripModal();showTestTrips("list");} catch(error){tripsError(error);}};
+        break;
+      }
+    }
+  } catch(error) { tripsError(error); }
+});
+backButton.addEventListener("click",event=>{
+  if (!testTripLegContext) return;
+  event.stopImmediatePropagation(); endTestTripLeg();
+},true);
+document.getElementById("tripsModal").addEventListener("keydown",event=>{
+  if (event.key === "Escape") {event.preventDefault(); if(testTripLegContext) {closeTestTripModal();showCabinSelectPopup();} else closeTestTripModal();}
+  if (event.key === "Tab") {
+    const controls=[...document.getElementById("tripsDialog").querySelectorAll("button:not(:disabled),select:not(:disabled),input:not(:disabled)")];
+    if (!controls.length) {event.preventDefault();return;}
+    if (event.shiftKey && (document.activeElement===controls[0] || document.activeElement===document.getElementById("tripsDialog"))) {event.preventDefault();controls.at(-1).focus();}
+    else if (!event.shiftKey && document.activeElement===controls.at(-1)) {event.preventDefault();controls[0].focus();}
+  }
+});
+try {testTrips=readTestTrips();} catch(error) {testTripStorageError=error.message;}
+window.addEventListener("storage",event=>{
+  if (event.key!==TEST_TRIPS_STORAGE_KEY) return;
+  try {testTrips=readTestTrips();renderTestTripsHome();if(document.getElementById("tripsPage").classList.contains("active") && !testTripLegContext && !testTripBusy) renderTestTrips();}
+  catch(error){testTripStorageError=error.message;}
+});
+renderTestTripsHome();
+// TRIPS_UI_END
+
     processReturnedSeatSelection();
     
     deleteFlightButton?.addEventListener("click", openManagementDeleteModal);
