@@ -7402,6 +7402,7 @@ transition: transform 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
     .trips-tag { display: inline-block; font-size: 10px; font-weight: 800; color: #86dfcb; border: 1px solid #397263; padding: 3px 6px; border-radius: 4px; vertical-align: middle; letter-spacing: 0; }
     .trips-note { color: #a6b0c3; font-size: 13px; line-height: 1.6; margin-bottom: 22px; }
     .trips-section { margin: 28px 0 12px; font-size: 18px; font-weight: 750; }
+    .trip-completed-divider { height:1px; background:#ffffff24; margin-bottom:12px; }
     .trips-field { display: block; margin: 20px 0; font-size: 14px; color: #c9d0df; }
     .trips-field input, .trips-field select { display: block; width: 100%; margin-top: 9px; min-height: 48px; border: 1px solid #3b4351; border-radius: 8px; background: #191e29; color: white; padding: 12px; font: inherit; }
     .trips-segment { display: flex; background: #191e29; border: 1px solid #3b4351; border-radius: 8px; padding: 4px; gap: 4px; }
@@ -17155,6 +17156,10 @@ function tripConnectionsForFlight(trip, flight) {
   const index=legs.indexOf(selected);
   return [tripConnection(legs[index-1]?.flight,flight),tripConnection(flight,legs[index+1]?.flight)].filter(Boolean);
 }
+function sortCompletedTripLegs(legs) {
+  const completedTime=leg=>Date.parse(leg.flight?.completedAt) || 0;
+  return [...legs].sort((a,b)=>completedTime(b)-completedTime(a) || legs.indexOf(b)-legs.indexOf(a));
+}
 // TRIP_PRESENTATION_END
 
 // TRIP_BOOKING_START
@@ -17554,7 +17559,8 @@ function renderTrips() {
     const completedSection=document.createElement("section");
     completedSection.className="trips-completed";
     completedSection.setAttribute("aria-label","Completed flights");
-    completedLegs.forEach(leg=>createFlightCard(leg.flight,completedSection));
+    completedSection.innerHTML='<h2 class="trips-section">Completed</h2><div class="trip-completed-divider" aria-hidden="true"></div>';
+    sortCompletedTripLegs(completedLegs).forEach(leg=>createFlightCard(leg.flight,completedSection));
     itinerary.append(completedSection);
   }
   itinerary.insertAdjacentHTML("beforeend", `<footer class="trips-booking-footer"><p id="tripError" class="trips-error" role="alert"></p>${planning ? `<div><span class="trips-note">Trip total</span><div class="trips-price">${formatMoney(tripTotal(trip))}</div></div><button class="trips-primary" data-trip-action="checkout" ${trip.legs.some(leg => !leg.flight) ? "disabled" : ""}>Continue to checkout</button>` : '<button class="trips-secondary trips-danger" data-trip-action="delete">Delete trip</button>'}</footer>`);
