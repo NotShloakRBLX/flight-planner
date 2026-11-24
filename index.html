@@ -10636,7 +10636,7 @@ function updateAircraftInfoCard(flight) {
 
       if (!departure || !arrival) return arrival;
 
-      if (flight.overnight === true || arrival <= departure) {
+      if (arrival <= departure) {
         arrival.setDate(arrival.getDate() + 1);
       }
 
@@ -17067,7 +17067,7 @@ function tripNextDeparture(previous) {
 }
 function tripArrivalLocal(flight) {
   const date = new Date(`${flight.flightDateRaw}T12:00:00Z`);
-  if (flight.overnight || flight.scheduledArrival <= flight.scheduledDeparture) date.setUTCDate(date.getUTCDate()+1);
+  if (flight.scheduledArrival <= flight.scheduledDeparture) date.setUTCDate(date.getUTCDate()+1);
   return `${date.toISOString().slice(0,10)}T${flight.scheduledArrival}`;
 }
 function tripTotal(trip) {
