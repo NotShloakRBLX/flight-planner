@@ -17174,6 +17174,18 @@ function sortCompletedTripLegs(legs) {
   const completedTime=leg=>Date.parse(leg.flight?.completedAt) || 0;
   return [...legs].sort((a,b)=>completedTime(b)-completedTime(a) || legs.indexOf(b)-legs.indexOf(a));
 }
+function getTripSummaryStops(trip) {
+  const next=trip.legs.find(leg=>leg.flight?.phase !== "completed") || trip.legs[0];
+  if (!next) return [];
+  return trip.legs.filter(leg=>leg.direction === next.direction).slice(0,-1)
+    .map(leg=>String(leg.flight?.arrivalAirport || "").trim().toUpperCase()).filter(Boolean);
+}
+function getTripSummaryName(trip) {
+  const next=trip.legs.find(leg=>leg.flight?.phase !== "completed");
+  if (next?.direction !== "return") return trip.name;
+  const destination=trip.legs.filter(leg=>leg.direction === "return").at(-1)?.flight;
+  return destination?.cityArrival || destination?.arrivalAirport || trip.name;
+}
 // TRIP_PRESENTATION_END
 
 // TRIP_BOOKING_START
@@ -17463,7 +17475,10 @@ function tripsPlane() { return '<svg viewBox="0 0 24 24" aria-hidden="true"><pat
 function tripsDate(flight) { return flight?.flightDateRaw ? new Date(`${flight.flightDateRaw}T12:00:00`).toLocaleDateString("en-US", {month:"short",day:"numeric",year:"numeric"}) : "Unscheduled"; }
 function tripSummaryHTML(trip) {
   const next=trip.legs.find(leg=>leg.flight?.phase !== "completed")?.flight || trip.legs[0]?.flight;
-  return `${tripsPlane()}<span><strong>${escapeHTML(trip.name)}</strong><small>${trip.type === "round" ? "Round trip" : "One way"} &middot; ${escapeHTML(tripsDate(next))}</small></span><span aria-hidden="true">&#8250;</span>`;
+  const stops=getTripSummaryStops(trip);
+  const subtitle=stops.length ? `${stops.length} stop${stops.length === 1 ? "" : "s"} ${stops.map(code=>`(${code})`).join(" ")}`
+    : `${trip.type === "round" ? "Round trip" : "One way"} · ${tripsDate(next)}`;
+  return `${tripsPlane()}<span><strong>${escapeHTML(getTripSummaryName(trip))}</strong><small>${escapeHTML(subtitle)}</small></span><span aria-hidden="true">&#8250;</span>`;
 }
 function appendTripHomeCard(trip) {
       const button = document.createElement("button");
