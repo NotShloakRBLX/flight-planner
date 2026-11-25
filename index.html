@@ -10462,7 +10462,8 @@ function closeTransactionEditor() {
   const type = transaction.type || "earned";
   const isSpent = type === "spent";
   const signedAmount = isSpent ? `-${formatMilesAmount(amount)}` : `+${formatMilesAmount(amount)}`;
-  const title = escapeHTML(transaction.tripId ? "MSFS Trips" : transaction.title || "Miles Transaction");
+  const tripCarrier=transaction.tripId && transaction.bookingAirline;
+  const title = escapeHTML(transaction.tripId ? tripCarrier ? transaction.bookingAirlineName || transaction.airlineName || tripCarrier : "MSFS Trips" : transaction.title || "Miles Transaction");
 
   const routeText = transaction.tripId ? transaction.tripName || "Trip activity" : transaction.departureAirport && transaction.arrivalAirport
     ? `${transaction.departureAirport} → ${transaction.arrivalAirport}`
@@ -10473,7 +10474,7 @@ function closeTransactionEditor() {
 
   card.innerHTML = `
     <div class="transaction-logo">
-      <img src="${transaction.tripId ? "msfs-flight-operations-avatar.png" : transaction.icon === "cc" || transaction.type === "card_payment" ? "cc.png" : getAirlineLogoPath(airline)}" alt="${transaction.tripId ? "MSFS Trips" : transaction.icon === "cc" || transaction.type === "card_payment" ? "Aviator Reserve" : airline} logo" onerror="this.style.display='none';" />
+      <img src="${transaction.tripId ? tripCarrier ? getAirlineLogoPath(tripCarrier) : "msfs-flight-operations-avatar.png" : transaction.icon === "cc" || transaction.type === "card_payment" ? "cc.png" : getAirlineLogoPath(airline)}" alt="${transaction.tripId ? title : transaction.icon === "cc" || transaction.type === "card_payment" ? "Aviator Reserve" : airline} logo" onerror="this.style.display='none';" />
     </div>
 
     <div class="transaction-main">
@@ -17113,6 +17114,19 @@ function tripSortKey(trip) {
   const flight = trip.legs.find(leg => leg.flight && leg.flight.phase !== "completed")?.flight || trip.legs[0]?.flight;
   return flight?.flightDateRaw ? `${flight.flightDateRaw}T${flight.scheduledDeparture || "00:00"}` : "9999";
 }
+function getTripBookingAirline(legs) {
+  const counts=new Map();
+  for (const leg of legs) {
+    const flight=leg.flight;
+    const code=String(flight?.airline || "").trim().toUpperCase();
+    if (!/^[A-Z0-9]+$/.test(code)) continue;
+    const entry=counts.get(code) || {code,name:flight.airlineName || code,count:0};
+    entry.count++;counts.set(code,entry);
+  }
+  const ranked=[...counts.values()].sort((a,b)=>b.count-a.count);
+  const winner=ranked[0] && (!ranked[1] || ranked[0].count>ranked[1].count) ? ranked[0] : null;
+  return {bookingAirline:winner?.code || "",bookingAirlineName:winner?.name || "MSFS Trips"};
+}
 // TRIPS_CORE_END
 
 // TRIP_PRESENTATION_START
@@ -17168,6 +17182,8 @@ async function saveTripBooking(review) {
   if (!trip || trip.id !== review.tripId) throw new Error("This booking is no longer available.");
   validateTrip(trip);
   const booked = bookTrip(trip, review.paymentMethod);
+  const bookingAirline=getTripBookingAirline(booked.legs);
+  Object.assign(booked,bookingAirline);
   booked.billingVersion = 2;
   booked.paymentTransactionId = `trip_${trip.id}`;
   const confirmationCode = trip.confirmationCode || trip.legs[0].flight.reservationCode || trip.legs[0].flight.boardingCode;
@@ -17197,7 +17213,7 @@ async function saveTripBooking(review) {
     }
     return {leg,flight,flightRef,paymentRef,legReview,milesPaid};
   });
-  const receipt = {confirmationCode, passengerName:entries[0].flight.passengerName, issuedAt:new Date().toISOString(),
+  const receipt = {...bookingAirline,confirmationCode, passengerName:entries[0].flight.passengerName, issuedAt:new Date().toISOString(),
     scheduleTimeZone:entries[0].flight.scheduleTimeZone,paymentMethod:review.paymentMethod,cardLast4:AVIATOR_RESERVE_LAST4,
     baseAmount:entries.reduce((sum,e)=>sum+e.flight.bookingReceipt.baseAmount,0),
     seatAmount:entries.reduce((sum,e)=>sum+e.flight.bookingReceipt.seatAmount,0),
@@ -17229,7 +17245,9 @@ async function saveTripBooking(review) {
     if (balance !== null) transaction.set(balanceRef,{balance:balance-milesTotal,updatedAt:serverTimestamp()},{merge:true});
     const allocations=entries.map(e=>({flightId:e.flightRef.id,amount:e.flight.totalFare,baseFare:e.flight.baseFare,seatCost:e.flight.seatCost,
       milesEarned:calculateCardMilesForReview(e.legReview),rewardsRate:getCardFlightMilesRate(e.flight)}));
-    const common={tripId:trip.id,tripName:trip.name,title:"MSFS Trips",airlineName:"MSFS Trips",icon:"msfs-flight-operations-avatar.png",
+    const common={...bookingAirline,tripId:trip.id,tripName:trip.name,title:bookingAirline.bookingAirlineName,
+      airline:bookingAirline.bookingAirline,airlineName:bookingAirline.bookingAirlineName,
+      icon:bookingAirline.bookingAirline ? `${bookingAirline.bookingAirline.toLowerCase()}.png` : "msfs-flight-operations-avatar.png",
       customerEmail:review.customerEmail,tripLegs:allocations,createdAt:serverTimestamp()};
     transaction.set(entries[0].paymentRef, review.paymentMethod === "card"
       ? {...common,type:"flight_purchase",status:"pending",amount:booked.totalFare,baseFare:receipt.baseAmount,seatCost:receipt.seatAmount,
@@ -17299,7 +17317,8 @@ async function deleteTripBooking(id) {
     }
     if (refund>0) {
       transaction.set(doc(db,"miles","balance"),{balance:increment(refund),updatedAt:serverTimestamp()},{merge:true});
-      transaction.set(doc(db,"mileTransactions",`trip_${id}_refund`),{type:"earned",title:"Trip Purchase Refund",amount:refund,tripId:id,tripName:trip.name,createdAt:serverTimestamp()});
+      transaction.set(doc(db,"mileTransactions",`trip_${id}_refund`),{type:"earned",title:"Trip Purchase Refund",amount:refund,tripId:id,tripName:trip.name,
+        bookingAirline:trip.bookingAirline || "",bookingAirlineName:trip.bookingAirlineName || "MSFS Trips",createdAt:serverTimestamp()});
     }
     if (credit>0) transaction.set(doc(db,"cardAccount","aviatorReserve"),{currentBalance:increment(-credit),updatedAt:serverTimestamp()},{merge:true});
     transaction.delete(ref);
